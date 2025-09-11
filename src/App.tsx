@@ -9,6 +9,7 @@ import { DashboardOverview } from "./components/dashboard/DashboardOverview";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import SurveyGuide from "./pages/SurveyGuide";
+import ManageSurveys from "./pages/ManageSurveys";
 
 const queryClient = new QueryClient();
 
@@ -33,7 +34,7 @@ const App = () => (
             {/* Dashboard routes */}
             <Route path="/dashboard">
               <Route index element={<DashboardOverview />} />
-              <Route path="surveys" element={<div className="p-6">Surveys Page (Coming Soon)</div>} />
+              <Route path="surveys" element={<ManageSurveys />} />
               <Route path="analytics" element={<div className="p-6">Analytics Page (Coming Soon)</div>} />
               <Route path="responses" element={<div className="p-6">Responses Page (Coming Soon)</div>} />
               <Route path="audience" element={<div className="p-6">Audience Page (Coming Soon)</div>} />
