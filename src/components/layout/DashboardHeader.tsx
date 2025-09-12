@@ -26,7 +26,7 @@ export const DashboardHeader = () => {
   };
 
   return (
-    <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+    <header className="border-b border-border/80 bg-card/50 backdrop-blur-sm sticky top-0 border-border/90 shadow-md bg-gradient-to-br from-background to-muted/40">
       <div className="flex h-16 items-center px-6 gap-4">
         <SidebarTrigger className="hover:bg-accent rounded-md p-2" />
         

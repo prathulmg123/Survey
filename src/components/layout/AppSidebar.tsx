@@ -51,7 +51,7 @@ export function AppSidebar() {
     }`;
 
   return (
-    <Sidebar className="bg-card/50 border-r border-border shadow-sidebar backdrop-blur-sm">
+    <Sidebar className="bg-card/50 border-r border-border shadow-sidebar backdrop-blur-sm border-border/90 shadow-md bg-gradient-to-br from-background to-muted/40">
       <SidebarContent className="p-4">
         {/* Brand */}
         <div className="mb-10 pt-4">
