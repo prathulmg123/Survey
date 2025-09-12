@@ -13,10 +13,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col h-screen overflow-hidden">
           <DashboardHeader />
           <main className="flex-1 overflow-y-auto bg-muted/30">
-            <div className="h-full p-6">
+            <div className="p-6">
               {children || <Outlet />}
             </div>
           </main>

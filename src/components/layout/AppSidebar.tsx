@@ -20,11 +20,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
-  { title: "Create Survey Guide", url: "/guide", icon: Plus },
-  { title: "Manage Survey Guide", url: "/manage", icon: BarChart3 },
+  { title: "Create Survey", url: "/guide", icon: Plus },
+  { title: "Manage Survey", url: "/manage", icon: BarChart3 },
   { title: "In Progress", url: "/active", icon: Clock },
 ];
 
@@ -44,9 +45,9 @@ export function AppSidebar() {
   };
 
   const getNavLinkClass = (active: boolean) =>
-    `group flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-300 relative font-medium ${
+    `group flex items-center gap-4 ${isCollapsed ? 'justify-center px-3' : 'px-3'} ${active ? 'py-6' : 'py-4'} ${active ? 'rounded-md' : 'rounded-md'} transition-all duration-300 relative font-medium ${
       active
-        ? "bg-primary/8 text-primary shadow-sm border border-primary/10 scale-[1.02]"
+        ? "bg-primary/8 text-primary border-border/80 bg-card/50 backdrop-blur-sm sticky top-0 border-border/90 shadow-md shadow-primary/30 bg-gradient-to-br from-background to-muted/10 border border-primary/10 scale-[1.02]"
         : "text-muted-foreground hover:bg-secondary/80 hover:text-foreground hover:shadow-sm hover:scale-[1.01] hover:border hover:border-border/50"
     }`;
 
@@ -54,21 +55,21 @@ export function AppSidebar() {
     <Sidebar className="bg-card/50 border-r border-border shadow-sidebar backdrop-blur-sm border-border/90 shadow-md bg-gradient-to-br from-background to-muted/40">
       <SidebarContent className="p-4">
         {/* Brand */}
-        <div className="mb-10 pt-4">
-          <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-4 px-3'}`}>
+        <div className={`mb-10 ${isCollapsed ? 'flex justify-center' : ''}`}>
+          <div className={`flex items-center ${isCollapsed ? 'flex-col gap-2' : 'gap-4 px-3'}`}>
             <div className="relative group">
-              <div className="p-3 bg-gradient-primary rounded-2xl shadow-lg group-hover:shadow-xl transition-shadow duration-300">
-                <BarChart3 className="h-7 w-7 text-white" />
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-primary rounded-xl shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+                <span className="text-2xl font-bold text-white">K</span>
               </div>
               <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
             </div>
             {!isCollapsed && (
               <div className="animate-slide-in">
                 <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                Katalyze.ai
+                  Katalyze.ai
                 </h1>
                 <p className="text-xs text-muted-foreground font-semibold tracking-wide">
-                  ADMIN DASHBOARD
+                  ADMIN PANEL
                 </p>
               </div>
             )}
@@ -93,17 +94,30 @@ export function AppSidebar() {
                         to={item.url}
                         className={getNavLinkClass(active)}
                       >
-                        <div className={`p-2 rounded-lg transition-all duration-300 ${
-                          active ? 'bg-primary/15' : 'bg-muted/30 group-hover:bg-muted'
-                        }`}>
-                          <item.icon className={`h-5 w-5 flex-shrink-0 transition-all duration-300 ${
-                            active ? 'text-primary scale-110' : 'text-muted-foreground group-hover:text-foreground group-hover:scale-105'
-                          }`} />
+                        <div className="flex items-center gap-2">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className={`p-2 rounded-lg transition-all duration-300 ${
+                                  active ? 'bg-primary/15' : 'bg-muted/30 group-hover:bg-muted'
+                                }`}>
+                                  <item.icon className={`h-5 w-5 flex-shrink-0 transition-all duration-300 ${
+                                    active ? 'text-primary scale-110' : 'text-muted-foreground group-hover:text-foreground group-hover:scale-105'
+                                  }`} />
+                                </div>
+                              </TooltipTrigger>
+                              {isCollapsed && (
+                                <TooltipContent side="right" sideOffset={10}>
+                                  <p>{item.title}</p>
+                                </TooltipContent>
+                              )}
+                            </Tooltip>
+                          </TooltipProvider>
+                          {!isCollapsed && (
+                            <span className="font-semibold text-sm tracking-wide">{item.title}</span>
+                          )}
                         </div>
-                        {!isCollapsed && (
-                          <span className="font-semibold text-sm tracking-wide">{item.title}</span>
-                        )}
-                        {active && (
+                        {active && !isCollapsed && (
                           <div className="absolute right-2 w-2 h-8 bg-primary rounded-full shadow-sm"></div>
                         )}
                       </NavLink>

@@ -66,6 +66,7 @@ const questionTypes = [
 ];
 
 export default function SurveyGuide() {
+  // Add a container with consistent padding to match other dashboard pages
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -101,15 +102,17 @@ export default function SurveyGuide() {
   };
 
   return (
+    <div className="space-y-6">
+      <div className="space-y-1">
+        <h2 className="text-2xl font-bold tracking-tight">Create New Survey</h2>
+        <p className="text-muted-foreground">
+          Fill in the details below to create your survey
+        </p>
+      </div>
     <div className="h-full">
-      <Card className="border-0 shadow-sm h-full">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Create New Survey</CardTitle>
-          <p className="text-muted-foreground">
-            Fill in the details below to create your survey
-          </p>
-        </CardHeader>
-        <CardContent>
+      <Card>
+        
+        <CardContent className="p-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               {/* Survey Title */}
@@ -193,6 +196,7 @@ export default function SurveyGuide() {
           </Form>
         </CardContent>
       </Card>
+    </div>
     </div>
   );
 }

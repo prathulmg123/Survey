@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MoreHorizontal, Pencil, Trash2, Eye, FileText, BarChart, Calendar, Users, FileType } from "lucide-react";
+import { Pencil, Trash2, Eye, FileText, Users } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Mock data - in a real app, this would come from an API
 const mockSurveys = [
@@ -161,37 +162,46 @@ export default function ManageSurveys() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem asChild>
-                            <Link to={`/surveys/${survey.id}`} className="cursor-pointer">
-                              <Eye className="mr-2 h-4 w-4" />
-                              View
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <Link to={`/surveys/${survey.id}/edit`} className="cursor-pointer">
-                              <Pencil className="mr-2 h-4 w-4" />
-                              Edit
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-destructive focus:text-destructive"
-                            onClick={() => handleDelete(survey.id)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex items-center justify-end gap-2">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                              <Link to={`/surveys/${survey.id}`}>
+                                <Eye className="h-4 w-4" />
+                                <span className="sr-only">View</span>
+                              </Link>
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>View Survey</TooltipContent>
+                        </Tooltip>
+                        
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                              <Link to={`/surveys/${survey.id}/edit`}>
+                                <Pencil className="h-4 w-4" />
+                                <span className="sr-only">Edit</span>
+                              </Link>
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Edit Survey</TooltipContent>
+                        </Tooltip>
+                        
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-destructive hover:text-destructive/80"
+                              onClick={() => handleDelete(survey.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Delete</span>
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Delete Survey</TooltipContent>
+                        </Tooltip>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))

@@ -32,7 +32,7 @@ export const DashboardHeader = () => {
         
         <div className="flex-1 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <h1 className="font-semibold text-lg">Survey Dashboard</h1>
+            {/* <h1 className="font-semibold text-lg">Survey Dashboard</h1> */}
           </div>
 
           <div className="flex items-center gap-3">
