@@ -7,6 +7,7 @@ import {
   Plus,
   Clock,
   HelpCircle,
+  Users as UsersIcon,
 } from "lucide-react";
 
 import {
@@ -24,6 +25,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
+  { title: "Users", url: "/users", icon: UsersIcon },
   { title: "Create Survey", url: "/guide", icon: Plus },
   { title: "Manage Survey", url: "/manage", icon: BarChart3 },
   { title: "In Progress", url: "/active", icon: Clock },

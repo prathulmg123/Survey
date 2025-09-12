@@ -10,6 +10,7 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import SurveyGuide from "./pages/SurveyGuide";
 import ManageSurveys from "./pages/ManageSurveys";
+import Users from "./pages/Users";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
             {/* Top-level routes */}
             <Route path="/guide" element={<SurveyGuide />} />
             <Route path="/manage" element={<ManageSurveys />} />
+            <Route path="/users" element={<Users />} />
             <Route path="/active" element={<div className="p-6">Active Surveys (Coming Soon)</div>} />
             
             {/* Nested dashboard routes */}

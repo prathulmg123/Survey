@@ -121,10 +121,10 @@ export const DashboardOverview = () => {
             Welcome back! Here's an overview of your survey platform.
           </p>
         </div>
-        <Button variant="hero" className="gap-2">
+        {/* <Button variant="hero" className="gap-2">
           <Plus className="h-4 w-4" />
           Create Survey
-        </Button>
+        </Button> */}
       </div>
 
       {/* Stats Grid */}
