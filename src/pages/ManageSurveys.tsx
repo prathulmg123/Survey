@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -69,13 +69,13 @@ interface Survey {
 export default function ManageSurveys() {
   const [searchTerm, setSearchTerm] = useState("");
   const [surveys, setSurveys] = useState<Survey[]>(mockSurveys);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentSurvey, setCurrentSurvey] = useState<Survey | null>(null);
   const [surveyToDelete, setSurveyToDelete] = useState<Survey | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { showLoader, hideLoader } = useLoader();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -129,27 +129,10 @@ export default function ManageSurveys() {
   };
 
   const handleEditClick = (survey: Survey) => {
-    setCurrentSurvey(survey);
-    setIsEditModalOpen(true);
+    navigate(`/surveys/${survey.id}`);
   };
 
-  const handleSaveChanges = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!currentSurvey) return;
-    
-    setSurveys(surveys.map(survey => 
-      survey.id === currentSurvey.id ? { ...currentSurvey, updatedAt: new Date().toISOString() } : survey
-    ));
-    setIsEditModalOpen(false);
-  };
 
-  const handleInputChange = (field: keyof Survey, value: string) => {
-    if (!currentSurvey) return;
-    setCurrentSurvey({
-      ...currentSurvey,
-      [field]: value
-    });
-  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -286,106 +269,7 @@ export default function ManageSurveys() {
         </div>
       )}
 
-      {/* Edit Survey Modal */}
-      {isEditModalOpen && currentSurvey && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-background rounded-lg shadow-lg border">
-            <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="text-xl font-semibold">Edit Survey</h2>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setIsEditModalOpen(false)}
-                className="h-8 w-8 p-0"
-              >
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </Button>
-            </div>
-            
-            <form onSubmit={handleSaveChanges} className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Survey Title</Label>
-                  <Input
-                    id="title"
-                    value={currentSurvey.title}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
-                    placeholder="Enter survey title"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select 
-                    value={currentSurvey.status} 
-                    onValueChange={(value) => handleInputChange('status', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={currentSurvey.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Enter survey description"
-                    className="min-h-[100px]"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Created</Label>
-                  <div className="text-sm text-muted-foreground">
-                    {new Date(currentSurvey.createdAt).toLocaleDateString()}
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Last Updated</Label>
-                  <div className="text-sm text-muted-foreground">
-                    {new Date(currentSurvey.updatedAt).toLocaleDateString()}
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Responses</Label>
-                  <div className="text-sm text-muted-foreground">
-                    {currentSurvey.responses} response{currentSurvey.responses !== 1 ? 's' : ''}
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Questions</Label>
-                  <div className="text-sm text-muted-foreground">
-                    {currentSurvey.questions} question{currentSurvey.questions !== 1 ? 's' : ''}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex justify-end gap-3 pt-4 border-t">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setIsEditModalOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit">Save Changes</Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Manage Surveys</h1>

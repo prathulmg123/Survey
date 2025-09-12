@@ -43,6 +43,10 @@ export function AppSidebar() {
 
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
+    // Special case for survey detail pages to keep Manage Surveys active
+    if (path === "/manage") {
+      return location.pathname.startsWith("/manage") || location.pathname.startsWith("/surveys/");
+    }
     return location.pathname.startsWith(path);
   };
 

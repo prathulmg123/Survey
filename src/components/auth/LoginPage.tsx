@@ -89,7 +89,7 @@ const LoginPage = () => {
           {/* <h2 className="text-2xl font-semibold text-gray-900 mb-2">Welcome Back</h2> */}
         </div>
 
-        <Card className="bg-white border-0 shadow-encore">
+        <Card className="bg-white border-border/90 shadow-md bg-gradient-to-br from-background to-muted/20 border border-gray-100 shadow-[0_10px_50px_-12px_rgba(59,130,246,0.25)] hover:shadow-[0_15px_60px_-12px_rgba(59,130,246,0.3)] transition-shadow duration-300">
           <CardContent className="p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
