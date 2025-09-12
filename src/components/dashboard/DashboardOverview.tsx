@@ -130,7 +130,7 @@ export const DashboardOverview = () => {
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <Card key={stat.title} className="bg-gradient-card border-0 shadow-md hover:shadow-lg transition-shadow duration-200">
+          <Card key={stat.title}  className="group relative overflow-hidden border-border/50 shadow-md hover:shadow-hover transition-all duration-300 hover:scale-[1.02] hover:border-primary/20 animate-scale-in bg-gradient-to-br from-background to-muted/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
               <div className={`p-2 rounded-lg ${stat.bgColor}`}>
@@ -147,7 +147,7 @@ export const DashboardOverview = () => {
 
       {/* Recent Surveys */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="bg-gradient-card border-0 shadow-md">
+        <Card  className="group relative overflow-hidden border-border/80 shadow-md hover:shadow-hover transition-all duration-300 hover:scale-[1.02] hover:border-primary/20 animate-scale-in bg-gradient-to-br from-background to-muted/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-primary" />
@@ -161,7 +161,7 @@ export const DashboardOverview = () => {
             {recentSurveys.map((survey) => (
               <div
                 key={survey.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors duration-200"
+                className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/80 transition-colors duration-200"
               >
                 <div className="flex items-start gap-3">
                   {getStatusIcon(survey.status)}
@@ -196,7 +196,7 @@ export const DashboardOverview = () => {
         </Card>
 
         {/* Quick Actions */}
-        <Card className="bg-gradient-card border-0 shadow-md">
+        <Card  className="group relative overflow-hidden border-border/80 shadow-md hover:shadow-hover transition-all duration-300 hover:scale-[1.02] hover:border-primary/20 animate-scale-in bg-gradient-to-br from-background to-muted/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-primary" />

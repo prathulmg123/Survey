@@ -31,10 +31,16 @@ const App = () => (
               </ProtectedRoute>
             }
           >
-            {/* Dashboard routes */}
+            {/* Dashboard route */}
+            <Route path="/dashboard" element={<DashboardOverview />} />
+            
+            {/* Top-level routes */}
+            <Route path="/guide" element={<SurveyGuide />} />
+            <Route path="/manage" element={<ManageSurveys />} />
+            <Route path="/active" element={<div className="p-6">Active Surveys (Coming Soon)</div>} />
+            
+            {/* Nested dashboard routes */}
             <Route path="/dashboard">
-              <Route index element={<DashboardOverview />} />
-              <Route path="surveys" element={<ManageSurveys />} />
               <Route path="analytics" element={<div className="p-6">Analytics Page (Coming Soon)</div>} />
               <Route path="responses" element={<div className="p-6">Responses Page (Coming Soon)</div>} />
               <Route path="audience" element={<div className="p-6">Audience Page (Coming Soon)</div>} />
@@ -42,9 +48,6 @@ const App = () => (
               <Route path="help" element={<div className="p-6">Help & Support Page (Coming Soon)</div>} />
               <Route path="settings" element={<div className="p-6">Settings Page (Coming Soon)</div>} />
             </Route>
-            
-            {/* Guide route */}
-            <Route path="/guide" element={<SurveyGuide />} />
           </Route>
           
           {/* 404 route */}
