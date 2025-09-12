@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
+import { Loader } from "@/components/ui/Loader";
+import { useLoader } from "@/hooks/useLoader";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -66,7 +68,10 @@ const questionTypes = [
 ];
 
 export default function SurveyGuide() {
-  // Add a container with consistent padding to match other dashboard pages
+  const [isLoading, setIsLoading] = useState(true);
+  const { showLoader, hideLoader } = useLoader();
+  
+  // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -83,10 +88,35 @@ export default function SurveyGuide() {
     },
   });
 
+  // Initialize field array after form
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "questions",
   });
+
+  // Handle loading state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      hideLoader();
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+      hideLoader();
+    };
+  }, [showLoader, hideLoader]);
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
+        <div className="text-center">
+          <Loader text="Loading..." show={true} size={52} />
+        </div>
+      </div>
+    );
+  }
 
   const addQuestion = () => {
     append({

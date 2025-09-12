@@ -1,7 +1,10 @@
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { useLoader } from "@/hooks/useLoader";
+import { Loader } from "@/components/ui/Loader";
 import {
   BarChart3,
   Users,
@@ -16,6 +19,32 @@ import {
 } from "lucide-react";
 
 export const DashboardOverview = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const { showLoader, hideLoader } = useLoader();
+
+  useEffect(() => {
+    // Set a timeout to hide the loader after 3 seconds
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      hideLoader();
+    }, 500);
+
+    // Cleanup function to clear the timeout if the component unmounts
+    return () => {
+      clearTimeout(timer);
+      hideLoader();
+    };
+  }, [showLoader, hideLoader]);
+
+  if (isLoading) {
+    return (
+      <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
+        <div className="text-center">
+          <Loader text="Loading..." show={true} size={52} />
+        </div>
+      </div>
+    );
+  }
   const stats = [
     {
       title: "Total Surveys",

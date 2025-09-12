@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Loader } from "@/components/ui/Loader";
+import { useLoader } from "@/hooks/useLoader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -34,7 +36,31 @@ const mockUsers = [
 ];
 
 export default function Users() {
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const { showLoader, hideLoader } = useLoader();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      hideLoader();
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+      hideLoader();
+    };
+  }, [showLoader, hideLoader]);
+
+  if (isLoading) {
+    return (
+      <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
+        <div className="text-center">
+          <Loader text="Loading..." show={true} size={52} />
+        </div>
+      </div>
+    );
+  }
 
   const filteredUsers = mockUsers.filter(
     (user) =>

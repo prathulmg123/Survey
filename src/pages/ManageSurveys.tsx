@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Pencil, Trash2, Eye, FileText, Users, X } from "lucide-react";
+import { Loader } from "@/components/ui/Loader";
+import { useLoader } from "@/hooks/useLoader";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,6 +74,30 @@ export default function ManageSurveys() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentSurvey, setCurrentSurvey] = useState<Survey | null>(null);
   const [surveyToDelete, setSurveyToDelete] = useState<Survey | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { showLoader, hideLoader } = useLoader();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      hideLoader();
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+      hideLoader();
+    };
+  }, [showLoader, hideLoader]);
+
+  if (isLoading) {
+    return (
+      <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
+        <div className="text-center">
+          <Loader text="Loading..." show={true} size={52} />
+        </div>
+      </div>
+    );
+  }
 
   const filteredSurveys = surveys.filter((survey) =>
     survey.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
