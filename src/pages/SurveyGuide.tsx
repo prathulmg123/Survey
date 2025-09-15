@@ -134,10 +134,7 @@ export default function SurveyGuide() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h2 className="text-2xl font-bold tracking-tight">Create New Survey</h2>
-        <p className="text-muted-foreground">
-          Fill in the details below to create your survey
-        </p>
+        <h2 className="text-2xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">Create Survey</h2>
       </div>
     <div className="h-full">
       <Card>

@@ -121,33 +121,12 @@ export default function SurveyDetail() {
 
   return (
     <div className="space-y-6">
-      <Button 
-        variant="ghost" 
-        className="mb-4 -ml-2"
-        onClick={() => navigate(-1)}
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Surveys
-      </Button>
-
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Edit Survey</h1>
-          <p className="text-muted-foreground">
-            Update the survey details below
-          </p>
-        </div>
+       <div className="space-y-1">
+        <h2 className="text-2xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">Survey Details</h2>
       </div>
-
       <Card>
         <form onSubmit={handleSubmit}>
-          <CardHeader>
-            <CardTitle>Survey Details</CardTitle>
-            <CardDescription>
-              Update the survey information as needed
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 mt-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="title">Survey Title</Label>
@@ -217,15 +196,26 @@ export default function SurveyDetail() {
               </div>
             </div>
           </CardContent>
-          <CardContent className="flex justify-end gap-3 border-t pt-6">
+          <CardContent className="flex justify-between border-t pt-6">
             <Button 
               type="button" 
-              variant="outline" 
+              variant="ghost" 
+              className="-ml-2"
               onClick={() => navigate(-1)}
               disabled={isSaving}
             >
-              Cancel
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Surveys
             </Button>
+            <div className="flex gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => navigate(-1)}
+                disabled={isSaving}
+              >
+                Cancel
+              </Button>
             <Button type="submit" disabled={isSaving}>
               {isSaving ? (
                 <>
@@ -234,6 +224,7 @@ export default function SurveyDetail() {
                 </>
               ) : 'Save Changes'}
             </Button>
+            </div>
           </CardContent>
         </form>
       </Card>
