@@ -51,11 +51,15 @@ export function AppSidebar() {
   };
 
   const getNavLinkClass = (active: boolean) =>
-    `group flex items-center gap-4 ${isCollapsed ? 'justify-center px-3' : 'px-3'} ${active ? 'py-6' : 'py-4'} ${active ? 'rounded-md' : 'rounded-md'} transition-all duration-300 relative font-medium ${
-      active
-        ? "bg-primary/8 text-primary border-border/80 bg-card/50 backdrop-blur-sm sticky top-0 border-border/90 shadow-md shadow-primary/30 bg-gradient-to-br from-background to-muted/10 border border-primary/10 scale-[1.02]"
-        : "text-muted-foreground hover:bg-secondary/80 hover:text-foreground hover:shadow-sm hover:scale-[1.01] hover:border hover:border-border/50"
-    }`;
+    `group flex items-center gap-4 ${isCollapsed ? 'justify-center px-3' : 'px-3'} 
+     py-4 rounded-md transition-all duration-300 relative font-medium 
+     ${
+       active
+         ? "bg-gradient-to-r to-[#8a9097] from-[#d7dbe1fa] text-black border-l-4 border-blue-500"
+         : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+     }`;
+  
+  
 
   return (
     <Sidebar className="bg-card/50 border-r border-border shadow-sidebar backdrop-blur-sm border-border/90 shadow-md bg-gradient-to-br from-background to-muted/40">
@@ -84,11 +88,11 @@ export function AppSidebar() {
 
         {/* Main Navigation */}
         <SidebarGroup>
-          {!isCollapsed && (
+          {/* {!isCollapsed && (
             <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
               Navigation
             </SidebarGroupLabel>
-          )}
+          )} */}
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
               {menuItems.map((item, index) => {
@@ -123,9 +127,7 @@ export function AppSidebar() {
                             <span className="font-semibold text-sm tracking-wide">{item.title}</span>
                           )}
                         </div>
-                        {active && !isCollapsed && (
-                          <div className="absolute right-2 w-2 h-8 bg-primary rounded-full shadow-sm"></div>
-                        )}
+
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -148,26 +150,20 @@ export function AppSidebar() {
                 {bottomItems.map((item, index) => {
                   const active = isActive(item.url);
                   return (
-                    <SidebarMenuItem key={item.title} className="animate-fade-in" style={{ animationDelay: `${(index + 5) * 50}ms` }}>
+                    <SidebarMenuItem key={item.title} className="animate-fade-in  cursor-not-allowed" style={{ animationDelay: `${(index + 5) * 50}ms` }}>
                       <SidebarMenuButton asChild>
-                        <NavLink
-                          to={item.url}
-                          className={getNavLinkClass(active)}
-                        >
+                        <div className={getNavLinkClass(active).replace('hover:bg-secondary/80', '')}>
                           <div className={`p-2 rounded-lg transition-all duration-300 ${
-                            active ? 'bg-primary/15' : 'bg-muted/30 group-hover:bg-muted'
+                            active ? 'bg-primary/15' : 'bg-muted/30'
                           }`}>
                             <item.icon className={`h-5 w-5 flex-shrink-0 transition-all duration-300 ${
-                              active ? 'text-primary scale-110' : 'text-muted-foreground group-hover:text-foreground group-hover:scale-105'
+                              active ? 'text-primary scale-110' : 'text-muted-foreground'
                             }`} />
                           </div>
                           {!isCollapsed && (
                             <span className="font-semibold text-sm tracking-wide">{item.title}</span>
                           )}
-                          {active && (
-                            <div className="absolute right-2 w-2 h-8 bg-primary rounded-full shadow-sm"></div>
-                          )}
-                        </NavLink>
+                        </div>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   );

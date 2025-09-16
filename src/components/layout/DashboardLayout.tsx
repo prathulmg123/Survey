@@ -15,7 +15,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         <AppSidebar />
         <div className="flex-1 flex flex-col h-screen overflow-hidden">
           <DashboardHeader />
-          <main className="flex-1 overflow-y-auto bg-muted/30">
+          <main className="flex-1 overflow-y-auto" style={{ backgroundColor: '#cbcdd14d' }}>
             <div className="p-6">
               {children || <Outlet />}
             </div>
