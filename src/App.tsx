@@ -12,6 +12,7 @@ import SurveyGuide from "./pages/SurveyGuide";
 import ManageSurveys from "./pages/ManageSurveys";
 import SurveyDetail from "./pages/SurveyDetail";
 import Users from "./pages/Users";
+import ProgressPage from "./pages/ProgressPage";
 
 const queryClient = new QueryClient();
 
@@ -41,7 +42,7 @@ const App = () => (
             <Route path="/manage" element={<ManageSurveys />} />
             <Route path="/surveys/:id" element={<SurveyDetail />} />
             <Route path="/users" element={<Users />} />
-            <Route path="/active" element={<div className="p-6">Active Surveys (Coming Soon)</div>} />
+            <Route path="/active" element={<ProgressPage />} />
             
             {/* Nested dashboard routes */}
             <Route path="/dashboard">
