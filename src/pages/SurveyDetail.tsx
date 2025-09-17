@@ -168,9 +168,9 @@ export default function SurveyDetail() {
           </nav>
         </div>
       </div>
-      <Card>
-        <form onSubmit={handleSubmit} className="p-2">
-          <CardContent className="space-y-6 mt-8 ">
+      <Card className="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-6 p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="title">Survey Title</Label>
@@ -213,55 +213,35 @@ export default function SurveyDetail() {
               
               <div className="space-y-2">
                 <Label>Created</Label>
-                <div className="p-2 bg-muted/50 rounded-md text-sm">
+                <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-300 dark:border-gray-600 text-sm text-gray-900 dark:text-gray-300">
                   {new Date(survey.createdAt).toLocaleDateString()}
                 </div>
               </div>
               
               <div className="space-y-2">
                 <Label>Last Updated</Label>
-                <div className="p-2 bg-muted/50 rounded-md text-sm">
+                <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-300 dark:border-gray-600 text-sm text-gray-900 dark:text-gray-300">
                   {new Date(survey.updatedAt).toLocaleDateString()}
                 </div>
               </div>
               
               <div className="space-y-2">
                 <Label>Responses</Label>
-                <div className="p-2 bg-muted/50 rounded-md text-sm">
+                <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-300 dark:border-gray-600 text-sm text-gray-900 dark:text-gray-300">
                   {survey.responses} response{survey.responses !== 1 ? 's' : ''}
                 </div>
               </div>
               
               <div className="space-y-2">
                 <Label>Questions</Label>
-                <div className="p-2 bg-muted/50 rounded-md text-sm">
+                <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-300 dark:border-gray-600 text-sm text-gray-900 dark:text-gray-300">
                   {survey.questions} question{survey.questions !== 1 ? 's' : ''}
                 </div>
               </div>
             </div>
           </CardContent>
-          <CardContent className="flex justify-between border-t pt-6">
-            <Button 
-              type="button" 
-              variant="ghost" 
-              className="-ml-2"
-              onClick={() => navigate(-1)}
-              disabled={isSaving}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Surveys
-            </Button>
-            <div className="flex gap-3">
-              <Button 
-                type="button" 
-                variant="outline" 
-                className="hover:bg-blue-700/90"
-                onClick={() => navigate(-1)}
-                disabled={isSaving}
-              >
-                Cancel
-              </Button>
-            <Button type="submit" disabled={isSaving} className=" bg-blue-700/90 hover:bg-blue-700/90">
+          <CardContent className="flex justify-end border-t border-gray-200 dark:border-gray-700 pt-6">
+            <Button type="submit" disabled={isSaving} className="bg-blue-700/90 hover:bg-blue-700/90">
               {isSaving ? (
                 <>
                   <Loader className="mr-2 h-4 w-4 animate-spin" show={true} />
@@ -269,7 +249,7 @@ export default function SurveyDetail() {
                 </>
               ) : 'Save Changes'}
             </Button>
-            </div>
+            
           </CardContent>
         </form>
       </Card>

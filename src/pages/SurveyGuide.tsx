@@ -202,9 +202,8 @@ export default function SurveyGuide() {
         </div>
       </div>
     <div className="h-full">
-      <Card>
-        
-        <CardContent className="p-8 mt-3">
+      <Card className="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <CardContent className="p-6">
           <Form {...form}>
             <form onSubmit={(e) => handleFormSubmit(e)} className="space-y-8" noValidate>
               {/* Survey Title */}
@@ -213,10 +212,10 @@ export default function SurveyGuide() {
                 name="surveyTitle"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center">
-                      Survey Name
-                      <span className="text-destructive ml-1">*</span>
-                    </FormLabel>
+                      <FormLabel className="flex items-center text-gray-700 dark:text-gray-300">
+                        Survey Name
+                        <span className="text-destructive ml-1">*</span>
+                      </FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="Enter survey name" 
@@ -235,7 +234,7 @@ export default function SurveyGuide() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                      <FormLabel className="text-gray-700 dark:text-gray-300">Description</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Enter survey description"
@@ -254,10 +253,10 @@ export default function SurveyGuide() {
                 name="files"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center">
-                      Upload Files
-                      <span className="text-destructive ml-1">*</span>
-                    </FormLabel>
+                      <FormLabel className="flex items-center text-gray-700 dark:text-gray-300">
+                        Upload Files
+                        <span className="text-destructive ml-1">*</span>
+                      </FormLabel>
                     <FormControl>
                       <FileUpload
                         value={field.value}
@@ -279,20 +278,20 @@ export default function SurveyGuide() {
                 )}
               />
            
-              <div className="flex justify-end pt-6 border-t">
+              <div className="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex space-x-3">
                   <Button 
                     type="button" 
                     variant="outline"
                     onClick={() => form.reset()}
-                    className="hover:bg-blue-700/90"
+                    className="text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                   >
                     Reset Form
                   </Button>
                   <Button 
                     type="submit" 
                     disabled={form.formState.isSubmitting}
-                    className="bg-blue-700/90 hover:bg-blue-700/90"
+                    className="bg-blue-700/90 hover:bg-blue-700/90 text-white"
                   >
                     {form.formState.isSubmitting ? (
                       <>
@@ -302,7 +301,6 @@ export default function SurveyGuide() {
                     ) : (
                       <>
                         Create Survey
-                        <ArrowRight className="ml-2 h-4 w-4" />
                       </>
                     )}
                   </Button>

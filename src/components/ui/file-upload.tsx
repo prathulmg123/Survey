@@ -96,8 +96,10 @@ export function FileUpload({
       <div
         {...getRootProps({
           className: cn(
-            "relative rounded-lg border-2 border-dashed border-gray-200 bg-gray-80 p-6 text-center transition-colors",
-            isDragActive ? "border-primary bg-primary/5" : "hover:border-primary/50 hover:bg-gray-100/50",
+            "relative rounded-lg border-2 border-dashed border-gray-200 bg-gray-80 p-6 text-center transition-colors dark:border-gray-700 dark:bg-gray-800",
+            isDragActive 
+              ? "border-primary bg-primary/5 dark:border-primary/70 dark:bg-primary/10" 
+              : "hover:border-primary/50 hover:bg-gray-100/50 dark:hover:border-gray-700 dark:hover:bg-gray-800",
             disabled && "cursor-not-allowed opacity-60",
             className
           ),
@@ -129,7 +131,7 @@ export function FileUpload({
             {files.map((file, index) => (
               <li
                 key={file.name}
-                className="group flex items-center justify-between rounded-lg border border-blue-100 bg-blue-100/80 p-3 text-sm shadow-sm transition-colors hover:bg-blue-100/80"
+                className="group flex items-center justify-between rounded-lg border border-blue-100 bg-blue-100/80 p-3 text-sm shadow-sm transition-colors hover:bg-blue-100/80 dark:border-gray-700 dark:bg-gray-800/80 dark:hover:bg-gray-800/80"
               >
                 <div className="flex min-w-0 items-center space-x-3">
                   <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">

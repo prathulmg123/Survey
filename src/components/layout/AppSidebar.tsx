@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   BarChart3,
   FileText,
@@ -38,6 +39,7 @@ const bottomItems = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
+  const { theme } = useTheme();
   const isCollapsed = state === "collapsed";
 
   const isActive = (path: string) => {
@@ -53,14 +55,20 @@ export function AppSidebar() {
     return location.pathname.startsWith(path);
   };
 
-  const getNavLinkClass = (active: boolean) =>
-    `group flex items-center gap-4 ${isCollapsed ? 'justify-center px-3' : 'px-3'} 
-     py-4 rounded-md transition-all duration-300 relative font-medium 
-     ${
-       active
-         ? "bg-gradient-to-r to-[#e1e1e1] from-[#e1e1e1] !text-primary hover:!text-primary font-bold border-l-4 border-blue-500"
-         : "text-muted-foreground hover:bg-muted/50 hover:!text-foreground"
-     }`;
+  const getNavLinkClass = (active: boolean) => {
+    const baseClasses = `group flex items-center gap-4 ${isCollapsed ? 'justify-center px-3' : 'px-3'} py-4 rounded-md transition-all duration-300 relative font-medium`;
+    
+    if (theme === 'dark') {
+      return active
+        ? `${baseClasses} bg-blue-900/20 text-blue-300 font-semibold border-l-4 border-blue-400 hover:bg-blue-900/30`
+        : `${baseClasses} text-gray-400 hover:bg-gray-800/50 hover:text-gray-200`;
+    }
+    
+    // Light theme styles (original)
+    return active
+      ? `${baseClasses} bg-gradient-to-r to-[#e1e1e1] from-[#e1e1e1] !text-primary font-bold border-l-4 border-blue-500`
+      : `${baseClasses} text-muted-foreground hover:bg-muted/50 hover:!text-foreground`;
+  };
   
   
 

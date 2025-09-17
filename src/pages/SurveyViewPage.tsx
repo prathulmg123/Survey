@@ -132,21 +132,6 @@ export default function SurveyViewPage() {
             </ol>
           </nav>
         </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => navigate(-1)}
-            className="text-gray-700 hover:bg-white hover:text-gray-700"
-          >
-            Back
-          </Button>
-          <Button 
-            onClick={() => navigate(`/surveys/${survey.id}`)}
-            className="bg-blue-700/90 hover:bg-blue-700/90"
-          >
-            Edit Survey
-          </Button>
-        </div>
       </div>
 
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-8">

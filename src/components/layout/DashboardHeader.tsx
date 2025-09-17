@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,13 +13,21 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bell, Search, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export const DashboardHeader = () => {
   const navigate = useNavigate();
   const userEmail = localStorage.getItem("userEmail") || "user@example.com";
   const userInitials = userEmail.slice(0, 2).toUpperCase();
 
+  const { theme, toggleTheme } = useTheme();
+
   const handleLogout = () => {
+    // Switch to light mode before logging out
+    if (theme === 'dark') {
+      toggleTheme();
+    }
+    
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("userEmail");
     toast.success("Logged out successfully");
@@ -38,6 +47,7 @@ export const DashboardHeader = () => {
           <div className="flex items-center gap-3">
           
             
+            <ThemeToggle />
             <Button variant="ghost" size="icon" className="relative">
               <Search className="h-4 w-4" />
             </Button>

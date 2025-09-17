@@ -317,14 +317,14 @@ export default function ManageSurveys() {
             </div>
           </div>
 
-          <div className="relative rounded-lg border border-gray-200 overflow-hidden mb-6 group shadow-md hover:shadow-lg transition-shadow duration-200 border-2 border-blue-100">
-            <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-blue-50/50 to-transparent opacity-70 rounded-b-lg pointer-events-none"></div>
-            <div className="relative bg-white rounded-lg overflow-hidden">
+          <div className="relative rounded-lg border-2 border-blue-100 dark:border-gray-700 overflow-hidden mb-6 group shadow-md transition-shadow duration-200">
+            <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-blue-50/50 to-transparent dark:from-gray-800/50 dark:to-transparent opacity-70 rounded-b-lg pointer-events-none"></div>
+            <div className="relative bg-white dark:bg-gray-800/50 rounded-lg overflow-hidden">
               <Table>
-                <TableHeader className="bg-blue-700/90">
+                <TableHeader className="bg-blue-700/90 dark:bg-blue-900/80">
                   <TableRow className="hover:bg-transparent">
                     <TableHead 
-                      className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                      className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 dark:hover:bg-blue-800/90 transition-colors"
                       onClick={() => handleSort('title')}
                     >
                       <div className="flex items-center">
@@ -333,7 +333,7 @@ export default function ManageSurveys() {
                       </div>
                     </TableHead>
                     <TableHead 
-                      className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                      className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 dark:hover:bg-blue-800/90 transition-colors"
                       onClick={() => handleSort('status')}
                     >
                       <div className="flex items-center">
@@ -342,7 +342,7 @@ export default function ManageSurveys() {
                       </div>
                     </TableHead>
                     <TableHead 
-                      className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                      className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 dark:hover:bg-blue-800/90 transition-colors"
                       onClick={() => handleSort('responses')}
                     >
                       <div className="flex items-center">
@@ -351,7 +351,7 @@ export default function ManageSurveys() {
                       </div>
                     </TableHead>
                     <TableHead 
-                      className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                      className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 dark:hover:bg-blue-800/90 transition-colors"
                       onClick={() => handleSort('createdAt')}
                     >
                       <div className="flex items-center">
@@ -362,13 +362,13 @@ export default function ManageSurveys() {
                     <TableHead className="text-white/95 font-medium py-3 px-4 text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody className="bg-white">
+                <TableBody className="bg-white dark:bg-gray-800/30">
                   {currentItems.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} className="h-24 text-center py-8">
                         <div className="flex flex-col items-center justify-center">
-                          <FileText className="h-12 w-12 text-gray-300 mb-2" />
-                          <p className="text-gray-500">No surveys found</p>
+                          <FileText className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-2" />
+                          <p className="text-gray-500 dark:text-gray-400">No surveys found</p>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -381,8 +381,8 @@ export default function ManageSurveys() {
                               <FileText className="h-5 w-5 text-blue-600" />
                             </div>
                             <div>
-                              <div className="font-medium text-gray-800">{survey.title}</div>
-                              <div className="text-sm text-gray-500">{survey.description}</div>
+                              <div className="font-medium text-gray-800 dark:text-gray-200">{survey.title}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">{survey.description}</div>
                             </div>
                           </div>
                         </TableCell>
@@ -401,11 +401,11 @@ export default function ManageSurveys() {
                         </TableCell>
                         <TableCell className="px-4">
                           <div className="flex items-center gap-2">
-                            <Users className="h-4 w-4 text-gray-400" />
-                            <span>{survey.responses} {survey.responses === 1 ? 'response' : 'responses'}</span>
+                            <Users className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                            <span className="text-gray-700 dark:text-gray-300">{survey.responses} {survey.responses === 1 ? 'response' : 'responses'}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="px-4">
+                        <TableCell className="px-4 text-gray-700 dark:text-gray-300">
                           {new Date(survey.createdAt).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric',
@@ -419,7 +419,7 @@ export default function ManageSurveys() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8"
+                                  className="h-8 w-8 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
                                   onClick={() => handleViewClick(survey)}
                                 >
                                   <Eye className="h-4 w-4" />
@@ -433,7 +433,7 @@ export default function ManageSurveys() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8"
+                                  className="h-8 w-8 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
                                   onClick={() => handleEditClick(survey)}
                                 >
                                   <Pencil className="h-4 w-4" />
@@ -447,7 +447,7 @@ export default function ManageSurveys() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-500 dark:hover:text-red-400 dark:hover:bg-red-900/30"
                                   onClick={() => handleDeleteClick(survey)}
                                 >
                                   <Trash2 className="h-4 w-4" />
@@ -467,8 +467,8 @@ export default function ManageSurveys() {
 
               {/* Pagination */}
               {totalItems > 0 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t bg-gray-50">
-                  <div className="text-sm text-gray-600 mb-4 sm:mb-0">
+                <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t bg-gray-50 dark:bg-gray-800/50 dark:border-gray-700">
+                  <div className="text-sm text-gray-600 dark:text-gray-300 mb-4 sm:mb-0">
                     Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
                     <span className="font-medium">{Math.min(endIndex, totalItems)}</span> of{' '}
                     <span className="font-medium">{totalItems}</span> results
@@ -476,7 +476,7 @@ export default function ManageSurveys() {
 
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-600">Rows per page:</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">Rows per page:</span>
                       <div className="w-24 [&_button]:border-0 [&_button]:ring-1 [&_button]:ring-gray-300 [&_button]:ring-offset-0">
                       <Select
                         value={itemsPerPage.toString()}
@@ -499,14 +499,14 @@ export default function ManageSurveys() {
                       <button
                         onClick={() => goToPage(1)}
                         disabled={currentPage === 1}
-                        className="p-1 rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <ChevronsLeft className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => goToPage(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className="p-1 rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <ChevronLeft className="h-4 w-4" />
                       </button>
@@ -528,8 +528,8 @@ export default function ManageSurveys() {
                             key={pageNum}
                             onClick={() => goToPage(pageNum)}
                             className={`w-8 h-8 rounded-md text-sm ${currentPage === pageNum
-                                ? 'bg-blue-700/90 hover:bg-blue-700/90 text-white'
-                                : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                                ? 'bg-blue-700/90 hover:bg-blue-700/90 text-white dark:bg-blue-600 dark:hover:bg-blue-700'
+                                : 'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'
                               }`}
                           >
                             {pageNum}
@@ -540,14 +540,14 @@ export default function ManageSurveys() {
                       <button
                         onClick={() => goToPage(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="p-1 rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <ChevronRight className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => goToPage(totalPages)}
                         disabled={currentPage === totalPages}
-                        className="p-1 rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <ChevronsRight className="h-4 w-4" />
                       </button>
