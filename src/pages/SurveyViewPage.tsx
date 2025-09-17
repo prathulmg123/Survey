@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -114,9 +114,9 @@ export default function SurveyViewPage() {
             <ol className="flex text-sm items-center space-x-2">
               <li>
                 <div>
-                  <a href="/manage"  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                   Survey
-                  </a>
+                  <Link to="/manage" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline">
+                    Survey
+                  </Link>
                 </div>
               </li>
               <li>

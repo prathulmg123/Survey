@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -203,12 +203,12 @@ export default function SurveyDetail() {
         <nav className="flex" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2 text-sm">
             <li>
-              <a 
-                href="/surveys" 
-                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              <Link 
+                to="/manage" 
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
               >
                 Surveys
-              </a>
+              </Link>
             </li>
             <li className="text-gray-400">/</li>
             <li className="text-gray-500 dark:text-gray-400">

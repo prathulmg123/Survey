@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Loader } from "@/components/ui/Loader";
 import { useLoader } from "@/hooks/useLoader";
@@ -182,9 +183,9 @@ export default function SurveyGuide() {
             <ol className="flex text-sm items-center space-x-2">
               <li>
                 <div>
-                  <a href="/manage" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                  <Link to="/manage" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline">
                     Survey
-                  </a>
+                  </Link>
                 </div>
               </li>
               <li>
