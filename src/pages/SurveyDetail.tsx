@@ -150,7 +150,7 @@ export default function SurveyDetail() {
               <li>
                 <div>
                   <a href="/manage" className="text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-                   Manage Survey
+                  Survey
                   </a>
                 </div>
               </li>
@@ -255,12 +255,13 @@ export default function SurveyDetail() {
               <Button 
                 type="button" 
                 variant="outline" 
+                className="hover:bg-blue-700/90"
                 onClick={() => navigate(-1)}
                 disabled={isSaving}
               >
                 Cancel
               </Button>
-            <Button type="submit" disabled={isSaving}>
+            <Button type="submit" disabled={isSaving} className=" bg-blue-700/90 hover:bg-blue-700/90">
               {isSaving ? (
                 <>
                   <Loader className="mr-2 h-4 w-4 animate-spin" show={true} />

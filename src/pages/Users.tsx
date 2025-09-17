@@ -180,7 +180,7 @@ export default function Users() {
             <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-blue-50/50 to-transparent opacity-70 rounded-b-lg pointer-events-none"></div>
             <div className="relative bg-white rounded-lg overflow-hidden">
               <Table className="w-full">
-              <TableHeader className="bg-blue-600/90">
+              <TableHeader className="bg-blue-700/90">
                 <TableRow className="hover:bg-transparent">
                   <TableHead 
                     className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
@@ -368,7 +368,7 @@ export default function Users() {
                           onClick={() => goToPage(pageNum)}
                           className={`w-8 h-8 rounded-md text-sm ${
                             currentPage === pageNum
-                              ? 'bg-blue-600/90 hover:bg-blue-600/90 text-white'
+                              ? 'bg-blue-700/90 hover:bg-blue-700/90 text-white'
                               : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
                           }`}
                         >

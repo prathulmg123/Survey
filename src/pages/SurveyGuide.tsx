@@ -173,13 +173,32 @@ export default function SurveyGuide() {
 
   return (
     <div className="space-y-6">
-     <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">Create Survey</h2>
-          
-          <p className="text-muted-foreground text-base text-sm mt-2">
-            Create and customize your survey with ease
-          </p>
+          <h2 className="text-xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">
+            Create Survey
+          </h2>
+          <nav className="flex mt-2" aria-label="Breadcrumb">
+            <ol className="flex items-center space-x-2">
+              <li>
+                <div>
+                  <a href="/manage" className="text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                    Survey
+                  </a>
+                </div>
+              </li>
+              <li>
+                <div className="flex items-center">
+                  <svg className="h-5 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span className="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Create New
+                  </span>
+                </div>
+              </li>
+            </ol>
+          </nav>
         </div>
       </div>
     <div className="h-full">
@@ -266,12 +285,14 @@ export default function SurveyGuide() {
                     type="button" 
                     variant="outline"
                     onClick={() => form.reset()}
+                    className="hover:bg-blue-700/90"
                   >
                     Reset Form
                   </Button>
                   <Button 
                     type="submit" 
                     disabled={form.formState.isSubmitting}
+                    className="bg-blue-700/90 hover:bg-blue-700/90"
                   >
                     {form.formState.isSubmitting ? (
                       <>

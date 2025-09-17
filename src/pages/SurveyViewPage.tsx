@@ -115,7 +115,7 @@ export default function SurveyViewPage() {
               <li>
                 <div>
                   <a href="/manage" className="text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-                   Manage Survey
+                   Survey
                   </a>
                 </div>
               </li>
@@ -142,7 +142,7 @@ export default function SurveyViewPage() {
           </Button>
           <Button 
             onClick={() => navigate(`/surveys/${survey.id}`)}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-700/90 hover:bg-blue-700/90"
           >
             Edit Survey
           </Button>

@@ -26,8 +26,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
   { title: "Users", url: "/users", icon: UsersIcon },
-  { title: "Create Survey", url: "/guide", icon: Plus },
-  { title: "Manage Survey", url: "/manage", icon: BarChart3 },
+  { title: "Survey", url: "/manage", icon: BarChart3 },
   { title: "In Progress", url: "/active", icon: Clock },
 ];
 
@@ -43,9 +42,13 @@ export function AppSidebar() {
 
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
-    // Special case for survey detail pages to keep Manage Surveys active
+    // Special case for survey related pages to keep Survey menu active
     if (path === "/manage") {
-      return location.pathname.startsWith("/manage") || location.pathname.startsWith("/surveys/");
+      return (
+        location.pathname.startsWith("/manage") || 
+        location.pathname.startsWith("/surveys/") ||
+        location.pathname.startsWith("/guide")
+      );
     }
     return location.pathname.startsWith(path);
   };
