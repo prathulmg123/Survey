@@ -419,7 +419,7 @@ export default function ManageSurveys() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+                                  className="h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-transparent dark:text-gray-400 dark:hover:text-gray-200"
                                   onClick={() => handleViewClick(survey)}
                                 >
                                   <Eye className="h-4 w-4" />
@@ -433,7 +433,7 @@ export default function ManageSurveys() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+                                  className="h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-transparent dark:text-gray-400 dark:hover:text-gray-200"
                                   onClick={() => handleEditClick(survey)}
                                 >
                                   <Pencil className="h-4 w-4" />
@@ -447,7 +447,7 @@ export default function ManageSurveys() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-500 dark:hover:text-red-400 dark:hover:bg-red-900/30"
+                                  className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-transparent dark:text-red-500 dark:hover:text-red-400"
                                   onClick={() => handleDeleteClick(survey)}
                                 >
                                   <Trash2 className="h-4 w-4" />

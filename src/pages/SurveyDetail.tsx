@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Loader } from "@/components/ui/Loader";
+import { toast } from "sonner";
 
 interface Survey {
   id: number;
@@ -30,23 +33,64 @@ interface Survey {
   completionCriteria?: string;
 }
 
-interface FormValues {
-  guideName: string;
-  surveyGoal: string;
-  initiatorQuestion: string;
-  areaName: string;
-  areaDescription: string;
-  subTopicName: string;
-  followUpLimit: number;
-  consecutiveProbesLimit: number;
-  completionCriteria: string;
-}
+// Form validation schema
+const formSchema = z.object({
+  guideName: z.string()
+    .min(1, { message: "Guide name is required" })
+    .min(3, { message: "Guide name must be at least 3 characters" })
+    .trim(),
+    
+  surveyGoal: z.string()
+    .min(1, { message: "Survey goal is required" })
+    .trim(),
+    
+  initiatorQuestion: z.string()
+    .min(1, { message: "Initiator question is required" })
+    .trim(),
+    
+  areaName: z.string()
+    .min(1, { message: "Area name is required" })
+    .trim(),
+    
+  areaDescription: z.string()
+    .min(1, { message: "Area description is required" })
+    .max(500, { message: "Area description cannot exceed 500 characters" })
+    .trim(),
+    
+  subTopicName: z.string()
+    .max(100, { message: "Sub-topic name cannot exceed 100 characters" })
+    .trim()
+    .optional(),
+    
+  followUpLimit: z.number()
+    .int({ message: "Must be a whole number" })
+    .min(0, { message: "Cannot be negative" })
+    .max(10, { message: "Cannot exceed 10" })
+    .optional()
+    .or(z.literal('')),
+    
+  consecutiveProbesLimit: z.number()
+    .int({ message: "Must be a whole number" })
+    .min(0, { message: "Cannot be negative" })
+    .max(10, { message: "Cannot exceed 10" })
+    .optional()
+    .or(z.literal('')),
+    
+  completionCriteria: z.string()
+    .max(500, { message: "Completion criteria cannot exceed 500 characters" })
+    .trim()
+    .optional()
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function SurveyDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   
   const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    mode: 'onBlur',
     defaultValues: {
       guideName: "Product Feedback",
       surveyGoal: "Understand user satisfaction with new features",
@@ -88,9 +132,51 @@ export default function SurveyDetail() {
     form.setValue(field as any, value, { shouldValidate: true });
   };
 
-  const onSubmit = (data: FormValues) => {
-    console.log('Form submitted:', data);
-    // Handle form submission here
+  const onSubmit = async (data: FormValues) => {
+    try {
+      setIsSaving(true);
+      console.log('Form submitted:', data);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const updatedSurvey: Survey = {
+        ...survey,
+        guideName: data.guideName,
+        surveyGoal: data.surveyGoal,
+        initiatorQuestion: data.initiatorQuestion,
+        areaName: data.areaName,
+        areaDescription: data.areaDescription,
+        subTopicName: data.subTopicName,
+        followUpLimit: data.followUpLimit ? Number(data.followUpLimit) : undefined,
+        consecutiveProbesLimit: data.consecutiveProbesLimit ? Number(data.consecutiveProbesLimit) : undefined,
+        completionCriteria: data.completionCriteria,
+        updatedAt: new Date().toISOString()
+      };
+      
+      setSurvey(updatedSurvey);
+      toast.success('Survey saved successfully!');
+    } catch (error) {
+      console.error('Error saving survey:', error);
+      toast.error('Failed to save survey. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Manually trigger validation and get the result
+    const result = await form.trigger();
+    
+    if (result) {
+      // If validation passes, submit the form
+      await form.handleSubmit(onSubmit)();
+    } else {
+      // If validation fails, show error toast
+      toast.error('Please fix the form errors before submitting.');
+    }
   };
 
   if (isLoading) {
@@ -133,7 +219,7 @@ export default function SurveyDetail() {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleFormSubmit} className="space-y-6" noValidate>
           <Card className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
             <CardHeader className="border-b dark:border-gray-700">
               <CardTitle className="text-lg font-semibold">
@@ -316,8 +402,10 @@ export default function SurveyDetail() {
                                             min="0"
                                             placeholder="e.g., 3"
                                             {...field}
-                                            value={field.value ?? ''}
+                                                value={field.value}
                                             onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
+                                            onBlur={field.onBlur}
+                                            disabled={isSaving}
                                             className="bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                           />
                                         </FormControl>
@@ -338,8 +426,10 @@ export default function SurveyDetail() {
                                             min="0"
                                             placeholder="e.g., 2"
                                             {...field}
-                                            value={field.value ?? ''}
+                                                value={field.value}
                                             onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
+                                            onBlur={field.onBlur}
+                                            disabled={isSaving}
                                             className="bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                           />
                                         </FormControl>
@@ -387,9 +477,18 @@ export default function SurveyDetail() {
                 Cancel
               </Button>
               <Button 
-                type="submit" 
+                type="submit"
                 disabled={isSaving} 
                 className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  const isValid = await form.trigger();
+                  if (isValid) {
+                    await form.handleSubmit(onSubmit)();
+                  } else {
+                    toast.error('Please fill the mandatory fields..');
+                  }
+                }}
               >
                 {isSaving ? (
                   <>

@@ -179,10 +179,10 @@ export default function SurveyGuide() {
             Create Survey
           </h2>
           <nav className="flex mt-2" aria-label="Breadcrumb">
-            <ol className="flex items-center space-x-2">
+            <ol className="flex text-sm items-center space-x-2">
               <li>
                 <div>
-                  <a href="/manage" className="text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                  <a href="/manage" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                     Survey
                   </a>
                 </div>
