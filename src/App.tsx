@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import SurveyGuide from "./pages/SurveyGuide";
 import ManageSurveys from "./pages/ManageSurveys";
 import SurveyDetail from "./pages/SurveyDetail";
+import SurveyViewPage from "./pages/SurveyViewPage";
 import Users from "./pages/Users";
 import ProgressPage from "./pages/ProgressPage";
 
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/guide" element={<SurveyGuide />} />
             <Route path="/manage" element={<ManageSurveys />} />
             <Route path="/surveys/:id" element={<SurveyDetail />} />
+            <Route path="/surveys/view/:id" element={<SurveyViewPage />} />
             <Route path="/users" element={<Users />} />
             <Route path="/active" element={<ProgressPage />} />
             

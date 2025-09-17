@@ -173,13 +173,19 @@ export default function SurveyGuide() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <h2 className="text-2xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">Create Survey</h2>
+     <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">Create Survey</h2>
+          
+          <p className="text-muted-foreground text-base text-sm mt-2">
+            Create and customize your survey with ease
+          </p>
+        </div>
       </div>
     <div className="h-full">
       <Card>
         
-        <CardContent className="p-6">
+        <CardContent className="p-8 mt-3">
           <Form {...form}>
             <form onSubmit={(e) => handleFormSubmit(e)} className="space-y-8" noValidate>
               {/* Survey Title */}

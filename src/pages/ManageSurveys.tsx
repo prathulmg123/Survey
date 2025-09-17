@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Pencil, Trash2, Eye, FileText, Users, X, Plus, ChevronLeft, ChevronRight, Search, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Pencil, Trash2, Eye, FileText, Users, X, Plus, ChevronLeft, ChevronRight, Search, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Loader } from "@/components/ui/Loader";
 import { useLoader } from "@/hooks/useLoader";
 import {
@@ -69,11 +69,11 @@ interface Survey {
 export default function ManageSurveys() {
   const [searchTerm, setSearchTerm] = useState("");
   const [surveys, setSurveys] = useState<Survey[]>(mockSurveys);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [currentSurvey, setCurrentSurvey] = useState<Survey | null>(null);
   const [surveyToDelete, setSurveyToDelete] = useState<Survey | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [sortField, setSortField] = useState<keyof Survey>('title');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const { showLoader, hideLoader } = useLoader();
@@ -101,17 +101,68 @@ export default function ManageSurveys() {
     );
   }
 
-  const filteredSurveys = surveys.filter((survey) =>
-    survey.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    survey.description.toLowerCase().includes(searchTerm.toLowerCase())
+  // Sort function
+  const sortSurveys = (surveysToSort: Survey[]) => {
+    return [...surveysToSort].sort((a, b) => {
+      let aValue = a[sortField];
+      let bValue = b[sortField];
+
+      // Handle different data types for sorting
+      if (sortField === 'createdAt' || sortField === 'updatedAt') {
+        aValue = new Date(a[sortField]).getTime() as any;
+        bValue = new Date(b[sortField]).getTime() as any;
+      } else if (typeof aValue === 'string' && typeof bValue === 'string') {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+
+      if (aValue < bValue) {
+        return sortDirection === 'asc' ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return sortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  };
+
+  // Handle sort click
+  const handleSort = (field: keyof Survey) => {
+    if (sortField === field) {
+      // Toggle sort direction if clicking the same field
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      // New field, default to ascending
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1); // Reset to first page when changing sort
+  };
+
+  // Get sort icon for a column
+  const getSortIcon = (field: keyof Survey) => {
+    if (sortField !== field) return <ArrowUpDown className="ml-1 h-3 w-3 inline-block opacity-50" />;
+    return sortDirection === 'asc' 
+      ? <ArrowUp className="ml-1 h-3 w-3 inline-block" /> 
+      : <ArrowDown className="ml-1 h-3 w-3 inline-block" />;
+  };
+
+  // Filter and sort surveys
+  const filteredSurveys = surveys.filter(
+    (survey) =>
+      survey.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      survey.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      survey.status.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  
+  const sortedSurveys = sortSurveys(filteredSurveys);
 
   // Pagination logic
-  const totalItems = filteredSurveys.length;
+  const totalItems = sortedSurveys.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
-  const currentItems = filteredSurveys.slice(startIndex, endIndex);
+  const currentItems = sortedSurveys.slice(startIndex, endIndex);
 
   const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setItemsPerPage(Number(e.target.value));
@@ -142,8 +193,7 @@ export default function ManageSurveys() {
   };
 
   const handleViewClick = (survey: Survey) => {
-    setCurrentSurvey(survey);
-    setIsViewModalOpen(true);
+    navigate(`/surveys/view/${survey.id}`);
   };
 
   const handleEditClick = (survey: Survey) => {
@@ -167,90 +217,6 @@ export default function ManageSurveys() {
 
   return (
     <div className="space-y-6">
-      {/* View Survey Modal */}
-      {isViewModalOpen && currentSurvey && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-background rounded-lg shadow-lg border">
-            <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="text-xl font-semibold !text-[#374151] dark:!text-gray-200">Survey Details</h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsViewModalOpen(false)}
-                className="h-8 w-8 p-0"
-              >
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </Button>
-            </div>
-
-            <div className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label className="font-medium">Survey Title</Label>
-                  <div className="p-2 bg-muted/50 rounded-md">
-                    {currentSurvey.title}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="font-medium">Status</Label>
-                  <div className="p-2 bg-muted/50 rounded-md">
-                    {getStatusBadge(currentSurvey.status)}
-                  </div>
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <Label className="font-medium">Description</Label>
-                  <div className="p-3 bg-muted/50 rounded-md min-h-[100px]">
-                    {currentSurvey.description || "No description provided"}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="font-medium">Created</Label>
-                  <div className="p-2 bg-muted/50 rounded-md">
-                    {new Date(currentSurvey.createdAt).toLocaleDateString()}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="font-medium">Last Updated</Label>
-                  <div className="p-2 bg-muted/50 rounded-md">
-                    {new Date(currentSurvey.updatedAt).toLocaleDateString()}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="font-medium">Responses</Label>
-                  <div className="p-2 bg-muted/50 rounded-md">
-                    {currentSurvey.responses} response{currentSurvey.responses !== 1 ? 's' : ''}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="font-medium">Questions</Label>
-                  <div className="p-2 bg-muted/50 rounded-md">
-                    {currentSurvey.questions} question{currentSurvey.questions !== 1 ? 's' : ''}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t">
-                <Button
-                  type="button"
-                  onClick={() => {
-                    setIsViewModalOpen(false);
-                    handleEditClick(currentSurvey);
-                  }}
-                >
-                  Edit Survey
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && surveyToDelete && (
@@ -265,7 +231,7 @@ export default function ManageSurveys() {
               </div>
 
               <p className="text-muted-foreground">
-                Are you sure you want to delete <span className="font-medium text-foreground">{surveyToDelete.title}</span>?
+                Are you sure you want to delete?
               </p>
 
               <div className="flex justify-end gap-3 pt-4">
@@ -288,10 +254,13 @@ export default function ManageSurveys() {
       )}
 
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+<div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">Manage Surveys</h2>
-
+          <h2 className="text-xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">Manage Survey</h2>
+          
+          <p className="text-muted-foreground text-base text-sm mt-2">
+            Overview of your survey management
+          </p>
         </div>
       </div>
 
@@ -317,13 +286,45 @@ export default function ManageSurveys() {
             <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-blue-50/50 to-transparent opacity-70 rounded-b-lg pointer-events-none"></div>
             <div className="relative bg-white rounded-lg overflow-hidden">
               <Table>
-                <TableHeader className="bg-blue-600">
-                  <TableRow className="hover:bg-blue-50">
-                    <TableHead className="text-white font-medium py-3 px-4 text-left">Survey</TableHead>
-                    <TableHead className="text-white font-medium py-3 px-4 text-left">Status</TableHead>
-                    <TableHead className="text-white font-medium py-3 px-4 text-left">Responses</TableHead>
-                    <TableHead className="text-white font-medium py-3 px-4 text-left">Created</TableHead>
-                    <TableHead className="text-white font-medium py-3 px-4 text-right">Actions</TableHead>
+                <TableHeader className="bg-blue-600/90">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead 
+                      className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                      onClick={() => handleSort('title')}
+                    >
+                      <div className="flex items-center">
+                        Survey
+                        {getSortIcon('title')}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                      onClick={() => handleSort('status')}
+                    >
+                      <div className="flex items-center">
+                        Status
+                        {getSortIcon('status')}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                      onClick={() => handleSort('responses')}
+                    >
+                      <div className="flex items-center">
+                        Responses
+                        {getSortIcon('responses')}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                      onClick={() => handleSort('createdAt')}
+                    >
+                      <div className="flex items-center">
+                        Created
+                        {getSortIcon('createdAt')}
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-white/95 font-medium py-3 px-4 text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="bg-white">
@@ -492,7 +493,7 @@ export default function ManageSurveys() {
                             key={pageNum}
                             onClick={() => goToPage(pageNum)}
                             className={`w-8 h-8 rounded-md text-sm ${currentPage === pageNum
-                                ? 'bg-blue-600 text-white'
+                                ? 'bg-blue-600/90 hover:bg-blue-600/90 text-white'
                                 : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
                               }`}
                           >
@@ -526,92 +527,7 @@ export default function ManageSurveys() {
     </div>
   );
 
-  {/* View Survey Modal */ }
-  {
-    isViewModalOpen && currentSurvey && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-        <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-background rounded-lg shadow-lg border">
-          <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="text-xl font-semibold">Survey Details</h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsViewModalOpen(false)}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </Button>
-          </div>
 
-          <div className="p-6 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label className="font-medium">Survey Title</Label>
-                <div className="p-2 bg-muted/50 rounded-md">
-                  {currentSurvey.title}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="font-medium">Status</Label>
-                <div className="p-2 bg-muted/50 rounded-md">
-                  {getStatusBadge(currentSurvey.status)}
-                </div>
-              </div>
-
-              <div className="space-y-2 md:col-span-2">
-                <Label className="font-medium">Description</Label>
-                <div className="p-3 bg-muted/50 rounded-md min-h-[100px]">
-                  {currentSurvey.description || "No description provided"}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="font-medium">Created</Label>
-                <div className="p-2 bg-muted/50 rounded-md">
-                  {new Date(currentSurvey.createdAt).toLocaleDateString()}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="font-medium">Last Updated</Label>
-                <div className="p-2 bg-muted/50 rounded-md">
-                  {new Date(currentSurvey.updatedAt).toLocaleDateString()}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="font-medium">Responses</Label>
-                <div className="p-2 bg-muted/50 rounded-md">
-                  {currentSurvey.responses} response{currentSurvey.responses !== 1 ? 's' : ''}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="font-medium">Questions</Label>
-                <div className="p-2 bg-muted/50 rounded-md">
-                  {currentSurvey.questions} question{currentSurvey.questions !== 1 ? 's' : ''}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button
-                type="button"
-                onClick={() => {
-                  setIsViewModalOpen(false);
-                  handleEditClick(currentSurvey);
-                }}
-              >
-                Edit Survey
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   /* Delete Confirmation Modal */
   {

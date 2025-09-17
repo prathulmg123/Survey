@@ -255,16 +255,12 @@ export const DashboardOverview = () => {
     <div className="space-y-6 h-full">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">Dashboard</h2>
+          <h2 className="text-xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">Dashboard</h2>
           
-          <p className="text-muted-foreground text-base">
+          <p className="text-muted-foreground text-base text-sm mt-2">
             Welcome back! Here's an overview of your survey platform.
           </p>
         </div>
-        {/* <Button variant="hero" className="gap-2">
-          <Plus className="h-4 w-4" />
-          Create Survey
-        </Button> */}
       </div>
 
       {/* Enhanced Stats Grid */}

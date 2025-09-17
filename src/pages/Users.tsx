@@ -5,7 +5,7 @@ import { useLoader } from "@/hooks/useLoader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Search, UserPlus, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Search, UserPlus, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Mock data - in a real app, this would come from an API
@@ -36,11 +36,16 @@ const mockUsers = [
   },
 ];
 
+type SortDirection = 'asc' | 'desc';
+type SortableField = 'name' | 'email' | 'role' | 'status' | 'lastActive';
+
 export default function Users() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [sortField, setSortField] = useState<SortableField>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const { showLoader, hideLoader } = useLoader();
 
   useEffect(() => {
@@ -65,19 +70,68 @@ export default function Users() {
     );
   }
 
+  // Sort function
+  const sortUsers = (users: typeof mockUsers) => {
+    return [...users].sort((a, b) => {
+      let aValue = a[sortField];
+      let bValue = b[sortField];
+
+      // Handle different data types for sorting
+      if (sortField === 'lastActive') {
+        aValue = new Date(a.lastActive).getTime() as any;
+        bValue = new Date(b.lastActive).getTime() as any;
+      } else {
+        aValue = String(aValue).toLowerCase();
+        bValue = String(bValue).toLowerCase();
+      }
+
+      if (aValue < bValue) {
+        return sortDirection === 'asc' ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return sortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  };
+
+  // Handle sort click
+  const handleSort = (field: SortableField) => {
+    if (sortField === field) {
+      // Toggle sort direction if clicking the same field
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      // New field, default to ascending
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1); // Reset to first page when changing sort
+  };
+
+  // Get sort icon for a column
+  const getSortIcon = (field: SortableField) => {
+    if (sortField !== field) return <ArrowUpDown className="ml-1 h-3 w-3 inline-block opacity-50" />;
+    return sortDirection === 'asc' 
+      ? <ArrowUp className="ml-1 h-3 w-3 inline-block" /> 
+      : <ArrowDown className="ml-1 h-3 w-3 inline-block" />;
+  };
+
+  // Filter and sort users
   const filteredUsers = mockUsers.filter(
     (user) =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.role.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  
+  const sortedUsers = sortUsers(filteredUsers);
 
   // Pagination logic
-  const totalItems = filteredUsers.length;
+  const totalItems = sortedUsers.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
-  const currentItems = filteredUsers.slice(startIndex, endIndex);
+  const currentItems = sortedUsers.slice(startIndex, endIndex);
 
   const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setItemsPerPage(Number(e.target.value));
@@ -94,13 +148,14 @@ export default function Users() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-        <h2 className="text-2xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">Users</h2>
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold tracking-tight !text-[#374151] dark:!text-gray-200">Users</h2>
+          <p className="text-muted-foreground text-base text-sm mt-2">
+            Here's an overview of your survey platform users and their activities.
+          </p>
+        </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            <UserPlus className="mr-2 h-4 w-4" />
-            Add User
-          </Button>
         </div>
       </div>
 
@@ -121,23 +176,63 @@ export default function Users() {
               />
             </div>
           </div>
-          <div className="relative rounded-lg border-2 border-blue-100 overflow-hidden mb-6 group shadow-md hover:shadow-lg transition-shadow duration-200">
+          <div className="relative rounded-lg border-2 border-blue-100 overflow-hidden mb-6 group shadow-md  transition-shadow duration-200">
             <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-blue-50/50 to-transparent opacity-70 rounded-b-lg pointer-events-none"></div>
             <div className="relative bg-white rounded-lg overflow-hidden">
               <Table className="w-full">
-              <TableHeader className="bg-blue-600">
-                <TableRow className="hover:bg-blue-700">
-                  <TableHead className="text-white font-medium py-3 px-4 text-left">Name</TableHead>
-                  <TableHead className="text-white font-medium py-3 px-4 text-left">Email</TableHead>
-                  <TableHead className="text-white font-medium py-3 px-4 text-left">Role</TableHead>
-                  <TableHead className="text-white font-medium py-3 px-4 text-left">Status</TableHead>
-                  <TableHead className="text-white font-medium py-3 px-4 text-right">Last Active</TableHead>
+              <TableHeader className="bg-blue-600/90">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead 
+                    className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                    onClick={() => handleSort('name')}
+                  >
+                    <div className="flex items-center">
+                      Name
+                      {getSortIcon('name')}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                    onClick={() => handleSort('email')}
+                  >
+                    <div className="flex items-center">
+                      Email
+                      {getSortIcon('email')}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                    onClick={() => handleSort('role')}
+                  >
+                    <div className="flex items-center">
+                      Role
+                      {getSortIcon('role')}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                    onClick={() => handleSort('status')}
+                  >
+                    <div className="flex items-center">
+                      Status
+                      {getSortIcon('status')}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="text-white/95 font-medium py-3 px-4 text-right cursor-pointer hover:bg-blue-700/80 transition-colors"
+                    onClick={() => handleSort('lastActive')}
+                  >
+                    <div className="flex items-center justify-end">
+                      Last Active
+                      {getSortIcon('lastActive')}
+                    </div>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className="bg-white">
                 {currentItems.length > 0 ? (
                   currentItems.map((user) => (
-                    <TableRow key={user.id} className="hover:bg-gray-50 border-b border-gray-100">
+                    <TableRow key={user.id} className=" border-b border-gray-100">
                       <TableCell className="py-4 px-4">
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
@@ -273,7 +368,7 @@ export default function Users() {
                           onClick={() => goToPage(pageNum)}
                           className={`w-8 h-8 rounded-md text-sm ${
                             currentPage === pageNum
-                              ? 'bg-blue-600 text-white'
+                              ? 'bg-blue-600/90 hover:bg-blue-600/90 text-white'
                               : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
                           }`}
                         >

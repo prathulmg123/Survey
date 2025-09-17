@@ -55,7 +55,7 @@ export function AppSidebar() {
      py-4 rounded-md transition-all duration-300 relative font-medium 
      ${
        active
-         ? "bg-gradient-to-r to-[#8a9097] from-[#d7dbe1fa] text-black border-l-4 border-blue-500"
+         ? "bg-gradient-to-r to-[#e1e1e1] from-[#e1e1e1] text-primary hover:text-primary font-bold border-l-4 border-blue-500"
          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
      }`;
   
@@ -109,7 +109,7 @@ export function AppSidebar() {
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <div className={`p-2 rounded-lg transition-all duration-300 ${
-                                  active ? 'bg-primary/15' : 'bg-muted/30 group-hover:bg-muted'
+                                  active ? '' : 'bg-muted/30 group-hover:bg-muted'
                                 }`}>
                                   <item.icon className={`h-5 w-5 flex-shrink-0 transition-all duration-300 ${
                                     active ? 'text-primary scale-110' : 'text-muted-foreground group-hover:text-foreground group-hover:scale-105'

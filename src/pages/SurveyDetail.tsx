@@ -23,7 +23,26 @@ const mockSurveys = [
     createdAt: "2023-09-01",
     updatedAt: "2023-09-10",
   },
-  // ... other mock surveys
+  {
+    id: 2,
+    title: "Product Feedback Q3",
+    description: "Gather feedback on our latest product features",
+    status: "draft",
+    responses: 0,
+    questions: 8,
+    createdAt: "2023-08-15",
+    updatedAt: "2023-08-20",
+  },
+  {
+    id: 3,
+    title: "Customer Satisfaction",
+    description: "Measure overall customer satisfaction with our services",
+    status: "completed",
+    responses: 128,
+    questions: 10,
+    createdAt: "2023-07-10",
+    updatedAt: "2023-08-31",
+  },
 ];
 
 interface Survey {
@@ -121,12 +140,37 @@ export default function SurveyDetail() {
 
   return (
     <div className="space-y-6">
-       <div className="space-y-1">
-        <h2 className="text-2xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">Survey Details</h2>
+        <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">
+            Edit Survey
+          </h2>
+          <nav className="flex mt-2" aria-label="Breadcrumb">
+            <ol className="flex items-center space-x-2">
+              <li>
+                <div>
+                  <a href="/manage" className="text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                   Manage Survey
+                  </a>
+                </div>
+              </li>
+              <li>
+                <div className="flex items-center">
+                  <svg className="h-5 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span className="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {survey?.title || 'View'}
+                  </span>
+                </div>
+              </li>
+            </ol>
+          </nav>
+        </div>
       </div>
       <Card>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-6 mt-8">
+        <form onSubmit={handleSubmit} className="p-2">
+          <CardContent className="space-y-6 mt-8 ">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="title">Survey Title</Label>
