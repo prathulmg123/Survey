@@ -120,7 +120,7 @@ export default function SurveyDetail() {
     return (
       <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
         <div className="text-center">
-          <Loader text="Loading survey..." show={true} size={52} />
+          <Loader text="Loading..." show={true} size={52} />
         </div>
       </div>
     );

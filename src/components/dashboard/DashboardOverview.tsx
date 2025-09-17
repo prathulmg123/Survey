@@ -256,7 +256,7 @@ export const DashboardOverview = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">Dashboard</h2>
-          
+
           <p className="text-muted-foreground text-base text-sm mt-2">
             Welcome back! Here's an overview of your survey platform.
           </p>
@@ -317,19 +317,19 @@ export const DashboardOverview = () => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={responseData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-muted" />
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
                   tickLine={false}
                   tick={{ fontSize: 12 }}
                 />
-                <YAxis 
-                  axisLine={false} 
+                <YAxis
+                  axisLine={false}
                   tickLine={false}
                   tick={{ fontSize: 12 }}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Line 
+                <Line
                   type="monotone"
                   dataKey="responses"
                   stroke="#3c83f5"
@@ -422,20 +422,21 @@ export const DashboardOverview = () => {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={surveyPerformance}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-muted" />
-              <XAxis 
-                dataKey="name" 
-                axisLine={false} 
+              <XAxis
+                dataKey="name"
+                axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 12 }}
               />
-              <YAxis 
-                axisLine={false} 
+              <YAxis
+                axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 12 }}
                 domain={[0, 100]}
                 tickFormatter={(value) => `${value}%`}
               />
-              <Tooltip 
+              <Tooltip
+                cursor={{ fill: "transparent" }}
                 content={({ active, payload, label }) => {
                   if (active && payload && payload.length) {
                     return (
@@ -455,16 +456,19 @@ export const DashboardOverview = () => {
                   return null;
                 }}
               />
-              <Bar 
-                dataKey="target" 
+
+              <Bar
+                dataKey="target"
                 fill="#bcc3ca"
                 radius={[4, 4, 0, 0]}
                 opacity={0.7}
+                barSize={70}
               />
-              <Bar 
-                dataKey="completion" 
+              <Bar
+                dataKey="completion"
                 fill="#3c83f5"
                 radius={[4, 4, 0, 0]}
+                barSize={70}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -503,7 +507,7 @@ export const DashboardOverview = () => {
                 className="pl-9 h-9 text-sm"
               />
             </div>
-            
+
             <div className="space-y-3">
               {recentSurveys.map((survey) => (
                 <div
@@ -539,9 +543,9 @@ export const DashboardOverview = () => {
                       )}
                     </div>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     className="h-8 w-8 opacity-0 group-hover/item:opacity-100 transition-opacity"
                   >
                     <ArrowRight className="h-4 w-4" />
@@ -549,7 +553,7 @@ export const DashboardOverview = () => {
                 </div>
               ))}
             </div>
-            
+
             <Button variant="outline" className="w-full mt-2">
               View All Surveys
             </Button>
@@ -625,7 +629,7 @@ export const DashboardOverview = () => {
                 </div>
               </TabsContent>
             </Tabs>
-            
+
             <div className="bg-muted/30 p-4 rounded-lg">
               <h4 className="font-medium text-sm flex items-center gap-2">
                 <BarChart3 className="h-4 w-4 text-primary" />

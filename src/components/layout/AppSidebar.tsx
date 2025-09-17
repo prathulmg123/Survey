@@ -55,8 +55,8 @@ export function AppSidebar() {
      py-4 rounded-md transition-all duration-300 relative font-medium 
      ${
        active
-         ? "bg-gradient-to-r to-[#e1e1e1] from-[#e1e1e1] text-primary hover:text-primary font-bold border-l-4 border-blue-500"
-         : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+         ? "bg-gradient-to-r to-[#e1e1e1] from-[#e1e1e1] !text-primary hover:!text-primary font-bold border-l-4 border-blue-500"
+         : "text-muted-foreground hover:bg-muted/50 hover:!text-foreground"
      }`;
   
   

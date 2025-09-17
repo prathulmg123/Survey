@@ -48,7 +48,7 @@ const createFileWithPreview = (file: File): FileWithPreview => {
 
 const formSchema = z.object({
   surveyTitle: z.string()
-  .min(1, { message: "Survey title is required" })
+  .min(1, { message: "Survey name is required" })
     .min(5, { message: "Survey title must be at least 5 characters" })
     .max(100, { message: "Survey title cannot exceed 100 characters" })
     .trim(),
@@ -216,7 +216,7 @@ export default function SurveyGuide() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description (Optional)</FormLabel>
+                    <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Enter survey description"

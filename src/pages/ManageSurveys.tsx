@@ -20,6 +20,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Portal } from "@/components/ui/Portal";
 
 // Mock data - in a real app, this would come from an API
 const mockSurveys = [
@@ -71,6 +72,23 @@ export default function ManageSurveys() {
   const [surveys, setSurveys] = useState<Survey[]>(mockSurveys);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [surveyToDelete, setSurveyToDelete] = useState<Survey | null>(null);
+
+  // Prevent background scrolling when modal is open
+  useEffect(() => {
+    if (isDeleteModalOpen) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+    
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [isDeleteModalOpen]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [sortField, setSortField] = useState<keyof Survey>('title');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -178,18 +196,22 @@ export default function ManageSurveys() {
     setIsDeleteModalOpen(true);
   };
 
-  const confirmDelete = () => {
-    if (surveyToDelete) {
-      setSurveys(surveys.filter(survey => survey.id !== surveyToDelete.id));
-      // In a real app, you would call an API to delete the survey
-      setIsDeleteModalOpen(false);
-      setSurveyToDelete(null);
-    }
+  const cancelDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDeleteModalOpen(false);
+    // Don't clear surveyToDelete immediately to avoid animation flicker
+    setTimeout(() => setSurveyToDelete(null), 200);
   };
 
-  const cancelDelete = () => {
-    setIsDeleteModalOpen(false);
-    setSurveyToDelete(null);
+  const confirmDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (surveyToDelete) {
+      console.log("Deleting survey:", surveyToDelete.id);
+      setSurveys(prev => prev.filter(s => s.id !== surveyToDelete.id));
+      setIsDeleteModalOpen(false);
+      // Don't clear surveyToDelete immediately to avoid animation flicker
+      setTimeout(() => setSurveyToDelete(null), 200);
+    }
   };
 
   const handleViewClick = (survey: Survey) => {
@@ -219,39 +241,47 @@ export default function ManageSurveys() {
     <div className="space-y-6">
 
       {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && surveyToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md bg-background rounded-lg shadow-lg border">
-            <div className="p-6 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-destructive/10">
-                  <Trash2 className="h-6 w-6 text-destructive" />
+      <Portal>
+        {isDeleteModalOpen && surveyToDelete && (
+          <div 
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            onClick={cancelDelete}
+          >
+            <div 
+              className="w-full max-w-md bg-background rounded-lg shadow-xl border border-border/50 overflow-hidden animate-in fade-in-75 zoom-in-95"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-destructive/10">
+                    <Trash2 className="h-6 w-6 text-destructive" />
+                  </div>
+                  <h2 className="text-xl font-semibold">Delete Survey</h2>
                 </div>
-                <h2 className="text-xl font-semibold">Delete Survey</h2>
-              </div>
 
-              <p className="text-muted-foreground">
-                Are you sure you want to delete?
-              </p>
+                <p className="text-muted-foreground">
+                  Are you sure you want to delete?
+                </p>
 
-              <div className="flex justify-end gap-3 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={cancelDelete}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={confirmDelete}
-                >
-                  Delete Survey
-                </Button>
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={cancelDelete}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={confirmDelete}
+                  >
+                    Delete Survey
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Portal>
 
 
 <div className="flex items-center justify-between">

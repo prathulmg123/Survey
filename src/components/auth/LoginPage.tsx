@@ -22,7 +22,7 @@ const LoginPage = () => {
       if (email && password) {
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("userEmail", email);
-        toast.success("Welcome back! Redirecting to dashboard...");
+        toast.success("Login successful! Taking you to your dashboard...");
         navigate("/dashboard");
       } else {
         toast.error("Please fill in all fields");

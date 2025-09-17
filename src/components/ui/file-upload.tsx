@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useDropzone, type DropzoneOptions } from "react-dropzone";
-import { Upload, X } from "lucide-react";
+import { Upload, X, FileText, File } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 
@@ -34,8 +34,13 @@ export function FileUpload({
   className,
   ...props
 }: FileUploadProps) {
-  const [files, setFiles] = React.useState<FileWithPreview[]>([]);
+  const [files, setFiles] = React.useState<FileWithPreview[]>(value || []);
   const [rejected, setRejected] = React.useState<{ file: File; errors: { code: string; message: string }[] }[]>([]);
+
+  // Sync internal state with external value prop
+  React.useEffect(() => {
+    setFiles(value || []);
+  }, [value]);
 
   React.useEffect(() => {
     return () => {
@@ -91,8 +96,8 @@ export function FileUpload({
       <div
         {...getRootProps({
           className: cn(
-            "relative rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors",
-            isDragActive ? "border-primary bg-primary/5" : "hover:border-primary/50",
+            "relative rounded-lg border-2 border-dashed border-gray-200 bg-gray-80 p-6 text-center transition-colors",
+            isDragActive ? "border-primary bg-primary/5" : "hover:border-primary/50 hover:bg-gray-100/50",
             disabled && "cursor-not-allowed opacity-60",
             className
           ),
@@ -102,7 +107,7 @@ export function FileUpload({
         <input {...getInputProps()} />
         <div className="flex flex-col items-center justify-center space-y-2">
           <Upload className="h-10 w-10 text-muted-foreground" />
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-blue-700/90">
             <span className="relative rounded-md bg-transparent font-medium text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2">
               Upload a file
             </span>{" "}or drag and drop
@@ -118,31 +123,40 @@ export function FileUpload({
 
       {/* Accepted files */}
       {files.length > 0 && (
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium">Uploaded files</h4>
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-foreground">Uploaded files</h4>
           <ul className="space-y-2">
             {files.map((file, index) => (
               <li
                 key={file.name}
-                className="flex items-center justify-between rounded-md border border-border bg-muted/20 p-2 text-sm"
+                className="group flex items-center justify-between rounded-lg border border-blue-100 bg-blue-100/80 p-3 text-sm shadow-sm transition-colors hover:bg-blue-100/80"
               >
-                <div className="flex items-center space-x-2">
-                  <span className="truncate">{file.name}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {(file.size / 1024).toFixed(1)} KB
-                  </span>
+                <div className="flex min-w-0 items-center space-x-3">
+                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                    {file.name.endsWith('.pdf') ? (
+                      <FileText className="h-4 w-4" />
+                    ) : (
+                      <File className="h-4 w-4" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-foreground">{file.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {(file.size / 1024).toFixed(1)} KB
+                    </p>
+                  </div>
                 </div>
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6"
+                  className="h-7 w-7 p-0 hover:bg-transparent text-muted-foreground hover:text-foreground"
                   onClick={(e) => {
                     e.stopPropagation();
                     removeFile(index);
                   }}
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-3.5 w-3.5" />
                   <span className="sr-only">Remove file</span>
                 </Button>
               </li>
