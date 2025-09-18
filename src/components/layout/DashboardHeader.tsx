@@ -14,6 +14,7 @@ import { Bell, Search, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useTheme } from "@/contexts/ThemeContext";
+import authService from "@/api/authService";
 
 export const DashboardHeader = () => {
   const navigate = useNavigate();
@@ -22,16 +23,20 @@ export const DashboardHeader = () => {
 
   const { theme, toggleTheme } = useTheme();
 
-  const handleLogout = () => {
-    // Switch to light mode before logging out
-    if (theme === 'dark') {
-      toggleTheme();
+  const handleLogout = async () => {
+    try {
+      // Switch to light mode before logging out
+      if (theme === 'dark') {
+        toggleTheme();
+      }
+      
+      // Call the authService logout which will handle API call and cleanup
+      await authService.logout(navigate);
+      toast.success("Successfully logged out");
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error("Failed to log out. Please try again.");
     }
-    
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("userEmail");
-    toast.success("Logged out successfully");
-    navigate("/login");
   };
 
   return (

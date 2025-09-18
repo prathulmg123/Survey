@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import authService from "@/api/authService";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -15,20 +16,31 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
     setIsLoading(true);
 
-    // Simulate authentication
-    setTimeout(() => {
-      if (email && password) {
-        localStorage.setItem("isAuthenticated", "true");
-        localStorage.setItem("userEmail", email);
-        toast.success("Login successful! Taking you to your dashboard...");
-        navigate("/dashboard");
-      } else {
-        toast.error("Please fill in all fields");
-      }
+    try {
+      const response = await authService.login({
+        email: email,
+        password: password
+      });
+      console.log("Login response:", response);
+      // Store user email in localStorage for display purposes
+      localStorage.setItem("userEmail", email);
+      localStorage.setItem("isAuthenticated", "true");
+      
+      toast.success("Login successful! Taking you to your dashboard...");
+      navigate("/dashboard");
+    } catch (error: any) {  
+      toast.error(error.response?.data?.detail);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (

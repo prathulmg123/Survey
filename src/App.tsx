@@ -8,6 +8,7 @@ import LoginPage from "./components/auth/LoginPage";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import { DashboardOverview } from "./components/dashboard/DashboardOverview";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { AuthRoute } from "./components/auth/AuthRoute";
 import NotFound from "./pages/NotFound";
 import SurveyGuide from "./pages/SurveyGuide";
 import ManageSurveys from "./pages/ManageSurveys";
@@ -27,7 +28,14 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route 
+            path="/login" 
+            element={
+              <AuthRoute>
+                <LoginPage />
+              </AuthRoute>
+            } 
+          />
           
           {/* All authenticated routes with layout */}
           <Route
