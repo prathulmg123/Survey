@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Loader } from "@/components/ui/Loader";
+import { ArrowLeft, Info, List, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Survey {
@@ -300,9 +301,7 @@ export default function SurveyDetail() {
                   <AccordionTrigger className="px-6 py-4 hover:no-underline bg-indigo-100 dark:bg-indigo-900/40">
                     <div className="flex items-center space-x-4">
                       <span className="h-10 w-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h2a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                        </svg>
+                      <Info className="h-5 w-5" />
                       </span>
                       <div className="text-left">
                         <h3 className="text-base font-semibold">Topic Area</h3>
@@ -358,10 +357,7 @@ export default function SurveyDetail() {
                             <AccordionTrigger className="px-5 py-3 hover:no-underline bg-orange-50 dark:bg-orange-900/40">
                               <div className="flex items-center space-x-3">
                                 <span className="h-8 w-8 rounded-md bg-white dark:bg-slate-700 flex items-center justify-center text-orange-600 dark:text-orange-500 shadow-sm">
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                                    <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
-                                  </svg>
+                                <List className="h-4 w-4" />
                                 </span>
                                 <div className="text-left">
                                   <h3 className="text-base font-medium">Sub-Topic</h3>

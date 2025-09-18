@@ -3,10 +3,12 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Calendar } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ArrowLeft, Info, List, Plus, Trash2 } from "lucide-react";
 import { useLoader } from "@/hooks/useLoader";
 import { Loader } from "@/components/ui/Loader";
 
@@ -134,84 +136,143 @@ export default function SurveyViewPage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-8">
-
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-2">
-          <div className="space-y-1">
-            <Label htmlFor="title" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Survey Title
-            </Label>
-            <Input
-              id="title"
-              value={survey.title}
-              disabled
-              className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Status
-            </Label>
-            <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-300 dark:border-gray-600 text-sm">
-              {getStatusBadge(survey.status)}
-            </div>
-          </div>
-
-          <div className="md:col-span-2 space-y-1">
-            <Label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Description
-            </Label>
-            <Textarea
-              id="description"
-              value={survey.description || "No description provided"}
-              disabled
-              className="min-h-[100px] bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:col-span-2 border-t border-gray-200 dark:border-gray-700 pt-6">
-            <div className="space-y-1">
-              <Label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Created
-              </Label>
-              <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-300 dark:border-gray-600 text-sm">
-                {new Date(survey.createdAt).toLocaleDateString()}
+      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700/50">
+        {/* Header Section */}
+        <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-700/50">
+          <div className="flex flex-col space-y-4">
+            <div className="flex flex-col space-y-1">
+              <h1 className="text-xl font-medium text-gray-800 dark:text-gray-200 leading-tight mb-2">{survey.title}</h1>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                <span className="inline-flex items-center text-gray-500 dark:text-gray-400">
+                  <Calendar className="h-4 w-4 mr-1.5 text-gray-400 dark:text-gray-500" />
+                  Created {new Date(survey.createdAt).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                  })}
+                </span>
+                <span className="text-gray-300 dark:text-gray-600">•</span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  <span className="font-medium text-gray-700 dark:text-gray-300">{survey.questions}</span> question{survey.questions !== 1 ? 's' : ''}
+                </span>
+                <span className="text-gray-300 dark:text-gray-600">•</span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  <span className="font-medium text-gray-700 dark:text-gray-300">{survey.responses}</span> response{survey.responses !== 1 ? 's' : ''}
+                </span>
               </div>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Last Updated
-              </Label>
-              <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-300 dark:border-gray-600 text-sm">
-                {new Date(survey.updatedAt).toLocaleDateString()}
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Responses
-              </Label>
-              <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-300 dark:border-gray-600 text-sm">
-                {survey.responses} response{survey.responses !== 1 ? 's' : ''}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-1 md:col-span-2">
-            <Label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Questions
-            </Label>
-            <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-300 dark:border-gray-600">
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                {survey.questions} question{survey.questions !== 1 ? 's' : ''} in this survey
-              </p>
             </div>
           </div>
         </div>
+
+        {/* Details Section */}
+        <div className="bg-gray-50/50 dark:bg-gray-800/50 px-8 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="border-b border-gray-100 dark:border-gray-700/50">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Guide</h3>
+            <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
+            {survey.guideName || 'Product Feedback'}
+            </div>
+          </div>
+          <div className="border-b border-gray-100 dark:border-gray-700/50">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Goal</h3>
+            <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
+            {survey.surveyGoal || 'Understand user satisfaction with new features'}
+            </div>
+          </div>
+            
+            
+            <div className="border-b border-gray-100 dark:border-gray-700/50">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Initiator Question</h3>
+            <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
+            {survey.initiatorQuestion || 'How satisfied are you with our product?'}
+            </div>
+          </div>
+           
+          </div>
+        </div>
+
+        {/* Description Section */}
+        {survey.description && (
+          <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-700/50">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</h3>
+            <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
+              {survey.description}
+            </div>
+          </div>
+        )}
+
+         {/* Topic Area Section */}
+      <div className="mt-8 p-6">
+        <Accordion type="single" collapsible className="w-full space-y-4" defaultValue="topic-area">
+          <AccordionItem value="topic-area" className="border-2 border-indigo-200 dark:border-indigo-800/70 rounded-xl overflow-hidden">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline bg-indigo-100 dark:bg-indigo-900/40">
+              <div className="flex items-center space-x-4">
+                <span className="h-10 w-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                  <Info className="h-5 w-5" />
+                </span>
+                <div className="text-left">
+                  <h3 className="text-base font-semibold">Topic Area</h3>
+                  <p className="text-sm text-muted-foreground">Feature Appeal</p>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6 pt-0">
+              <div className="space-y-6 mt-6">
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Area Name</h4>
+                  <p className="text-sm text-gray-900 dark:text-gray-100">Product Features</p>
+                </div>
+                
+                {/* Sub-Topic Section */}
+                <div className="mt-8">
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="sub-topic" className="border-2 border-orange-200 dark:border-orange-800/70 rounded-xl overflow-hidden">
+                      <AccordionTrigger className="px-5 py-3 hover:no-underline bg-orange-50 dark:bg-orange-900/40">
+                        <div className="flex items-center space-x-4">
+                          <span className="h-9 w-9 rounded-lg bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400">
+                            <List className="h-4 w-4" />
+                          </span>
+                          <div className="text-left">
+                            <h3 className="text-sm font-medium">Sub-Topic</h3>
+                            <p className="text-xs text-muted-foreground">Feature Importance</p>
+                          </div>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="mb-4 mt-3 px-8 pb-6">
+                        <div className="space-y-6">
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Sub-Topic Name</h4>
+                            <p className="text-sm text-gray-900 dark:text-gray-100">Core Features</p>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Description</h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-300">
+                              Rate the importance of each core feature in our product.
+                            </p>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Questions</h4>
+                            <div className="space-y-2">
+                              <p className="text-sm text-gray-900 dark:text-gray-100">1. How important is the search functionality to you?</p>
+                              <p className="text-sm text-gray-900 dark:text-gray-100">2. Rate the importance of the dark mode feature.</p>
+                              <p className="text-sm text-gray-900 dark:text-gray-100">3. How valuable is the offline access feature?</p>
+                            </div>
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
+      </div>
+
+     
     </div>
   );
 }
