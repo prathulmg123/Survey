@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Loader } from "@/components/ui/Loader";
 import { useLoader } from "@/hooks/useLoader";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { createSurveyDraft } from "@/api/surveyService";
 import {
   Form,
   FormControl,
@@ -91,7 +93,9 @@ const questionTypes = [
 
 export default function SurveyGuide() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { showLoader, hideLoader } = useLoader();
+  const navigate = useNavigate();
   
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -127,18 +131,44 @@ export default function SurveyGuide() {
       </div>
     );
   }
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log('=== Form Submission ===');
-    console.log('Form values:', values);
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (isSubmitting) return;
     
-    // Log file information
-    if (values.files && values.files.length > 0) {
-      console.log('Files:', values.files.map(file => ({
-        name: file.name,
-        type: file.type,
-        size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-        lastModified: new Date(file.lastModified).toLocaleString()
-      })));
+    setIsSubmitting(true);
+    showLoader('Creating survey...');
+    
+    try {
+      if (!values.files || values.files.length === 0) {
+        throw new Error('Please upload a file');
+      }
+      
+      // Call the API with query parameters and file
+      const response = await createSurveyDraft({
+        name: values.surveyTitle,
+        description: values.description,
+        file: values.files[0]
+      });
+      
+      if (response.success) {
+        toast.success('Survey created successfully!');
+        // Navigate to the create view page with the response data
+        console.log(response.data,"created")
+        navigate('/surveys/create-view', { 
+          state: { 
+            surveyData: response.data,
+            // Include any additional data you want to pass
+            fromCreate: true 
+          } 
+        });
+      } else {
+        throw new Error(response.message || 'Failed to create survey');
+      }
+    } catch (error) {
+      console.error('Error creating survey:', error);
+      toast.error(error.message || 'An error occurred while creating the survey');
+    } finally {
+      setIsSubmitting(false);
+      hideLoader();
     }
   };
 
@@ -291,18 +321,16 @@ export default function SurveyGuide() {
                   </Button>
                   <Button 
                     type="submit" 
-                    disabled={form.formState.isSubmitting}
+                    disabled={isSubmitting}
                     className="bg-blue-700/90 hover:bg-blue-700/90 text-white"
                   >
-                    {form.formState.isSubmitting ? (
+                    {isSubmitting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Creating...
                       </>
                     ) : (
-                      <>
-                        Create Survey
-                      </>
+                      'Create Survey'
                     )}
                   </Button>
                 </div>

@@ -31,14 +31,14 @@ export default function SurveyViewPage() {
           // Map the API response to the expected format
           const surveyData = {
             ...response.data,
-            title: response.data.human_readable_id?.replace(/-/g, ' ').replace(/\d+$/, '').trim() || 'Survey',
+            title: response.data.name?.replace(/-/g, ' ').replace(/\d+$/, '').trim() || 'Survey',
             description: `Survey ID: ${response.data.human_readable_id || id}`,
             status: response.data.status?.toLowerCase() || 'draft',
             questions: response.data.questions?.length || 0,
             responses: response.data.responses || 0,
             createdAt: response.data.created_at || response.data.createdAt,
             updatedAt: response.data.updated_at || response.data.updatedAt,
-            topicArea : response?.data.guide_snapshot?.research_areas
+            topicArea : response?.data?.research_areas
           };
           
           setSurvey(surveyData);
@@ -203,13 +203,13 @@ export default function SurveyViewPage() {
           <div className="border-b border-gray-100 dark:border-gray-700/50">
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Guide</h3>
             <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
-            {survey?.guide_snapshot?.name || 'Product Feedback'}
+            {survey?.source_document_name || 'Product Feedback'}
             </div>
           </div>
           <div className="border-b border-gray-100 dark:border-gray-700/50">
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Goal</h3>
             <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
-            {survey?.guide_snapshot?.overall_research_goal || 'Understand user satisfaction with new features'}
+            {survey?.overall_research_goal || 'Understand user satisfaction with new features'}
             </div>
           </div>
             
@@ -217,7 +217,7 @@ export default function SurveyViewPage() {
             <div className="border-b border-gray-100 dark:border-gray-700/50">
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Initiator Question</h3>
             <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
-            {survey?.guide_snapshot?.initiator_question || 'How satisfied are you with our product?'}
+            {survey?.initiator_question || 'How satisfied are you with our product?'}
             </div>
           </div>
            

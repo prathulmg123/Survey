@@ -21,14 +21,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Portal } from "@/components/ui/Portal";
-import { getSurveys, mapApiSurveyToUiSurvey, Survey as ApiSurvey } from "@/api/surveyService";
+import { getSurveys, mapApiSurveyToUiSurvey, Survey as ApiSurvey, deleteSurvey } from "@/api/surveyService";
+import { toast } from "sonner";
 
 interface Survey extends ApiSurvey {
   id: number;
   title: string;
   description: string;
   status: string;
-  responses: number;
+  responses: any;
   questions: number;
   createdAt: string;
   updatedAt: string;
@@ -54,7 +55,7 @@ export default function ManageSurveys() {
       setError(null);
       const response = await getSurveys();
       if (response.success) {
-        const mappedSurveys = response.data.sessions.map((survey, index) => 
+        const mappedSurveys = response.data.guides.map((survey, index) => 
           mapApiSurveyToUiSurvey(survey, index)
         ) as any;
         setSurveys(mappedSurveys);
@@ -174,12 +175,14 @@ export default function ManageSurveys() {
   };
 
   // Filter and sort surveys
-  const filteredSurveys = surveys.filter(
-    (survey) =>
-      survey.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      survey.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      survey.status.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredSurveys = surveys.filter((survey) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      (survey.title?.toLowerCase() || '').includes(searchLower) ||
+      (survey.description?.toLowerCase() || '').includes(searchLower) ||
+      (survey.status?.toLowerCase() || '').includes(searchLower)
+    );
+  });
   
   const sortedSurveys = sortSurveys(filteredSurveys);
 
@@ -215,15 +218,21 @@ export default function ManageSurveys() {
     e.stopPropagation();
     if (surveyToDelete) {
       try {
-        // TODO: Add actual API call to delete survey
-        // await deleteSurvey(surveyToDelete._id);
-        setSurveys(prev => prev.filter(s => s.id !== surveyToDelete.id));
-        setIsDeleteModalOpen(false);
-        // Show success message
+        const result = await deleteSurvey(surveyToDelete._id);
+        if (result.success) {
+          // Remove the deleted survey from the list
+          setSurveys(prev => prev.filter(s => s.id !== surveyToDelete.id));
+          // Show success message
+          toast.success('Survey deleted successfully');
+        } else {
+          // Show error message from API
+          toast.error(result.message || 'Failed to delete survey');
+        }
       } catch (error) {
         console.error('Error deleting survey:', error);
-        // Show error message
+        toast.error('An error occurred while deleting the survey');
       } finally {
+        setIsDeleteModalOpen(false);
         setTimeout(() => setSurveyToDelete(null), 200);
       }
     }
