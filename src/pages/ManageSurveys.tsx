@@ -45,7 +45,7 @@ export default function ManageSurveys() {
   const [sortField, setSortField] = useState<keyof Survey>('title');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -250,14 +250,16 @@ export default function ManageSurveys() {
 
   const getStatusBadge = (status: string) => {
     switch (status.toLowerCase()) {
-      case "in_progress":
-        return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">In Progress</Badge>;
+      case "draft":
+        return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">Draft</Badge>;
       case "completed":
         return <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200">Completed</Badge>;
       case "error":
-        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200">Error</Badge>;
+        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200">Error</Badge>
+        case "in_progress":
+        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200">In Progress</Badge>;
       default:
-        return <Badge variant="outline" className="capitalize">{status.toLowerCase().replace('_', ' ')}</Badge>;
+        return <Badge variant="outline" className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200 capitalize">{status.toLowerCase().replace('_', ' ')}</Badge>;
     }
   };
 

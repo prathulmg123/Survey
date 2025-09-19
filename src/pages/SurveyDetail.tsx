@@ -392,7 +392,7 @@ export default function SurveyDetail() {
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm mt-4">
               <span className="inline-flex items-center text-gray-500 dark:text-gray-400">
-                <Calendar className="h-4 w-4 mr-1.5 text-gray-400 dark:text-gray-500" />
+                <Calendar className="h-4 mb-1 w-4 mr-1.5 text-gray-400 dark:text-gray-500" />
                 Created {survey.createdAt ? new Date(survey.createdAt).toLocaleDateString('en-US', { 
                   year: 'numeric', 
                   month: 'short', 
@@ -462,11 +462,14 @@ export default function SurveyDetail() {
                           <span className="text-destructive ml-1">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="What do you want to learn?"
-                            {...field}
-                            className="bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                          />
+                          <div className="relative w-full">
+                            <Input
+                              placeholder="What do you want to learn?"
+                              {...field}
+                              className="bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white truncate pr-6"
+                              title={field.value} // Shows full text on hover
+                            />
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

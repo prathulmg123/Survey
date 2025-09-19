@@ -209,7 +209,7 @@ export default function SurveyCreateView() {
               </div>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm mt-4">
                 <span className="inline-flex items-center text-gray-500 dark:text-gray-400">
-                  <Calendar className="h-4 w-4 mr-1.5 text-gray-400 dark:text-gray-500" />
+                  <Calendar className="h-4 mb-1 w-4 mr-1.5 text-gray-400 dark:text-gray-500" />
                   Created {new Date(survey.createdAt).toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'short', 

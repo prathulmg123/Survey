@@ -283,12 +283,12 @@ export default function Users() {
                         </a>
                       </TableCell>
                       <TableCell className="px-4">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                           user.role === 'Admin' 
-                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' 
-                            : user.role === 'Admin' 
-                              ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' 
-                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                            ? 'bg-blue-500/20 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300' 
+                            : user.role === 'User' 
+                              ? 'bg-sky-500/20 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300'
+                              : 'bg-purple-500/20 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300'
                         }`}>
                           {user.role}
                         </span>

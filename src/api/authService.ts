@@ -95,19 +95,25 @@ export const authService = {
     return roles.includes(user?.role);
   },
 
-  async logout(navigate?: (path: string) => void) {
+  async logout(navigate?: (path: string) => void, sessionExpired = false) {
     try {
+      if (sessionExpired) {
+        localStorage.setItem('sessionExpired', 'true');
+      }
       // Call the logout API endpoint if needed
       await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT);
     } catch (error) {
       console.error('Logout error:', error);
       // Continue with local cleanup even if API call fails
     } finally {
-      // Clear all auth-related items from localStorage
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('tokenExpiresAt');
-      localStorage.removeItem('userEmail');
-      localStorage.removeItem('isAuthenticated');
+      // Clear all auth-related items from localStorage except sessionExpired flag
+      const sessionExpiredFlag = localStorage.getItem('sessionExpired');
+      localStorage.clear();
+      
+      // Restore sessionExpired flag if it was set
+      if (sessionExpired) {
+        localStorage.setItem('sessionExpired', 'true');
+      }
       
       // Clear axios authorization header
       delete apiClient.defaults.headers.common['Authorization'];

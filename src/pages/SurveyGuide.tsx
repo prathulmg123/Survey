@@ -92,9 +92,10 @@ const questionTypes = [
 ];
 
 export default function SurveyGuide() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isApiLoading, setIsApiLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showLoader, hideLoader } = useLoader();
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const navigate = useNavigate();
   
   // Initialize form
@@ -108,10 +109,10 @@ export default function SurveyGuide() {
     },
   });
 
-  // Handle loading state
+  // Handle page loading state
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsLoading(false);
+      setIsPageLoading(false);
       hideLoader();
     }, 500);
 
@@ -122,7 +123,7 @@ export default function SurveyGuide() {
   }, [showLoader, hideLoader]);
 
   // Show loading state
-  if (isLoading) {
+  if (isPageLoading) {
     return (
       <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
         <div className="text-center">
@@ -135,6 +136,7 @@ export default function SurveyGuide() {
     if (isSubmitting) return;
     
     setIsSubmitting(true);
+    setIsApiLoading(true);
     showLoader('Creating survey...');
     
     try {
@@ -168,6 +170,7 @@ export default function SurveyGuide() {
       toast.error(error.message || 'An error occurred while creating the survey');
     } finally {
       setIsSubmitting(false);
+      setIsApiLoading(false);
       hideLoader();
     }
   };
@@ -203,7 +206,23 @@ export default function SurveyGuide() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="relative min-h-screen">
+      {/* Full-screen overlay loader */}
+      {isApiLoading && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center gap-4 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-2xl">
+            <Loader show={true} size={48} />
+            <p className="text-lg font-medium text-gray-800 dark:text-gray-200">
+              Creating your survey...
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+              Please wait while we process your request.
+              <br />This may take a few moments.
+            </p>
+          </div>
+        </div>
+      )}
+      <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">
@@ -339,6 +358,7 @@ export default function SurveyGuide() {
           </Form>
         </CardContent>
       </Card>
+    </div>
     </div>
     </div>
   );

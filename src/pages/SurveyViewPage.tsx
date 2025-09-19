@@ -31,7 +31,7 @@ export default function SurveyViewPage() {
           // Map the API response to the expected format
           const surveyData = {
             ...response.data,
-            title: response.data.name?.replace(/-/g, ' ').replace(/\d+$/, '').trim() || 'Survey',
+            title: response.data.name?.replace(/-/g, ' ').trim() || 'Survey',
             description: `Survey ID: ${response.data.human_readable_id || id}`,
             status: response.data.status?.toLowerCase() || 'draft',
             questions: response.data.questions?.length || 0,
@@ -157,11 +157,11 @@ export default function SurveyViewPage() {
               <h1 className="text-xl font-medium text-gray-800 dark:text-gray-200 leading-tight">
                 {survey.title}
               </h1>
-              {getStatusBadge(survey.status)}
+              {/* {getStatusBadge(survey.status)} */}
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm mt-4">
               <span className="inline-flex items-center text-gray-500 dark:text-gray-400">
-                <Calendar className="h-4 w-4 mr-1.5 text-gray-400 dark:text-gray-500" />
+                <Calendar className="h-4 mb-1 w-4 mr-1.5 text-gray-400 dark:text-gray-500" />
                 Created {survey.createdAt ? new Date(survey.createdAt).toLocaleDateString('en-US', { 
                   year: 'numeric', 
                   month: 'short', 
