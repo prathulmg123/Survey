@@ -261,6 +261,7 @@ export default function SurveyDetail() {
       const requestBody = {
         surveyId: survey._id,
         name: formData.guideName,
+        status: 'finalized',
         source_document_name: survey.source_document_name || formData.guideName,
         overall_research_goal: formData.surveyGoal,
         initiator_question: formData.initiatorQuestion,

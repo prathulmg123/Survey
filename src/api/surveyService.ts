@@ -165,7 +165,8 @@ export const updateSurvey = async (params: UpdateSurveyParams): Promise<{ succes
       source_document_name: params.source_document_name,
       overall_research_goal: params.overall_research_goal,
       initiator_question: params.initiator_question,
-      research_areas: params.research_areas
+      research_areas: params.research_areas,
+      status: 'finalized',  
     });
     
     return { 
