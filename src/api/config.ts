@@ -8,7 +8,7 @@ export const API_ENDPOINTS = {
     REFRESH: '/api/auth/refresh',
     ME: '/api/auth/me',
   },
-  // Add more endpoints here as needed
+  USERS: '/api/users',
 };
 
 export default {

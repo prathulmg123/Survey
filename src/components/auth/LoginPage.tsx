@@ -37,7 +37,16 @@ const LoginPage = () => {
       toast.success("Login successful! Taking you to your dashboard...");
       navigate("/dashboard");
     } catch (error: any) {  
-      toast.error(error.response?.data?.detail);
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        const errorMessage = error.response.data?.detail || 'An error occurred during login';
+        toast.error(errorMessage);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error('Error setting up request:', error.message);
+        toast.error('Error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

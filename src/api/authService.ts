@@ -1,27 +1,6 @@
-import axios, { AxiosError, AxiosResponse } from 'axios';
-import config, { API_ENDPOINTS } from './config';
-
-const api = axios.create({
-  baseURL: config.API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 10000, // 10 seconds timeout
-});
-
-// Add a request interceptor to add the auth token to requests
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+import { AxiosError, AxiosResponse } from 'axios';
+import { API_ENDPOINTS } from './config';
+import apiClient from './apiClient';
 
 // Check if token is expired
 const isTokenExpired = (): boolean => {
@@ -35,7 +14,7 @@ const isTokenExpired = (): boolean => {
 };
 
 // Setup response interceptor to handle 401 responses
-api.interceptors.response.use(
+apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config;
@@ -50,9 +29,11 @@ api.interceptors.response.use(
       const newToken = await authService.refreshToken();
       if (newToken) {
         // Update the authorization header
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        }
         // Retry the original request with the new token
-        return api(originalRequest);
+        return apiClient(originalRequest);
       }
     } catch (refreshError) {
       console.error('Token refresh failed:', refreshError);
@@ -67,7 +48,7 @@ api.interceptors.response.use(
 export const authService = {
   async login(credentials: { email: string; password: string }) {
     try {
-      const response = await api.post(API_ENDPOINTS.AUTH.LOGIN, credentials);
+      const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, credentials);
       if (response.data.access_token) {
         localStorage.setItem('authToken', response.data.access_token);
         // Store token expiration time (current time + expires_in seconds)
@@ -87,7 +68,7 @@ export const authService = {
   async logout(navigate?: (path: string) => void) {
     try {
       // Call the logout API endpoint if needed
-      await api.post(API_ENDPOINTS.AUTH.LOGOUT || '/auth/logout');
+      await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT);
     } catch (error) {
       console.error('Logout error:', error);
       // Continue with local cleanup even if API call fails
@@ -99,7 +80,7 @@ export const authService = {
       localStorage.removeItem('isAuthenticated');
       
       // Clear axios authorization header
-      delete api.defaults.headers.common['Authorization'];
+      delete apiClient.defaults.headers.common['Authorization'];
       
       // If navigate function is provided, use it for client-side navigation
       if (navigate) {
@@ -137,8 +118,8 @@ export const authService = {
     }
 
     try {
-      const response = await api.post(API_ENDPOINTS.AUTH.REFRESH, {
-        refresh: refreshToken,
+      const response = await apiClient.post(API_ENDPOINTS.AUTH.REFRESH, {
+        refresh_token: refreshToken,
       });
       
       if (response.data.access_token) {

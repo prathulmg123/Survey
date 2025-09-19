@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,42 +21,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Portal } from "@/components/ui/Portal";
+import { getSurveys, mapApiSurveyToUiSurvey, Survey as ApiSurvey } from "@/api/surveyService";
 
-// Mock data - in a real app, this would come from an API
-const mockSurveys = [
-  {
-    id: 1,
-    title: "Employee Satisfaction Survey 2023",
-    description: "Annual survey to measure employee satisfaction and engagement",
-    status: "active",
-    responses: 42,
-    questions: 15,
-    createdAt: "2023-09-01",
-    updatedAt: "2023-09-10",
-  },
-  {
-    id: 2,
-    title: "Product Feedback Q3",
-    description: "Gather feedback on our latest product features",
-    status: "draft",
-    responses: 0,
-    questions: 8,
-    createdAt: "2023-08-15",
-    updatedAt: "2023-08-20",
-  },
-  {
-    id: 3,
-    title: "Customer Satisfaction",
-    description: "Measure overall customer satisfaction with our services",
-    status: "completed",
-    responses: 128,
-    questions: 10,
-    createdAt: "2023-07-10",
-    updatedAt: "2023-08-31",
-  },
-];
-
-interface Survey {
+interface Survey extends ApiSurvey {
   id: number;
   title: string;
   description: string;
@@ -69,9 +36,42 @@ interface Survey {
 
 export default function ManageSurveys() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [surveys, setSurveys] = useState<Survey[]>(mockSurveys);
+  const [surveys, setSurveys] = useState<Survey[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [surveyToDelete, setSurveyToDelete] = useState<Survey | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const [sortField, setSortField] = useState<keyof Survey>('title');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  // Fetch surveys from API
+  const fetchSurveys = useCallback(async () => {
+    try {
+      setError(null);
+      const response = await getSurveys();
+      if (response.success) {
+        const mappedSurveys = response.data.sessions.map((survey, index) => 
+          mapApiSurveyToUiSurvey(survey, index)
+        ) as any;
+        setSurveys(mappedSurveys);
+      } else {
+        setError(response.message || 'Failed to fetch surveys');
+      }
+    } catch (err) {
+      console.error('Error fetching surveys:', err);
+      // setError('An error occurred while fetching surveys');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSurveys();
+  }, []);
 
   // Prevent background scrolling when modal is open
   useEffect(() => {
@@ -89,31 +89,39 @@ export default function ManageSurveys() {
     };
   }, [isDeleteModalOpen]);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [sortField, setSortField] = useState<keyof Survey>('title');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const { showLoader, hideLoader } = useLoader();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-      hideLoader();
-    }, 500);
-
-    return () => {
-      clearTimeout(timer);
-      hideLoader();
-    };
-  }, [showLoader, hideLoader]);
-
-  if (isLoading) {
+  if (isLoading && surveys.length === 0) {
     return (
       <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
         <div className="text-center">
-          <Loader text="Loading..." show={true} size={52} />
+          <Loader text="Loading surveys..." show={true} size={52} />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Error: </strong>
+          <span className="block sm:inline">{error}</span>
+          <button 
+            onClick={fetchSurveys}
+            className="absolute top-0 bottom-0 right-0 px-4 py-3"
+          >
+            <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <title>Close</title>
+              <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+            </svg>
+          </button>
+          <div className="mt-2">
+            <button
+              onClick={fetchSurveys}
+              className="text-sm bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded"
+            >
+              Retry
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -203,19 +211,26 @@ export default function ManageSurveys() {
     setTimeout(() => setSurveyToDelete(null), 200);
   };
 
-  const confirmDelete = (e: React.MouseEvent) => {
+  const confirmDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (surveyToDelete) {
-      console.log("Deleting survey:", surveyToDelete.id);
-      setSurveys(prev => prev.filter(s => s.id !== surveyToDelete.id));
-      setIsDeleteModalOpen(false);
-      // Don't clear surveyToDelete immediately to avoid animation flicker
-      setTimeout(() => setSurveyToDelete(null), 200);
+      try {
+        // TODO: Add actual API call to delete survey
+        // await deleteSurvey(surveyToDelete._id);
+        setSurveys(prev => prev.filter(s => s.id !== surveyToDelete.id));
+        setIsDeleteModalOpen(false);
+        // Show success message
+      } catch (error) {
+        console.error('Error deleting survey:', error);
+        // Show error message
+      } finally {
+        setTimeout(() => setSurveyToDelete(null), 200);
+      }
     }
   };
 
   const handleViewClick = (survey: Survey) => {
-    navigate(`/surveys/view/${survey.id}`);
+    navigate(`/surveys/view/${survey._id}`);
   };
 
   const handleEditClick = (survey: Survey) => {
@@ -225,15 +240,15 @@ export default function ManageSurveys() {
 
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "active":
-        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
-      case "draft":
-        return <Badge variant="outline">Draft</Badge>;
+    switch (status.toLowerCase()) {
+      case "in_progress":
+        return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">In Progress</Badge>;
       case "completed":
-        return <Badge className="bg-blue-100 text-blue-800">Completed</Badge>;
+        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200">Completed</Badge>;
+      case "error":
+        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200">Error</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="outline" className="capitalize">{status.toLowerCase().replace('_', ' ')}</Badge>;
     }
   };
 
@@ -341,15 +356,7 @@ export default function ManageSurveys() {
                         {getSortIcon('status')}
                       </div>
                     </TableHead>
-                    <TableHead 
-                      className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 dark:hover:bg-blue-800/90 transition-colors"
-                      onClick={() => handleSort('responses')}
-                    >
-                      <div className="flex items-center">
-                        Responses
-                        {getSortIcon('responses')}
-                      </div>
-                    </TableHead>
+                   
                     <TableHead 
                       className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 dark:hover:bg-blue-800/90 transition-colors"
                       onClick={() => handleSort('createdAt')}
@@ -382,28 +389,22 @@ export default function ManageSurveys() {
                             </div>
                             <div>
                               <div className="font-medium text-gray-800 dark:text-gray-200">{survey.title}</div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400">{survey.description}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                                <span className="text-xs text-gray-400 dark:text-gray-500">
+                                  {new Date(survey.created_at || survey.createdAt).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell className="px-4">
-                          <Badge
-                            variant="outline"
-                            className={`${survey.status === 'active'
-                                ? 'bg-green-100 text-green-800 border-green-200'
-                                : survey.status === 'draft'
-                                  ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
-                                  : 'bg-gray-100 text-gray-800 border-gray-200'
-                              }`}
-                          >
-                            {survey.status.charAt(0).toUpperCase() + survey.status.slice(1)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="px-4">
-                          <div className="flex items-center gap-2">
-                            <Users className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                            <span className="text-gray-700 dark:text-gray-300">{survey.responses} {survey.responses === 1 ? 'response' : 'responses'}</span>
-                          </div>
+                            {getStatusBadge(survey.status)}
                         </TableCell>
                         <TableCell className="px-4 text-gray-700 dark:text-gray-300">
                           {new Date(survey.createdAt).toLocaleDateString('en-US', {

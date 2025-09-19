@@ -1,46 +1,30 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/Loader";
 import { useLoader } from "@/hooks/useLoader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Search, UserPlus, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Search, UserPlus, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown, AlertCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-// Mock data - in a real app, this would come from an API
-const mockUsers = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@example.com",
-    role: "Admin",
-    status: "active",
-    lastActive: "2023-09-12T10:30:00Z",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane.smith@example.com",
-    role: "Editor",
-    status: "active",
-    lastActive: "2023-09-11T15:45:00Z",
-  },
-  {
-    id: 3,
-    name: "Robert Johnson",
-    email: "robert.j@example.com",
-    role: "Viewer",
-    status: "inactive",
-    lastActive: "2023-09-05T08:20:00Z",
-  },
-];
+import { getUsers, User } from "@/api/userService";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type SortDirection = 'asc' | 'desc';
 type SortableField = 'name' | 'email' | 'role' | 'status' | 'lastActive';
 
+interface UserWithId extends User {
+  id: string;
+  name: string;
+  status: string;
+  lastActive: string;
+  role: string;
+}
+
 export default function Users() {
+  const [users, setUsers] = useState<UserWithId[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -48,41 +32,92 @@ export default function Users() {
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const { showLoader, hideLoader } = useLoader();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
+  // Fetch users from API
+  const fetchUsers = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await getUsers();
+      if (response.success) {
+        // Map API users to include an id field for table compatibility
+        const usersWithId = response.data.users.map(user => ({
+          ...user,
+          id: user._id,
+          name: user.full_name,
+          status: user.is_active ? 'active' : 'inactive',
+          lastActive: user.last_login,
+          role: user.role || 'User' // Default role if not specified
+        }));
+        setUsers(usersWithId);
+      } else {
+        setError(response.message || 'Failed to fetch users');
+      }
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      // setError('An error occurred while fetching users');
+    } finally {
       setIsLoading(false);
       hideLoader();
-    }, 500);
+    }
+  }, [hideLoader]);
 
-    return () => {
-      clearTimeout(timer);
-      hideLoader();
-    };
-  }, [showLoader, hideLoader]);
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
-  if (isLoading) {
+  if (isLoading && users.length === 0) {
     return (
       <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
         <div className="text-center">
-          <Loader text="Loading..." show={true} size={52} />
+          <Loader text="Loading users..." show={true} size={52} />
         </div>
       </div>
     );
   }
 
+  if (error) {
+    return (
+      <div className="container mx-auto p-6">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error}
+            <Button 
+              variant="outline" 
+              className="mt-2"
+              onClick={fetchUsers}
+            >
+              Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
   // Sort function
-  const sortUsers = (users: typeof mockUsers) => {
+  const sortUsers = (users: UserWithId[]) => {
     return [...users].sort((a, b) => {
-      let aValue = a[sortField];
-      let bValue = b[sortField];
+      let aValue: any;
+      let bValue: any;
 
       // Handle different data types for sorting
       if (sortField === 'lastActive') {
-        aValue = new Date(a.lastActive).getTime() as any;
-        bValue = new Date(b.lastActive).getTime() as any;
+        aValue = new Date(a.last_login).getTime();
+        bValue = new Date(b.last_login).getTime();
+      } else if (sortField === 'status') {
+        aValue = a.is_active ? 'active' : 'inactive';
+        bValue = b.is_active ? 'active' : 'inactive';
+      } else if (sortField === 'name') {
+        aValue = a.full_name.toLowerCase();
+        bValue = b.full_name.toLowerCase();
+      } else if (sortField === 'role') {
+        aValue = a.role || '';
+        bValue = b.role || '';
       } else {
-        aValue = String(aValue).toLowerCase();
-        bValue = String(bValue).toLowerCase();
+        aValue = String((a as any)[sortField] || '').toLowerCase();
+        bValue = String((b as any)[sortField] || '').toLowerCase();
       }
 
       if (aValue < bValue) {
@@ -117,17 +152,17 @@ export default function Users() {
   };
 
   // Filter and sort users
-  const filteredUsers = mockUsers.filter(
+  const filteredUsers = users.filter(
     (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.role.toLowerCase().includes(searchTerm.toLowerCase())
+      (user.role && user.role.toLowerCase().includes(searchTerm.toLowerCase()))
   );
   
   const sortedUsers = sortUsers(filteredUsers);
 
   // Pagination logic
-  const totalItems = sortedUsers.length;
+  const totalItems = filteredUsers.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
@@ -233,12 +268,12 @@ export default function Users() {
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                             <span className="text-sm font-semibold text-blue-600">
-                              {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                              {user.full_name.charAt(0).toUpperCase()}
                             </span>
                           </div>
                           <div>
-                            <div className="font-medium text-gray-800 dark:text-gray-200">{user.name}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">ID: {user.id}</div>
+                            <div className="font-medium text-gray-800 dark:text-gray-200">{user.full_name}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">@{user.username}</div>
                           </div>
                         </div>
                       </TableCell>
@@ -250,34 +285,34 @@ export default function Users() {
                       <TableCell className="px-4">
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                           user.role === 'Admin' 
-                            ? 'bg-blue-100 text-blue-800' 
-                            : user.role === 'Editor' 
-                              ? 'bg-purple-100 text-purple-800' 
-                              : 'bg-gray-100 text-gray-800'
+                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' 
+                            : user.role === 'Admin' 
+                              ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' 
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                         }`}>
                           {user.role}
                         </span>
                       </TableCell>
                       <TableCell className="px-4">
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                          user.status === 'active' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-gray-100 text-gray-800'
+                          user.is_active 
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' 
+                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                         }`}>
-                          {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                          {user.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </TableCell>
                       <TableCell className="text-right text-gray-600 dark:text-gray-300 px-4">
                         <div className="flex flex-col items-end">
                           <span className="font-medium">
-                            {new Date(user.lastActive).toLocaleDateString('en-US', {
+                            {new Date(user.last_login).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric',
                               year: 'numeric',
                             })}
                           </span>
                           <span className="text-xs text-gray-500">
-                            {new Date(user.lastActive).toLocaleTimeString('en-US', {
+                            {new Date(user.last_login).toLocaleTimeString('en-US', {
                               hour: '2-digit',
                               minute: '2-digit'
                             })}
