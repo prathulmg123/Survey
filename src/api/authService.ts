@@ -1,16 +1,22 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { API_ENDPOINTS } from './config';
 import apiClient from './apiClient';
+import { decodeJwt, isTokenExpired as isJwtExpired } from '../utils/jwt';
 
-// Check if token is expired
-const isTokenExpired = (): boolean => {
-  const expiresAt = localStorage.getItem('tokenExpiresAt');
-  if (!expiresAt) return true;
-  
-  const expirationTime = new Date(expiresAt).getTime();
-  const currentTime = new Date().getTime();
-  
-  return currentTime >= expirationTime;
+// Store user details in localStorage
+const storeUserDetails = (token: string) => {
+  const user = decodeJwt(token);
+  console.log('Logged in user:', user);
+  if (user) {
+    localStorage.setItem('user', JSON.stringify({
+      email: user.sub,
+      userId: user.user_id,
+      username: user.username,
+      fullName: user.full_name,
+      role: user.role,
+      isActive: user.is_active
+    }));
+  }
 };
 
 // Setup response interceptor to handle 401 responses
@@ -50,19 +56,43 @@ export const authService = {
     try {
       const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, credentials);
       if (response.data.access_token) {
-        localStorage.setItem('authToken', response.data.access_token);
-        // Store token expiration time (current time + expires_in seconds)
-        const expiresAt = new Date();
-        expiresAt.setSeconds(expiresAt.getSeconds() + (response.data.expires_in || 1800));
-        localStorage.setItem('tokenExpiresAt', expiresAt.toISOString());
+        const token = response.data.access_token;
+        localStorage.setItem('authToken', token);
         
-        return response.data;
+        // Store user details from token
+        storeUserDetails(token);
+        
+        // Set default authorization header
+        apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
+        return {
+          ...response.data,
+          user: JSON.parse(localStorage.getItem('user') || '{}')
+        };
       }
       throw new Error('No access token received');
     } catch (error) {
       console.error('Login error:', error);
       throw error;
     }
+  },
+  
+  // Get current user details
+  getCurrentUser() {
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
+  },
+  
+  // Check if user has specific role
+  hasRole(role: string): boolean {
+    const user = this.getCurrentUser();
+    return user?.role === role;
+  },
+  
+  // Check if user has any of the specified roles
+  hasAnyRole(roles: string[]): boolean {
+    const user = this.getCurrentUser();
+    return roles.includes(user?.role);
   },
 
   async logout(navigate?: (path: string) => void) {
@@ -100,8 +130,8 @@ export const authService = {
     const token = this.getAuthToken();
     if (!token) return false;
     
-    // Check if token is expired
-    if (isTokenExpired()) {
+    // Check if token is expired using JWT exp claim
+    if (isJwtExpired(token)) {
       this.logout();
       return false;
     }
@@ -142,7 +172,20 @@ export const authService = {
   
   // Check if token is expired (exposed for external use if needed)
   isTokenExpired() {
-    return isTokenExpired();
+    const token = this.getAuthToken();
+    return token ? isJwtExpired(token) : true;
+  },
+  
+  // Get user ID from token
+  getUserId(): string | null {
+    const user = this.getCurrentUser();
+    return user?.userId || null;
+  },
+  
+  // Get user role
+  getUserRole(): string | null {
+    const user = this.getCurrentUser();
+    return user?.role || null;
   },
 };
 

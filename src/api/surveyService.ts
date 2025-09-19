@@ -148,3 +148,36 @@ export const finalizeSurvey = async (params: FinalizeSurveyParams): Promise<{ su
     };
   }
 };
+
+export interface UpdateSurveyParams {
+  surveyId: string;
+  name: string;
+  source_document_name: string;
+  overall_research_goal: string;
+  initiator_question: string;
+  research_areas: ResearchArea[];
+}
+
+export const updateSurvey = async (params: UpdateSurveyParams): Promise<{ success: boolean; message?: string; data?: any }> => {
+  try {
+    const response = await apiClient.put(`/api/guides/${params.surveyId}`, {
+      name: params.name,
+      source_document_name: params.source_document_name,
+      overall_research_goal: params.overall_research_goal,
+      initiator_question: params.initiator_question,
+      research_areas: params.research_areas
+    });
+    
+    return { 
+      success: true, 
+      message: response.data?.message || 'Survey updated successfully',
+      data: response.data
+    };
+  } catch (error: any) {
+    console.error('Error updating survey:', error);
+    return { 
+      success: false, 
+      message: error.response?.data?.message || 'Failed to update survey' 
+    };
+  }
+};

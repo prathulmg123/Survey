@@ -243,7 +243,7 @@ export default function ManageSurveys() {
   };
 
   const handleEditClick = (survey: Survey) => {
-    navigate(`/surveys/${survey.id}`);
+    navigate(`/surveys/${survey._id}`);
   };
 
 
