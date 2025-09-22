@@ -63,7 +63,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 relative overflow-hidden flex items-center justify-center">
+    <div className="min-h-screen bg-white relative overflow-hidden flex items-center justify-center" data-theme="light">
       {/* Left curved blue shape */}
       <div className="absolute left-0 top-0 w-1/2 h-full pointer-events-none">
         <div className="absolute -left-32 top-0 w-96 h-full">
@@ -120,7 +120,7 @@ const LoginPage = () => {
           {/* <h2 className="text-2xl font-semibold text-gray-900 mb-2">Welcome Back</h2> */}
         </div>
 
-        <Card className="bg-white border-border/90 shadow-md bg-gradient-to-br from-background to-muted/20 border border-gray-100 shadow-[0_10px_50px_-12px_rgba(59,130,246,0.25)] hover:shadow-[0_15px_60px_-12px_rgba(59,130,246,0.3)] transition-shadow duration-300">
+        <Card className="bg-white border border-gray-200 shadow-lg rounded-xl overflow-hidden [&_*]:!text-gray-900">
           <CardContent className="p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
@@ -132,7 +132,8 @@ const LoginPage = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="pl-12 h-14 bg-gray-50 border-gray-200 rounded-lg focus:bg-white focus:border-accent-blue transition-all"
+                    className="pl-12 h-14 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue/50 transition-all"
+                    noDarkMode
                   />
                 </div>
                 
@@ -144,13 +145,14 @@ const LoginPage = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="pl-12 pr-12 h-14 bg-gray-50 border-gray-200 rounded-lg focus:bg-white focus:border-accent-blue transition-all"
+                    className="pl-12 pr-12 h-14 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue/50 transition-all"
+                    noDarkMode
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10 w-10 text-gray-400 hover:text-gray-600"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10 w-10 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-full"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
@@ -172,14 +174,14 @@ const LoginPage = () => {
               </Button>
 
               <div className="text-center">
-                <Button variant="link" className="text-gray-500 hover:text-accent-blue p-0">
+                <Button variant="link" className="text-gray-500 hover:text-accent-blue p-0 [&_*]:!text-inherit">
                   Forgot Password?
                 </Button>
               </div>
             </form>
 
             <div className="mt-8 text-center">
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-500">
                 Demo: Use any email and password to login
               </p>
             </div>
