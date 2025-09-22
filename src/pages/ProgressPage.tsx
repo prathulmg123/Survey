@@ -31,14 +31,68 @@ const ProgressPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-          <h2 className="text-xl font-semibold tracking-tight !text-[#374151] dark:!text-gray-200">AI Survey Assistant</h2>
-          <p className="text-muted-foreground text-base text-sm">
-          Get instant insights and recommendations for your survey data
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">Conversational Survey Agent</h2>
+          <p className="text-muted-foreground text-sm mt-1">
+            Interact with our AI assistant to manage and analyze your surveys
           </p>
         </div>
-
-     
+      </div>
+      
+      {/* <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        width: '380px',
+        height: '600px',
+        backgroundColor: '#fff',
+        borderRadius: '10px',
+        overflow: 'hidden',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        zIndex: 1000,
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        <iframe 
+          src="/chatbot-widget/index.html" 
+          style={{
+            width: '100%',
+            height: '100%',
+            border: 'none',
+            margin: 0,
+            padding: 0,
+            display: 'block',
+            flexGrow: 1
+          }}
+          title="AI Survey Assistant"
+          allow="microphone"
+        />
+      </div> */}
+       <div style={{
+        position: 'relative',
+        width: '100%',
+        height: '70vh',
+        minHeight: '600px',
+        backgroundColor: '#fff',
+        borderRadius: '10px',
+        overflow: 'hidden',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+      }}>
+        <iframe 
+          src="/chatbot-widget/index.html" 
+          style={{
+            width: '100%',
+            height: '100%',
+            border: 'none',
+            margin: 0,
+            padding: 0,
+            display: 'block'
+          }}
+          title="AI Survey Assistant"
+          allow="microphone"
+        />
+      </div>
     </div>
   );
 };

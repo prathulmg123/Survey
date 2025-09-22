@@ -94,27 +94,27 @@ useEffect(() => {
     try {
       setIsGoogleLoading(true);
       if (credentialResponse.credential) {
-        const decoded = jwtDecode(credentialResponse.credential) as any;
+        console.log("Google credential:", credentialResponse.credential)
+        // Send the Google credential to your backend for verification
+        const response = await authService.verifyGoogleToken(credentialResponse.credential);
         
-        // Store user data in localStorage
-        const userData = {
-          email: decoded.email,
-          name: decoded.name,
-          picture: decoded.picture
-        };
-        
-        localStorage.setItem("user", JSON.stringify(userData));
-        localStorage.setItem("isAuthenticated", "true");
-        
-        // You might want to send the token to your backend for verification
-        // await authService.verifyGoogleToken(credentialResponse.credential);
-        
-        toast.success("Login successful!");
-        navigate("/dashboard");
+        // If verification is successful, the backend should return user data
+        if (response && response.user) {
+          // Store user data in localStorage
+          localStorage.setItem("user", JSON.stringify(response.user));
+          localStorage.setItem("isAuthenticated", "true");
+          localStorage.setItem("token", response.token || '');
+          
+          toast.success("Login successful!");
+          navigate("/dashboard");
+        } else {
+          throw new Error('Invalid response from server');
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error during Google login:', error);
-      toast.error('Failed to sign in with Google');
+      const errorMessage = error.response?.data?.message || 'Failed to sign in with Google';
+      toast.error(errorMessage);
     } finally {
       setIsGoogleLoading(false);
     }
@@ -260,7 +260,7 @@ useEffect(() => {
                       onSuccess={async (credentialResponse: GoogleCredentialResponse) => {
                         try {
                           setIsGoogleLoading(true);
-                          
+                          setIsLoading(true);
                           // Send the credential to your backend for verification
                           const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/google`, {
                             method: 'POST',
@@ -268,7 +268,7 @@ useEffect(() => {
                               'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
-                              token: credentialResponse.credential,
+                              google_token: credentialResponse.credential,
                             }),
                           });
 
@@ -279,8 +279,9 @@ useEffect(() => {
                           const data = await response.json();
                           
                           // Store the authentication token and user data
-                          localStorage.setItem('authToken', data.token);
+                          localStorage.setItem('authToken', data.access_token);
                           localStorage.setItem('user', JSON.stringify(data.user));
+                          localStorage.setItem("userEmail", data.user.email);
                           localStorage.setItem('isAuthenticated', 'true');
                           
                           toast.success('Login successful!');
@@ -290,11 +291,13 @@ useEffect(() => {
                           toast.error('Failed to sign in with Google. Please try again.');
                         } finally {
                           setIsGoogleLoading(false);
+                          setIsLoading(false);
                         }
                       }}
                       onError={() => {
                         toast.error('Google Sign In failed');
                         setIsGoogleLoading(false);
+                        setIsLoading(false);
                       }}
                       useOneTap
                       auto_select

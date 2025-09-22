@@ -212,6 +212,35 @@ export const authService = {
     const user = this.getCurrentUser();
     return user?.role || null;
   },
+
+  // Verify Google OAuth token with backend
+  async verifyGoogleToken(credential: string) {
+    try {
+      const response = await apiClient.post(API_ENDPOINTS.AUTH.GOOGLE, { credential });
+      
+      if (response.data.access_token) {
+        const token = response.data.access_token;
+        localStorage.setItem('authToken', token);
+        
+        // Store user details from token
+        storeUserDetails(token);
+        
+        // Set default authorization header
+        apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
+        return {
+          ...response.data,
+          user: this.getCurrentUser(),
+          token: token
+        };
+      }
+      
+      throw new Error('No access token received from Google OAuth');
+    } catch (error) {
+      console.error('Google OAuth error:', error);
+      throw error;
+    }
+  },
 };
 
 export default authService;

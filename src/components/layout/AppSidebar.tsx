@@ -26,9 +26,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
-  { title: "Users", url: "/users", icon: UsersIcon },
-  { title: "Survey", url: "/manage", icon: BarChart3 },
-  { title: "In Progress", url: "/active", icon: Clock },
+  { title: "Users", url: "/users", icon: UsersIcon, roles: ['admin', 'manager'] },
+  { title: "Survey", url: "/manage", icon: BarChart3, roles: ['admin', 'manager'] },
+  // { title: "In Progress", url: "/active", icon: Clock },
 ];
 
 const bottomItems = [
@@ -41,6 +41,17 @@ export function AppSidebar() {
   const location = useLocation();
   const { theme } = useTheme();
   const isCollapsed = state === "collapsed";
+  
+  // Get user role from localStorage
+  const userRole = localStorage.getItem('user') 
+    ? JSON.parse(localStorage.getItem('user') || '{}').role || 'user' 
+    : 'user';
+
+  // Filter menu items based on user role
+  const filteredMenuItems = menuItems.filter(item => {
+    if (!item.roles) return true; // Show item if no roles are specified
+    return item.roles.includes(userRole);
+  });
 
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
@@ -106,7 +117,7 @@ export function AppSidebar() {
           )} */}
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
-              {menuItems.map((item, index) => {
+              {filteredMenuItems.map((item, index) => {
                 const active = isActive(item.url);
                 return (
                   <SidebarMenuItem key={item.title} className="animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>

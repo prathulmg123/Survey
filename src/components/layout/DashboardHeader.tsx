@@ -104,14 +104,13 @@ export const DashboardHeader = () => {
                     <p className="text-xs leading-none text-muted-foreground">
                       {userEmail}
                     </p>
-                   
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
-                <DropdownMenuSeparator />
+                    <DropdownMenuItem>Profile</DropdownMenuItem>
+                    <DropdownMenuItem>Settings</DropdownMenuItem>
+                    <DropdownMenuItem>Support</DropdownMenuItem>
+                    <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                   Log out
                 </DropdownMenuItem>
