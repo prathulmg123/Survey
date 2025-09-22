@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Pencil, Trash2, Eye, FileText, Users, X, Plus, ChevronLeft, ChevronRight, Search, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Pencil, Trash2, Eye, FileText, Users, X, Plus, ChevronLeft, ChevronRight, Search, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown, Grid, List } from "lucide-react";
 import { Loader } from "@/components/ui/Loader";
 import { useLoader } from "@/hooks/useLoader";
 import {
@@ -47,6 +47,7 @@ export default function ManageSurveys() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [isLoading, setIsLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const navigate = useNavigate();
 
   // Fetch surveys from API
@@ -317,16 +318,245 @@ export default function ManageSurveys() {
             Overview of your survey management
           </p>
         </div>
-        <Button asChild className="bg-blue-700/90 hover:bg-blue-700/90">
-          <Link to="/guide" className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Create Survey
-          </Link>
-        </Button>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+            <Button
+              variant={viewMode === 'table' ? 'outline' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('table')}
+              className={`flex items-center gap-2 ${viewMode === 'table' ? 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600' : ''}`}
+            >
+              <List className="h-4 w-4" />
+              <span>Table</span>
+            </Button>
+            <Button
+              variant={viewMode === 'grid' ? 'outline' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('grid')}
+              className={`flex items-center gap-2 ${viewMode === 'grid' ? 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600' : ''}`}
+            >
+              <Grid className="h-4 w-4" />
+              <span>Grid</span>
+            </Button>
+          </div>
+          <Button asChild className="bg-blue-700/90 hover:bg-blue-700/90">
+            <Link to="/guide" className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Create Survey
+            </Link>
+          </Button>
+        </div>
       </div>
+      {viewMode == 'grid' && (
+       <div className="w-full">
+       {/* Search */}
+       <div className="mb-6 flex justify-end">
+         <div className="relative w-full max-w-sm">
+           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-blue-500" />
+           <Input
+             type="search"
+             placeholder="Search users..."
+             className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+             value={searchTerm}
+             onChange={(e) => {
+               setSearchTerm(e.target.value);
+               setCurrentPage(1);
+             }}
+           />
+         </div>
+       </div>
+ 
+       {/* Cards */}
+       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {currentItems.length === 0 ? (
+          <div className="col-span-full flex flex-col items-center justify-center py-12">
+            <FileText className="h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
+            <p className="text-gray-500 dark:text-gray-400 text-lg">No surveys found</p>
+          </div>
+        ) : (
+          currentItems.map((survey) => (
+            <div
+              key={survey.id}
+              className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full"
+            >
+              <div className="absolute top-4 right-4">
+                {getStatusBadge(survey.status)}
+              </div>
+              
+              <div className="p-6 flex-1 flex flex-col">
+                <div className="flex items-start justify-between">
+                  <div className="h-12 w-12 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0">
+                    <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  </div>
+                </div>
+                
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-1">
+                    {survey.title || 'Untitled Survey'}
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                    {survey.description || 'No description'}
+                  </p>
+                </div>
+                
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {new Date(survey.createdAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleViewClick(survey)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>View Survey</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleEditClick(survey)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Edit Survey</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                          onClick={() => handleDeleteClick(survey)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete Survey</TooltipContent>
+                    </Tooltip>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+ 
+       {/* Pagination */}
+       {totalItems > 0 && (
+         <div className="mt-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm px-6 py-4 flex flex-col sm:flex-row items-center justify-between">
+           <div className="text-sm text-gray-600 dark:text-gray-300 mb-4 sm:mb-0">
+             Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
+             <span className="font-medium">{Math.min(endIndex, totalItems)}</span>{" "}
+             of <span className="font-medium">{totalItems}</span> results
+           </div>
+ 
+           <div className="flex items-center space-x-3">
+             {/* Rows per page */}
+             <div className="flex items-center space-x-2">
+               <span className="text-sm text-gray-600 dark:text-gray-300">
+                 Rows per page:
+               </span>
+               <Select
+                 value={itemsPerPage.toString()}
+                 onValueChange={(value) => {
+                   setItemsPerPage(Number(value));
+                   setCurrentPage(1);
+                 }}
+               >
+                 <SelectTrigger className="w-20 h-8 rounded-full border-gray-300 dark:border-gray-600">
+                   <SelectValue placeholder={itemsPerPage.toString()} />
+                 </SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="5">5</SelectItem>
+                   <SelectItem value="10">10</SelectItem>
+                   <SelectItem value="25">25</SelectItem>
+                   <SelectItem value="50">50</SelectItem>
+                 </SelectContent>
+               </Select>
+             </div>
+ 
+             {/* Page controls */}
+             <div className="flex items-center space-x-1">
+               <button
+                 onClick={() => goToPage(1)}
+                 disabled={currentPage === 1}
+                 className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+               >
+                 <ChevronsLeft className="h-4 w-4" />
+               </button>
+               <button
+                 onClick={() => goToPage(currentPage - 1)}
+                 disabled={currentPage === 1}
+                 className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+               >
+                 <ChevronLeft className="h-4 w-4" />
+               </button>
+ 
+               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                 let pageNum;
+                 if (totalPages <= 5) {
+                   pageNum = i + 1;
+                 } else if (currentPage <= 3) {
+                   pageNum = i + 1;
+                 } else if (currentPage >= totalPages - 2) {
+                   pageNum = totalPages - 4 + i;
+                 } else {
+                   pageNum = currentPage - 2 + i;
+                 }
+ 
+                 return (
+                   <button
+                     key={pageNum}
+                     onClick={() => goToPage(pageNum)}
+                     className={`w-9 h-9 flex items-center justify-center rounded-full text-sm font-medium transition-colors ${
+                       currentPage === pageNum
+                         ? "bg-blue-600 text-white shadow-md"
+                         : "border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                     }`}
+                   >
+                     {pageNum}
+                   </button>
+                 );
+               })}
+ 
+               <button
+                 onClick={() => goToPage(currentPage + 1)}
+                 disabled={currentPage === totalPages}
+                 className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+               >
+                 <ChevronRight className="h-4 w-4" />
+               </button>
+               <button
+                 onClick={() => goToPage(totalPages)}
+                 disabled={currentPage === totalPages}
+                 className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+               >
+                 <ChevronsRight className="h-4 w-4" />
+               </button>
+             </div>
+           </div>
+         </div>
+       )}
+     </div>
 
+      )}
+       {viewMode === 'table' && (
       <Card>
-        <CardContent>
+        <CardContent >
           <div className="mb-4 flex justify-end mt-4">
             <div className="relative w-50 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue-500 z-10" />
@@ -571,6 +801,7 @@ export default function ManageSurveys() {
           </div>
         </CardContent>
       </Card>
+      )}
     </div>
   );
 

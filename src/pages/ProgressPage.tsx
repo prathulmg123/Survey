@@ -38,22 +38,7 @@ const ProgressPage = () => {
           </p>
         </div>
 
-      <div className="grid gap-4">
-            <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-              <ChatBot
-                apiUrl="https://your-api-endpoint.com/chat"
-                placeholder="Ask me anything about your survey data..."
-                botName="Survey Analyst"
-                userName="You"
-                height="600px"
-                onMessageSent={(message) => console.log('Message sent:', message)}
-                onResponseReceived={(response) => console.log('Response:', response)}
-                onError={(error) => console.error('Error:', error)}
-                theme="light"
-                className="border-0 shadow-none"
-              />
-            </div>
-      </div>
+     
     </div>
   );
 };

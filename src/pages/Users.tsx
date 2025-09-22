@@ -5,7 +5,7 @@ import { useLoader } from "@/hooks/useLoader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Search, UserPlus, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown, AlertCircle } from "lucide-react";
+import { Search, UserPlus, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown, AlertCircle, Grid, List, Mail } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getUsers, User } from "@/api/userService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -30,6 +30,7 @@ export default function Users() {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [sortField, setSortField] = useState<SortableField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const { showLoader, hideLoader } = useLoader();
 
   // Fetch users from API
@@ -83,8 +84,8 @@ export default function Users() {
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>
             {error}
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="mt-2"
               onClick={fetchUsers}
             >
@@ -146,8 +147,8 @@ export default function Users() {
   // Get sort icon for a column
   const getSortIcon = (field: SortableField) => {
     if (sortField !== field) return <ArrowUpDown className="ml-1 h-3 w-3 inline-block opacity-50" />;
-    return sortDirection === 'asc' 
-      ? <ArrowUp className="ml-1 h-3 w-3 inline-block" /> 
+    return sortDirection === 'asc'
+      ? <ArrowUp className="ml-1 h-3 w-3 inline-block" />
       : <ArrowDown className="ml-1 h-3 w-3 inline-block" />;
   };
 
@@ -158,7 +159,7 @@ export default function Users() {
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (user.role && user.role.toLowerCase().includes(searchTerm.toLowerCase()))
   );
-  
+
   const sortedUsers = sortUsers(filteredUsers);
 
   // Pagination logic
@@ -185,248 +186,460 @@ export default function Users() {
         <div>
           <h2 className="text-xl font-bold tracking-tight !text-[#374151] dark:!text-gray-200">Users</h2>
           <p className="text-muted-foreground text-sm mt-1">
-          Here's an overview of your survey platform users and their activities.
+            Here's an overview of your survey platform users and their activities.
           </p>
         </div>
-        
+        <div className="flex items-center space-x-2">
+          <Button
+            variant={viewMode === 'table' ? 'outline' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('table')}
+            className={`flex items-center gap-2 ${viewMode === 'table' ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800' : ''}`}
+          >
+            <List className="h-4 w-4" />
+            <span>Table</span>
+          </Button>
+          <Button
+            variant={viewMode === 'grid' ? 'outline' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('grid')}
+            className={`flex items-center gap-2 ${viewMode === 'grid' ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800' : ''}`}
+          >
+            <Grid className="h-4 w-4" />
+            <span>Grid</span>
+          </Button>
+        </div>
       </div>
+      {viewMode == 'grid' && (
+       <div className="w-full">
+       {/* Search */}
+       <div className="mb-6 flex justify-end">
+         <div className="relative w-full max-w-sm">
+           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-blue-500" />
+           <Input
+             type="search"
+             placeholder="Search users..."
+             className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+             value={searchTerm}
+             onChange={(e) => {
+               setSearchTerm(e.target.value);
+               setCurrentPage(1);
+             }}
+           />
+         </div>
+       </div>
+ 
+       {/* Cards */}
+       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8" style={{
+         gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))',
+         justifyItems: 'center'
+       }}>
+         {currentItems.map((user) => (
+           <div
+             key={user.id}
+             className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full hover:-translate-y-1 hover:scale-[1.03] w-full max-w-[400px]"
+           >
+             {/* Status */}
+             <div
+               className={`absolute top-4 right-4 w-3 h-3 rounded-full ${
+                 user.is_active ? "bg-green-400" : "bg-gray-400"
+               } ring-2 ring-white dark:ring-gray-900`}
+             ></div>
+ 
+             <div className="p-8 flex-1">
+               {/* Profile */}
+               <div className="flex items-center space-x-4">
+                 <div className="h-16 w-16 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xl font-semibold shadow-lg">
+                   {user.full_name.charAt(0).toUpperCase()}
+                 </div>
+                 <div className="flex-1 min-w-0">
+                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                     {user.full_name}
+                   </h3>
+                   <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                     @{user.username}
+                   </p>
+                 </div>
+               </div>
+ 
+               {/* Email + Role */}
+               <div className="mt-4 space-y-3">
+                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                   <Mail className="h-4 w-4 text-gray-400 mr-2" />
+                   <a
+                     href={`mailto:${user.email}`}
+                     className="hover:underline truncate"
+                   >
+                     {user.email}
+                   </a>
+                 </div>
+ 
+                 <span
+                   className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium shadow-sm ${
+                     user.role === "Admin"
+                       ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+                       : user.role === "User"
+                       ? "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300"
+                       : "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300"
+                   }`}
+                 >
+                   {user.role}
+                 </span>
+ 
+                 {/* Last Active */}
+                 <div className="pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                   <span>Last active</span>
+                   <span>
+                     {new Date(user.last_login).toLocaleDateString("en-US", {
+                       month: "short",
+                       day: "numeric",
+                     })}
+                   </span>
+                 </div>
+               </div>
+             </div>
+           </div>
+         ))}
+       </div>
+ 
+       {/* Pagination */}
+       {totalItems > 0 && (
+         <div className="mt-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm px-6 py-4 flex flex-col sm:flex-row items-center justify-between">
+           <div className="text-sm text-gray-600 dark:text-gray-300 mb-4 sm:mb-0">
+             Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
+             <span className="font-medium">{Math.min(endIndex, totalItems)}</span>{" "}
+             of <span className="font-medium">{totalItems}</span> results
+           </div>
+ 
+           <div className="flex items-center space-x-3">
+             {/* Rows per page */}
+             <div className="flex items-center space-x-2">
+               <span className="text-sm text-gray-600 dark:text-gray-300">
+                 Rows per page:
+               </span>
+               <Select
+                 value={itemsPerPage.toString()}
+                 onValueChange={(value) => {
+                   setItemsPerPage(Number(value));
+                   setCurrentPage(1);
+                 }}
+               >
+                 <SelectTrigger className="w-20 h-8 rounded-full border-gray-300 dark:border-gray-600">
+                   <SelectValue placeholder={itemsPerPage.toString()} />
+                 </SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="5">5</SelectItem>
+                   <SelectItem value="10">10</SelectItem>
+                   <SelectItem value="25">25</SelectItem>
+                   <SelectItem value="50">50</SelectItem>
+                 </SelectContent>
+               </Select>
+             </div>
+ 
+             {/* Page controls */}
+             <div className="flex items-center space-x-1">
+               <button
+                 onClick={() => goToPage(1)}
+                 disabled={currentPage === 1}
+                 className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+               >
+                 <ChevronsLeft className="h-4 w-4" />
+               </button>
+               <button
+                 onClick={() => goToPage(currentPage - 1)}
+                 disabled={currentPage === 1}
+                 className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+               >
+                 <ChevronLeft className="h-4 w-4" />
+               </button>
+ 
+               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                 let pageNum;
+                 if (totalPages <= 5) {
+                   pageNum = i + 1;
+                 } else if (currentPage <= 3) {
+                   pageNum = i + 1;
+                 } else if (currentPage >= totalPages - 2) {
+                   pageNum = totalPages - 4 + i;
+                 } else {
+                   pageNum = currentPage - 2 + i;
+                 }
+ 
+                 return (
+                   <button
+                     key={pageNum}
+                     onClick={() => goToPage(pageNum)}
+                     className={`w-9 h-9 flex items-center justify-center rounded-full text-sm font-medium transition-colors ${
+                       currentPage === pageNum
+                         ? "bg-blue-600 text-white shadow-md"
+                         : "border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                     }`}
+                   >
+                     {pageNum}
+                   </button>
+                 );
+               })}
+ 
+               <button
+                 onClick={() => goToPage(currentPage + 1)}
+                 disabled={currentPage === totalPages}
+                 className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+               >
+                 <ChevronRight className="h-4 w-4" />
+               </button>
+               <button
+                 onClick={() => goToPage(totalPages)}
+                 disabled={currentPage === totalPages}
+                 className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+               >
+                 <ChevronsRight className="h-4 w-4" />
+               </button>
+             </div>
+           </div>
+         </div>
+       )}
+     </div>
+
+      )}
       <Card>
-        <CardContent>
-          <div className="mb-4 flex justify-end mt-4">
-            <div className="relative w-50 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue-500 z-10" />
-              <Input
-                type="search"
-                placeholder="Search users..."
-                className="w-full pl-10 pr-4 py-2 border border-blue-200 rounded-md focus:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-0 transition-colors duration-200"
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1); // Reset to first page when searching
-                }}
-              />
-            </div>
-          </div>
-          <div className="relative rounded-lg border-2 border-blue-100 dark:border-gray-700 overflow-hidden mb-6 group shadow-md transition-shadow duration-200">
-            <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-blue-50/50 to-transparent dark:from-gray-800/50 dark:to-transparent opacity-70 rounded-b-lg pointer-events-none"></div>
-            <div className="relative bg-white dark:bg-gray-800/50 rounded-lg overflow-hidden">
-              <Table className="w-full">
-              <TableHeader className="bg-blue-700/90 dark:bg-blue-900/80">
-                <TableRow className="hover:bg-transparent">
-                  <TableHead 
-                    className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 dark:hover:bg-blue-800/90 transition-colors"
-                    onClick={() => handleSort('name')}
-                  >
-                    <div className="flex items-center">
-                      Name
-                      {getSortIcon('name')}
-                    </div>
-                  </TableHead>
-                  <TableHead 
-                    className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
-                    onClick={() => handleSort('email')}
-                  >
-                    <div className="flex items-center">
-                      Email
-                      {getSortIcon('email')}
-                    </div>
-                  </TableHead>
-                  <TableHead 
-                    className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
-                    onClick={() => handleSort('role')}
-                  >
-                    <div className="flex items-center">
-                      Role
-                      {getSortIcon('role')}
-                    </div>
-                  </TableHead>
-                  <TableHead 
-                    className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
-                    onClick={() => handleSort('status')}
-                  >
-                    <div className="flex items-center">
-                      Status
-                      {getSortIcon('status')}
-                    </div>
-                  </TableHead>
-                  <TableHead 
-                    className="text-white/95 font-medium py-3 px-4 text-right cursor-pointer hover:bg-blue-700/80 transition-colors"
-                    onClick={() => handleSort('lastActive')}
-                  >
-                    <div className="flex items-center justify-end">
-                      Last Active
-                      {getSortIcon('lastActive')}
-                    </div>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody className="bg-white dark:bg-gray-800/30">
-                {currentItems.length > 0 ? (
-                  currentItems.map((user) => (
-                    <TableRow key={user.id} className="border-b border-gray-100 dark:border-gray-700">
-                      <TableCell className="py-4 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <span className="text-sm font-semibold text-blue-600">
-                              {user.full_name.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                          <div>
-                            <div className="font-medium text-gray-800 dark:text-gray-200">{user.full_name}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">@{user.username}</div>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="px-4">
-                        <a href={`mailto:${user.email}`} className="text-blue-600 hover:underline dark:text-blue-400">
-                          {user.email}
-                        </a>
-                      </TableCell>
-                      <TableCell className="px-4">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                          user.role === 'Admin' 
-                            ? 'bg-blue-500/20 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300' 
-                            : user.role === 'User' 
-                              ? 'bg-sky-500/20 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300'
-                              : 'bg-purple-500/20 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300'
-                        }`}>
-                          {user.role}
-                        </span>
-                      </TableCell>
-                      <TableCell className="px-4">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                          user.is_active 
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' 
-                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                        }`}>
-                          {user.is_active ? 'Active' : 'Inactive'}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right text-gray-600 dark:text-gray-300 px-4">
-                        <div className="flex flex-col items-end">
-                          <span className="font-medium">
-                            {new Date(user.last_login).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric',
-                            })}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {new Date(user.last_login).toLocaleTimeString('en-US', {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </span>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center py-8">
-                      <div className="flex flex-col items-center justify-center">
-                        <Search className="h-12 w-12 text-gray-300 mb-2" />
-                        <p className="text-gray-500">No users found</p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-            </div>
-            
-            {/* Pagination */}
-            {totalItems > 0 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t bg-gray-50 dark:bg-gray-800/50 dark:border-gray-700">
-                <div className="text-sm text-gray-600 dark:text-gray-300 mb-4 sm:mb-0">
-                  Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
-                  <span className="font-medium">{Math.min(endIndex, totalItems)}</span> of{' '}
-                  <span className="font-medium">{totalItems}</span> results
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600 dark:text-gray-300">Rows per page:</span>
-                    <div className="w-24 [&_button]:border-0 [&_button]:ring-1 [&_button]:ring-gray-300 [&_button]:ring-offset-0">
-                      <Select
-                        value={itemsPerPage.toString()}
-                        onValueChange={(value) => handleItemsPerPageChange({ target: { value }as any }as any)}
-                      >
-                        <SelectTrigger className="w-full h-8 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0">
-                          <SelectValue placeholder={itemsPerPage.toString()} />
-                        </SelectTrigger>
-                        <SelectContent className="min-w-[var(--radix-select-trigger-width)] w-[var(--radix-select-trigger-width)]">
-                          <SelectItem value="5">5</SelectItem>
-                          <SelectItem value="10">10</SelectItem>
-                          <SelectItem value="25">25</SelectItem>
-                          <SelectItem value="50">50</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-1">
-                    <button
-                      onClick={() => goToPage(1)}
-                      disabled={currentPage === 1}
-                      className="p-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <ChevronsLeft className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => goToPage(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="p-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </button>
-                    
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNum;
-                      if (totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (currentPage <= 3) {
-                        pageNum = i + 1;
-                      } else if (currentPage >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
-                      } else {
-                        pageNum = currentPage - 2 + i;
-                      }
-                      
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => goToPage(pageNum)}
-                          className={`w-8 h-8 rounded-md text-sm ${
-                            currentPage === pageNum
-                              ? 'bg-blue-700/90 hover:bg-blue-700/90 text-white dark:bg-blue-600 dark:hover:bg-blue-700'
-                              : 'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
-                    
-                    <button
-                      onClick={() => goToPage(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="p-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => goToPage(totalPages)}
-                      disabled={currentPage === totalPages}
-                      className="p-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <ChevronsRight className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
+        <CardContent className={viewMode === 'grid' ? 'p-0' : ''}>
+          {viewMode === 'table' && (
+            <div className="mb-4 flex justify-end mt-4">
+              <div className="relative w-50 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue-500 z-10" />
+                <Input
+                  type="search"
+                  placeholder="Search users..."
+                  className="w-full pl-10 pr-4 py-2 border border-blue-200 rounded-md focus:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-0 transition-colors duration-200"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1); // Reset to first page when searching
+                  }}
+                />
               </div>
-            )}
-          </div>
+            </div>
+          )}
+          {viewMode === 'table' && (
+            <div className="relative rounded-lg border-2 border-blue-100 dark:border-gray-700 overflow-hidden mb-6 group shadow-md transition-shadow duration-200">
+              <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-blue-50/50 to-transparent dark:from-gray-800/50 dark:to-transparent opacity-70 rounded-b-lg pointer-events-none"></div>
+              <div className="relative bg-white dark:bg-gray-800/50 rounded-lg overflow-hidden">
+                <Table>
+                  <TableHeader className="bg-blue-700/90 dark:bg-blue-900/80">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead
+                        className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 dark:hover:bg-blue-800/90 transition-colors"
+                        onClick={() => handleSort('name')}
+                      >
+                        <div className="flex items-center">
+                          Name
+                          {getSortIcon('name')}
+                        </div>
+                      </TableHead>
+                      <TableHead
+                        className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                        onClick={() => handleSort('email')}
+                      >
+                        <div className="flex items-center">
+                          Email
+                          {getSortIcon('email')}
+                        </div>
+                      </TableHead>
+                      <TableHead
+                        className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                        onClick={() => handleSort('role')}
+                      >
+                        <div className="flex items-center">
+                          Role
+                          {getSortIcon('role')}
+                        </div>
+                      </TableHead>
+                      <TableHead
+                        className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 transition-colors"
+                        onClick={() => handleSort('status')}
+                      >
+                        <div className="flex items-center">
+                          Status
+                          {getSortIcon('status')}
+                        </div>
+                      </TableHead>
+                      <TableHead
+                        className="text-white/95 font-medium py-3 px-4 text-right cursor-pointer hover:bg-blue-700/80 transition-colors"
+                        onClick={() => handleSort('lastActive')}
+                      >
+                        <div className="flex items-center justify-end">
+                          Last Active
+                          {getSortIcon('lastActive')}
+                        </div>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody className="bg-white dark:bg-gray-800/30">
+                    {currentItems.length > 0 ? (
+                      currentItems.map((user) => (
+                        <TableRow key={user.id} className="border-b border-gray-100 dark:border-gray-700">
+                          <TableCell className="py-4 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                <span className="text-sm font-semibold text-blue-600">
+                                  {user.full_name.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                              <div>
+                                <div className="font-medium text-gray-800 dark:text-gray-200">{user.full_name}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">@{user.username}</div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-4">
+                            <a href={`mailto:${user.email}`} className="text-blue-600 hover:underline dark:text-blue-400">
+                              {user.email}
+                            </a>
+                          </TableCell>
+                          <TableCell className="px-4">
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${user.role === 'Admin'
+                                ? 'bg-blue-500/20 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
+                                : user.role === 'User'
+                                  ? 'bg-sky-500/20 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300'
+                                  : 'bg-purple-500/20 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300'
+                              }`}>
+                              {user.role}
+                            </span>
+                          </TableCell>
+                          <TableCell className="px-4">
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${user.is_active
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                              }`}>
+                              {user.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right text-gray-600 dark:text-gray-300 px-4">
+                            <div className="flex flex-col items-end">
+                              <span className="font-medium">
+                                {new Date(user.last_login).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                })}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {new Date(user.last_login).toLocaleTimeString('en-US', {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={5} className="h-24 text-center py-8">
+                          <div className="flex flex-col items-center justify-center">
+                            <Search className="h-12 w-12 text-gray-300 mb-2" />
+                            <p className="text-gray-500">No users found</p>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+                {/* Pagination */}
+                {totalItems > 0 && (
+                  <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t bg-gray-50 dark:bg-gray-800/50 dark:border-gray-700">
+                    <div className="text-sm text-gray-600 dark:text-gray-300 mb-4 sm:mb-0">
+                      Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
+                      <span className="font-medium">{Math.min(endIndex, totalItems)}</span> of{' '}
+                      <span className="font-medium">{totalItems}</span> results
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm text-gray-600 dark:text-gray-300">Rows per page:</span>
+                        <div className="w-24">
+                          <Select
+                            value={itemsPerPage.toString()}
+                            onValueChange={(value) => setItemsPerPage(Number(value))}
+                          >
+                            <SelectTrigger className="w-full h-8 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0">
+                              <SelectValue placeholder={itemsPerPage.toString()} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="5">5</SelectItem>
+                              <SelectItem value="10">10</SelectItem>
+                              <SelectItem value="25">25</SelectItem>
+                              <SelectItem value="50">50</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-1">
+                        <button
+                          onClick={() => goToPage(1)}
+                          disabled={currentPage === 1}
+                          className="p-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <ChevronsLeft className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => goToPage(currentPage - 1)}
+                          disabled={currentPage === 1}
+                          className="p-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                          let pageNum;
+                          if (totalPages <= 5) {
+                            pageNum = i + 1;
+                          } else if (currentPage <= 3) {
+                            pageNum = i + 1;
+                          } else if (currentPage >= totalPages - 2) {
+                            pageNum = totalPages - 4 + i;
+                          } else {
+                            pageNum = currentPage - 2 + i;
+                          }
+
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => goToPage(pageNum)}
+                              className={`w-8 h-8 rounded-md text-sm ${currentPage === pageNum
+                                  ? 'bg-blue-700/90 hover:bg-blue-700/90 text-white dark:bg-blue-600 dark:hover:bg-blue-700'
+                                  : 'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        })}
+
+                        <button
+                          onClick={() => goToPage(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                          className="p-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => goToPage(totalPages)}
+                          disabled={currentPage === totalPages}
+                          className="p-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <ChevronsRight className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* </div> */}
         </CardContent>
       </Card>
     </div>

@@ -97,16 +97,15 @@ export const authService = {
 
   async logout(navigate?: (path: string) => void, sessionExpired = false) {
     try {
+      // Store the session expired state before clearing
       if (sessionExpired) {
         localStorage.setItem('sessionExpired', 'true');
       }
-      // Call the logout API endpoint if needed
-      await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT);
-    } catch (error) {
-      console.error('Logout error:', error);
-      // Continue with local cleanup even if API call fails
-    } finally {
-      // Clear all auth-related items from localStorage except sessionExpired flag
+      
+      // Get the current token before clearing
+      const token = this.getAuthToken();
+      
+      // Clear all auth-related items from localStorage
       const sessionExpiredFlag = localStorage.getItem('sessionExpired');
       localStorage.clear();
       
@@ -118,13 +117,32 @@ export const authService = {
       // Clear axios authorization header
       delete apiClient.defaults.headers.common['Authorization'];
       
-      // If navigate function is provided, use it for client-side navigation
-      if (navigate) {
-        navigate('/login');
-      } else {
-        // Fallback to window.location if navigate is not provided
-        window.location.href = '/login';
+      try {
+        // Only attempt to call the logout endpoint if we have a valid token
+        if (token && !this.isTokenExpired()) {
+          await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT, {}, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Logout API error:', error);
+        // Continue with navigation even if logout API call fails
       }
+      
+      // Force a redirect to login page
+      const loginUrl = sessionExpired ? '/login?sessionExpired=true' : '/login';
+      
+      if (navigate) {
+        navigate(loginUrl);
+      } else {
+        window.location.href = loginUrl;
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Ensure we still redirect even if there's an error
+      window.location.href = '/login';
     }
   },
 
@@ -136,9 +154,10 @@ export const authService = {
     const token = this.getAuthToken();
     if (!token) return false;
     
-    // Check if token is expired using JWT exp claim
-    if (isJwtExpired(token)) {
-      this.logout();
+    // Check if token is expired
+    if (this.isTokenExpired()) {
+      // Clear the expired token
+      localStorage.removeItem('authToken');
       return false;
     }
     

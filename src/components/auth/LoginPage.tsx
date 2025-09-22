@@ -5,7 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
 import authService from "@/api/authService";
+
+type GoogleCredentialResponse = {
+  credential?: string;
+  clientId?: string;
+  select_by?: string;
+};
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -13,6 +22,25 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [googleClientId] = useState(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      console.error('Google Client ID is not set in environment variables');
+    }
+    return clientId || '';
+  });
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  // In your LoginPage component
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('sessionExpired') === 'true') {
+    // Show a message to the user that their session has expired
+    toast.error('Your session has expired. Please log in again.');
+    // Optionally clear the query parameter from the URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}, []);
 
   // Check for session expired flag on component mount
   useEffect(() => {
@@ -60,6 +88,40 @@ const LoginPage = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      setIsGoogleLoading(true);
+      if (credentialResponse.credential) {
+        const decoded = jwtDecode(credentialResponse.credential) as any;
+        
+        // Store user data in localStorage
+        const userData = {
+          email: decoded.email,
+          name: decoded.name,
+          picture: decoded.picture
+        };
+        
+        localStorage.setItem("user", JSON.stringify(userData));
+        localStorage.setItem("isAuthenticated", "true");
+        
+        // You might want to send the token to your backend for verification
+        // await authService.verifyGoogleToken(credentialResponse.credential);
+        
+        toast.success("Login successful!");
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      console.error('Error during Google login:', error);
+      toast.error('Failed to sign in with Google');
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    toast.error('Google sign in failed. Please try again.');
   };
 
   return (
@@ -164,14 +226,87 @@ const LoginPage = () => {
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                className="w-full h-14 text-base font-medium"
-                disabled={isLoading}
-                variant="encore"
-              >
-                {isLoading ? "Signing In..." : "Login"}
-              </Button>
+              <div className="space-y-3">
+                <Button
+                  type="submit"
+                  className="w-full h-14 text-base font-medium"
+                  disabled={isLoading}
+                  variant="encore"
+                >
+                  {isLoading ? "Signing In..." : "Login with Email"}
+                </Button>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-gray-300"></span>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                  </div>
+                </div>
+
+                <div className="w-full">
+                  <GoogleOAuthProvider 
+                    clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+                    onScriptLoadError={() => {
+                      console.error('Failed to load Google OAuth script');
+                      toast.error('Failed to load Google Sign In. Please try again later.');
+                    }}
+                    onScriptLoadSuccess={() => {
+                      console.log('Google OAuth script loaded successfully');
+                    }}
+                  >
+                    <GoogleLogin
+                      onSuccess={async (credentialResponse: GoogleCredentialResponse) => {
+                        try {
+                          setIsGoogleLoading(true);
+                          
+                          // Send the credential to your backend for verification
+                          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/google`, {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              token: credentialResponse.credential,
+                            }),
+                          });
+
+                          if (!response.ok) {
+                            throw new Error('Authentication failed');
+                          }
+
+                          const data = await response.json();
+                          
+                          // Store the authentication token and user data
+                          localStorage.setItem('authToken', data.token);
+                          localStorage.setItem('user', JSON.stringify(data.user));
+                          localStorage.setItem('isAuthenticated', 'true');
+                          
+                          toast.success('Login successful!');
+                          navigate('/dashboard');
+                        } catch (error) {
+                          console.error('Google login error:', error);
+                          toast.error('Failed to sign in with Google. Please try again.');
+                        } finally {
+                          setIsGoogleLoading(false);
+                        }
+                      }}
+                      onError={() => {
+                        toast.error('Google Sign In failed');
+                        setIsGoogleLoading(false);
+                      }}
+                      useOneTap
+                      auto_select
+                      text="continue_with"
+                      shape="rectangular"
+                      theme="outline"
+                      size="large"
+                      width="100%"
+                    />
+                  </GoogleOAuthProvider>
+                </div>
+              </div>
 
               <div className="text-center">
                 <Button variant="link" className="text-gray-500 hover:text-accent-blue p-0 [&_*]:!text-inherit">
@@ -179,12 +314,6 @@ const LoginPage = () => {
                 </Button>
               </div>
             </form>
-
-            <div className="mt-8 text-center">
-              <p className="text-xs text-gray-500">
-                Demo: Use any email and password to login
-              </p>
-            </div>
           </CardContent>
         </Card>
       </div>
