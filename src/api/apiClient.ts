@@ -3,13 +3,13 @@ import config from './config';
 
 const apiClient = axios.create({
   baseURL: config.API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
-    'Accept': 'application/json',
-  },
-  withCredentials: true,
-  timeout: 60000, // Increased to 60 seconds
+  // headers: {
+  //   'Content-Type': 'application/json',
+  //   // 'ngrok-skip-browser-warning': 'true',
+  //   'Accept': 'application/json',
+  // },
+  // withCredentials: true,
+  //  timeout: 60000, // Increased to 60 seconds
 });
 
 // Request interceptor

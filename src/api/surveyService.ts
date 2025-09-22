@@ -4,7 +4,12 @@ export interface SurveyResponse {
   success: boolean;
   message: string;
   data: {
-    guides: Survey[];
+    sessions: Array<{
+      _id: string;
+      human_readable_id: string;
+      status: string;
+      created_at: string;
+    }>;
     count: number;
   };
 }
@@ -37,6 +42,11 @@ export interface Survey {
 
 export const getSurveys = async (): Promise<SurveyResponse> => {
   const response = await apiClient.get<SurveyResponse>('/api/guides');
+  return response.data;
+};
+
+export const getUserSurveys = async (): Promise<SurveyResponse> => {
+  const response = await apiClient.get<SurveyResponse>('/api/surveys');
   return response.data;
 };
 

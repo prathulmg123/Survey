@@ -28,7 +28,7 @@ const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
   { title: "Users", url: "/users", icon: UsersIcon, roles: ['admin', 'manager'] },
   { title: "Survey", url: "/manage", icon: BarChart3, roles: ['admin', 'manager'] },
-  // { title: "In Progress", url: "/active", icon: Clock },
+  { title: "Survey", url: "/survey", icon: BarChart3, roles: ['user'] },
 ];
 
 const bottomItems = [

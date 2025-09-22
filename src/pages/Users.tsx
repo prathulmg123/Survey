@@ -5,7 +5,7 @@ import { useLoader } from "@/hooks/useLoader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Search, UserPlus, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown, AlertCircle, Grid, List, Mail } from "lucide-react";
+import { Search, FileText,UserPlus, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown, AlertCircle, Grid, List, Mail } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getUsers, User } from "@/api/userService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -228,13 +228,19 @@ export default function Users() {
            />
          </div>
        </div>
- 
-       {/* Cards */}
+
        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8" style={{
          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))',
          justifyItems: 'center'
        }}>
-         {currentItems.map((user) => (
+
+
+         {currentItems.length === 0 ? (
+                   <div className="col-span-full flex flex-col items-center justify-center py-12 mt-12">
+                     <FileText className="h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
+                     <p className="text-gray-500 dark:text-gray-400 text-lg">No Users found</p>
+                   </div>
+                 ) : (currentItems.map((user) => (
            <div
              key={user.id}
              className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full hover:-translate-y-1 hover:scale-[1.03] w-full max-w-[400px]"
@@ -299,7 +305,7 @@ export default function Users() {
                </div>
              </div>
            </div>
-         ))}
+         )))}
        </div>
  
        {/* Pagination */}
@@ -401,8 +407,9 @@ export default function Users() {
      </div>
 
       )}
+       {viewMode === 'table' && (
       <Card>
-        <CardContent className={viewMode === 'grid' ? 'p-0' : ''}>
+        <CardContent >
           {viewMode === 'table' && (
             <div className="mb-4 flex justify-end mt-4">
               <div className="relative w-50 max-w-md">
@@ -420,7 +427,7 @@ export default function Users() {
               </div>
             </div>
           )}
-          {viewMode === 'table' && (
+         
             <div className="relative rounded-lg border-2 border-blue-100 dark:border-gray-700 overflow-hidden mb-6 group shadow-md transition-shadow duration-200">
               <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-blue-50/50 to-transparent dark:from-gray-800/50 dark:to-transparent opacity-70 rounded-b-lg pointer-events-none"></div>
               <div className="relative bg-white dark:bg-gray-800/50 rounded-lg overflow-hidden">
@@ -537,7 +544,7 @@ export default function Users() {
                       <TableRow>
                         <TableCell colSpan={5} className="h-24 text-center py-8">
                           <div className="flex flex-col items-center justify-center">
-                            <Search className="h-12 w-12 text-gray-300 mb-2" />
+                          <FileText className="h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
                             <p className="text-gray-500">No users found</p>
                           </div>
                         </TableCell>
@@ -637,11 +644,12 @@ export default function Users() {
                 )}
               </div>
             </div>
-          )}
+        
 
-          {/* </div> */}
+          
         </CardContent>
       </Card>
+    )}
     </div>
   );
 }

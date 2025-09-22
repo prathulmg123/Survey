@@ -17,6 +17,7 @@ import SurveyViewPage from "./pages/SurveyViewPage";
 import SurveyCreateView from "./pages/SurveyCreateView";
 import Users from "./pages/Users";
 import ProgressPage from "./pages/ProgressPage";
+import UserSurveys from "./pages/UserSurveys";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
             {/* Top-level routes */}
             <Route path="/guide" element={<SurveyGuide />} />
             <Route path="/manage" element={<ManageSurveys />} />
+            <Route path="/survey" element={<UserSurveys />} />
             <Route path="/surveys/:id" element={<SurveyDetail />} />
             <Route path="/surveys/view/:id" element={<SurveyViewPage />} />
             <Route path="/surveys/create-view" element={<SurveyCreateView />} />
