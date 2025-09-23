@@ -21,7 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Portal } from "@/components/ui/Portal";
-import { getSurveys, mapApiSurveyToUiSurvey, Survey as ApiSurvey, deleteSurvey } from "@/api/surveyService";
+import { getSurveys, mapApiSurveyToUiSurvey, Survey as ApiSurvey, deleteSurvey,updateSurvey } from "@/api/surveyService";
 import { toast } from "sonner";
 
 interface Survey extends ApiSurvey {
@@ -48,17 +48,22 @@ export default function ManageSurveys() {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+  const [editingSurveyId, setEditingSurveyId] = useState<number | null>(null);
+  const [editedTitle, setEditedTitle] = useState('');
+  const [updatedSurvey, setUpdatedSurvey] = useState<Survey[]>([]);
   const navigate = useNavigate();
 
   // Fetch surveys from API
   const fetchSurveys = useCallback(async () => {
     try {
       setError(null);
-      const response = await getSurveys();
+      const response = await getSurveys()as any;
       if (response.success) {
+        setUpdatedSurvey(response.data.guides)
         const mappedSurveys = response.data.guides.map((survey, index) => 
           mapApiSurveyToUiSurvey(survey, index)
         ) as any;
+        console.log(mappedSurveys,"mapped")
         setSurveys(mappedSurveys);
       } else {
         setError(response.message || 'Failed to fetch surveys');
@@ -245,6 +250,82 @@ export default function ManageSurveys() {
 
   const handleEditClick = (survey: Survey) => {
     navigate(`/surveys/${survey._id}`);
+  };
+
+  const startEditing = (survey: Survey) => {
+    setEditingSurveyId(survey.id);
+    setEditedTitle(survey.title);
+  };
+
+  const saveEdit = async (surveyId: number) => {
+    try {
+      // Find the survey in the surveys array to get the _id
+      const surveyToUpdate = surveys.find(survey => survey.id === surveyId);
+      
+      if (!surveyToUpdate) {
+        console.error('Survey not found:', surveyId);
+        return;
+      }
+
+      // Find the full survey data in updatedSurvey
+      const fullSurvey = updatedSurvey.find(survey => 
+        survey._id === surveyToUpdate._id || survey.id === surveyId
+      );
+
+      if (!fullSurvey) {
+        console.error('Full survey data not found for:', surveyId);
+        return;
+      }
+
+      // Prepare the data for the API call
+      const updateData = {
+        surveyId: fullSurvey._id,
+        name: editedTitle,
+        source_document_name: fullSurvey.source_document_name || editedTitle,
+        overall_research_goal: fullSurvey.overall_research_goal || '',
+        initiator_question: fullSurvey.initiator_question || '',
+        research_areas: fullSurvey.research_areas || []
+      };
+
+      // Call the API to update the survey
+      const response = await updateSurvey(updateData);
+      
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to update survey');
+      }
+
+      // Update the local state if API call is successful
+      const updatedSurveys = surveys.map(survey => 
+        survey.id === surveyId ? { ...survey, title: editedTitle } : survey
+      );
+      
+      const updatedSurveyData = updatedSurvey.map(survey => {
+        if (survey._id === fullSurvey._id || survey.id === surveyId) {
+          return { 
+            ...survey, 
+            name: editedTitle,
+            title: editedTitle 
+          };
+        }
+        return survey;
+      });
+      
+      setSurveys(updatedSurveys);
+      setUpdatedSurvey(updatedSurveyData);
+      setEditingSurveyId(null);
+      toast.success('Survey updated successfully');
+    } catch (error) {
+      console.error('Error updating survey:', error);
+      toast.error(error.message || 'Failed to update survey');
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, surveyId: number) => {
+    if (e.key === 'Enter') {
+      saveEdit(surveyId);
+    } else if (e.key === 'Escape') {
+      setEditingSurveyId(null);
+    }
   };
 
 
@@ -629,7 +710,24 @@ export default function ManageSurveys() {
                               <FileText className="h-5 w-5 text-blue-600" />
                             </div>
                             <div>
-                              <div className="font-medium text-gray-800 dark:text-gray-200">{survey.title}</div>
+                              {editingSurveyId === survey.id ? (
+                                <Input
+                                  type="text"
+                                  value={editedTitle}
+                                  onChange={(e) => setEditedTitle(e.target.value)}
+                                  onKeyDown={(e) => handleKeyDown(e, survey.id)}
+                                  onBlur={() => saveEdit(survey.id)}
+                                  autoFocus
+                                  className="h-8 px-2 py-1 text-sm border-blue-300 focus-visible:ring-1 focus-visible:ring-blue-500"
+                                />
+                              ) : (
+                                <div 
+                                  className="font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded cursor-text"
+                                  onClick={() => startEditing(survey)}
+                                >
+                                  {survey.title}
+                                </div>
+                              )}
                               <div className="text-sm text-gray-500 dark:text-gray-400">
                                 <span className="text-xs text-gray-400 dark:text-gray-500">
                                   {new Date(survey.created_at || survey.createdAt).toLocaleDateString('en-US', {

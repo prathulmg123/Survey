@@ -25,10 +25,10 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const menuItems = [
-  { title: "Dashboard", url: "/dashboard", icon: Home },
+  { title: "Dashboard", url: "/dashboard", icon: Home, roles: ['admin', 'manager'] },
   { title: "Users", url: "/users", icon: UsersIcon, roles: ['admin', 'manager'] },
   { title: "Survey", url: "/manage", icon: BarChart3, roles: ['admin', 'manager'] },
-  { title: "Survey", url: "/survey", icon: BarChart3, roles: ['user'] },
+  // { title: "Survey", url: "/survey", icon: BarChart3, roles: ['user'] },
 ];
 
 const bottomItems = [
