@@ -30,7 +30,21 @@ export default function Users() {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [sortField, setSortField] = useState<SortableField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+  // Load view mode from localStorage or default to 'table'
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>(() => {
+    if (typeof window !== 'undefined') {
+      const savedViewMode = localStorage.getItem('usersViewMode') as 'table' | 'grid' | null;
+      return savedViewMode || 'table';
+    }
+    return 'table';
+  });
+
+  // Save view mode to localStorage when it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('usersViewMode', viewMode);
+    }
+  }, [viewMode]);
   const { showLoader, hideLoader } = useLoader();
 
   // Fetch users from API
