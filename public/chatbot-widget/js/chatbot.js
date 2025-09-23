@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Handle email form submission
-    emailAuthForm.addEventListener('submit', function(e) {
+    emailAuthForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const name = userNameInput.value.trim();
@@ -91,17 +91,38 @@ document.addEventListener('DOMContentLoaded', function() {
             authMethod: 'email',
             authenticatedAt: new Date().toISOString()
         };
+
+        // Show loading state
+        const submitBtn = emailAuthForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please wait...';
         
-        localStorage.setItem('chatbot_user_data', JSON.stringify(userData));
-        localStorage.setItem('chatbot_authenticated', 'true');
-        
-        // Hide auth modal and show chat
-        authOverlay.style.display = 'none';
-        chatbotContainer.style.display = 'block';
-        
-        // Start survey if survey ID is present
-        if (window.surveyContext?.surveyId) {
-            startSurvey();
+        try {
+            // Call startSurvey with user data
+            await startSurvey({
+                guide_id: window.surveyContext?.surveyId || '',
+                email: userData.email,
+                username: userData.name
+            });
+            
+            // Only save auth state and show chat if API call is successful
+            localStorage.setItem('chatbot_user_data', JSON.stringify(userData));
+            localStorage.setItem('chatbot_authenticated', 'true');
+            
+            // Hide auth modal and show chat
+            authOverlay.style.display = 'none';
+            chatbotContainer.style.display = 'block';
+            
+            // Focus on the input field
+            userInput.focus();
+        } catch (error) {
+            console.error('Authentication failed:', error);
+            alert('Failed to start the chat. Please try again.');
+        } finally {
+            // Reset button state
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
         }
     });
     
@@ -262,7 +283,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Function to start the survey
-    async function startSurvey() {
+    async function startSurvey(userData) {
+        if (!userData || !userData.guide_id || !userData.email || !userData.username) {
+            throw new Error('Invalid user data provided');
+        }
+
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -270,13 +295,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    guide_id: window.surveyContext?.surveyId || ''
+                    guide_id: userData.guide_id,
+                    email: userData.email,
+                    username: userData.username
                 })
             });
 
             if (!response.ok) {
-                throw new Error('Failed to start survey');
+                const errorData = await response.json().catch(() => ({}));
+                console.error('API Error:', errorData);
+                throw new Error(errorData.message || 'Failed to start survey');
             }
+            
+            const responseData = await response.json();
+            return responseData;
 
             const data = await response.json();
             console.log('Survey started successfully:', data);
@@ -298,7 +330,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Start the survey when the page loads if user is already authenticated
     if (isAuthenticated && window.surveyContext?.surveyId) {
-        startSurvey();
+        const userData = JSON.parse(localStorage.getItem('chatbot_user_data') || '{}');
+        if (userData.email && userData.name) {
+            startSurvey({
+                guide_id: window.surveyContext.surveyId,
+                email: userData.email,
+                username: userData.name
+            }).then(() => {
+                authOverlay.style.display = 'none';
+                chatbotContainer.style.display = 'block';
+            }).catch(error => {
+                console.error('Failed to resume chat:', error);
+                // Clear auth state on failure
+                localStorage.removeItem('chatbot_authenticated');
+                localStorage.removeItem('chatbot_user_data');
+                authOverlay.style.display = 'flex';
+            });
+        } else {
+            // Clear invalid auth state
+            localStorage.removeItem('chatbot_authenticated');
+            localStorage.removeItem('chatbot_user_data');
+            authOverlay.style.display = 'flex';
+        }
     }
 
     // Handle clicks outside the chat (optional)
