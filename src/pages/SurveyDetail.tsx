@@ -580,8 +580,9 @@ export default function SurveyDetail() {
 
                                       {/* Sub-Topics */}
                                       <div className="space-y-4">
-                                        <Accordion type="single" collapsible className="w-full ">
                                           {area.sub_topics?.map((subTopic, subTopicIndex) => (
+                                             <div key={`subtopic-${subTopicIndex}`} className="mt-6">
+                                        <Accordion type="single" collapsible className="w-full">
                                             <AccordionItem key={subTopic.id} value={`item-${subTopic.id}`} className="border-2 border-orange-200 dark:border-orange-800/70 rounded-xl overflow-hidden">
                                               <AccordionTrigger className="px-5 py-4 hover:no-underline bg-orange-50 dark:bg-orange-900/40 mx-1 my-1 rounded-lg">
                                                 {/* <div className="flex items-center gap-2 flex-1 text-left">
@@ -762,8 +763,9 @@ export default function SurveyDetail() {
                                               </div>
                                               </AccordionContent>
                                             </AccordionItem>
-                                          ))}
                                         </Accordion>
+                                        </div>
+                                          ))}
                                       </div>
                                     </div>
                              
