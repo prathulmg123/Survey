@@ -1,6 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     // API Configuration
     const API_URL = 'http://vpn.seqato.com:8001/api/surveys/start';
+    const WS_URL = 'ws://vpn.seqato.com:8001/ws/chat/'; // WebSocket URL
+    
+    // WebSocket connection state
+    let socket = null;
+    let reconnectAttempts = 0;
+    const MAX_RECONNECT_ATTEMPTS = 5;
+    const RECONNECT_DELAY = 3000; // 3 seconds
     
     // DOM Elements
     const chatWindow = document.getElementById('chatWindow');
@@ -172,16 +179,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Send message when clicking the send button
-    sendButton.addEventListener('click', sendMessage);
-
-    // Send message when pressing Enter
-    userInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
+    // Add event listeners
+    if (sendButton) sendButton.addEventListener('click', sendMessage);
+    if (userInput) {
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    }
+    
+    // Handle window close to clean up WebSocket
+    window.addEventListener('beforeunload', () => {
+        if (socket) {
+            socket.close();
         }
     });
+
+    // Handle incoming WebSocket messages
+    function handleIncomingMessage(data) {
+        console.log('Received message:', data);
+        
+        if (data.type === 'message' && data.content) {
+            addMessage(data.content, 'bot');
+        } else if (data.type === 'typing') {
+            // Handle typing indicator if needed
+            console.log('Bot is typing...');
+        } else if (data.type === 'error') {
+            console.error('Server error:', data.message);
+            addMessage('Sorry, an error occurred. Please try again.', 'bot');
+        }
+    }
 
     // Function to send a message
     function sendMessage() {
@@ -191,15 +220,32 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add user message to chat
         addMessage(message, 'user');
         userInput.value = '';
-        userInput.focus();
+        
+        // Show typing indicator
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'typing-indicator';
+        typingIndicator.id = 'typing';
+        typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+        chatMessages.appendChild(typingIndicator);
         scrollToBottom();
 
-        // Simulate bot response after a short delay
-        setTimeout(() => {
-            const botResponse = getBotResponse(message);
-            addMessage(botResponse, 'bot');
-            scrollToBottom();
-        }, 500);
+        // Send message via WebSocket
+        const messageSent = sendWebSocketMessage({
+            type: 'message',
+            content: message,
+            timestamp: new Date().toISOString()
+        });
+
+        if (!messageSent) {
+            // Fallback to local response if WebSocket is not available
+            setTimeout(() => {
+                const botResponse = getBotResponse(message);
+                addMessage(botResponse, 'bot');
+                // Remove typing indicator
+                const typingEl = document.getElementById('typing');
+                if (typingEl) typingEl.remove();
+            }, 1000);
+        }
     }
 
     // Function to add a message to the chat
@@ -282,7 +328,158 @@ document.addEventListener('DOMContentLoaded', function() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Function to start the survey
+    // Initialize WebSocket connection
+    function initWebSocket(webSocketUrl, onMessage) {
+        if (socket) {
+            socket.close();
+        }
+
+        console.log('Connecting to WebSocket:', webSocketUrl);
+        updateConnectionStatus('connecting');
+        
+        try {
+            socket = new WebSocket(webSocketUrl);
+            reconnectAttempts = 0;
+
+            socket.onopen = () => {
+                console.log('WebSocket connected');
+                updateConnectionStatus('connected');
+                
+                // Clear any existing ping interval
+                if (window.pingInterval) {
+                    clearInterval(window.pingInterval);
+                }
+                
+                // Send a ping to keep the connection alive
+                window.pingInterval = setInterval(() => {
+                    if (socket && socket.readyState === WebSocket.OPEN) {
+                        try {
+                            socket.send(JSON.stringify({ type: 'ping' }));
+                        } catch (e) {
+                            console.error('Error sending ping:', e);
+                        }
+                    }
+                }, 30000); // Send ping every 30 seconds
+            };
+
+            socket.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'pong') return; // Ignore pong messages
+                    onMessage(data);
+                } catch (error) {
+                    console.error('Error parsing WebSocket message:', error, 'Raw data:', event.data);
+                }
+            };
+
+            socket.onclose = (event) => {
+                console.log('WebSocket disconnected:', event);
+                updateConnectionStatus('disconnected');
+                
+                // Clear ping interval on close
+                if (window.pingInterval) {
+                    clearInterval(window.pingInterval);
+                }
+                
+                // Don't attempt to reconnect if the close was clean
+                if (event.code === 1000) {
+                    console.log('WebSocket connection closed cleanly');
+                    return;
+                }
+                
+                // Attempt to reconnect
+                if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                    reconnectAttempts++;
+                    const delay = Math.min(RECONNECT_DELAY * Math.pow(2, reconnectAttempts), 30000); // Cap at 30s
+                    console.log(`Reconnecting in ${delay/1000} seconds... (attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
+                    setTimeout(() => initWebSocket(webSocketUrl, onMessage), delay);
+                } else {
+                    console.error('Max reconnection attempts reached');
+                    updateConnectionStatus('error', 'Connection lost. Please refresh the page.');
+                }
+            };
+
+            socket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                updateConnectionStatus('error', 'Connection error');
+                
+                // Try to reconnect on error
+                if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                    reconnectAttempts++;
+                    const delay = Math.min(RECONNECT_DELAY * Math.pow(2, reconnectAttempts), 30000);
+                    console.log(`Reconnecting after error in ${delay/1000} seconds...`);
+                    setTimeout(() => initWebSocket(webSocketUrl, onMessage), delay);
+                }
+            };
+
+            return socket;
+        } catch (error) {
+            console.error('Error creating WebSocket:', error);
+            updateConnectionStatus('error', 'Failed to connect');
+            
+            // Try to reconnect if possible
+            if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                reconnectAttempts++;
+                const delay = Math.min(RECONNECT_DELAY * Math.pow(2, reconnectAttempts), 30000);
+                console.log(`Retrying connection in ${delay/1000} seconds...`);
+                setTimeout(() => initWebSocket(webSocketUrl, onMessage), delay);
+            }
+            
+            throw error;
+        }
+    }
+
+    // Update connection status in the UI
+    function updateConnectionStatus(status, message = '') {
+        const statusElement = document.getElementById('connectionStatus');
+        if (!statusElement) return;
+
+        statusElement.className = `connection-status ${status}`;
+        
+        const statusText = {
+            'connected': 'Connected',
+            'connecting': 'Connecting...',
+            'disconnected': 'Disconnected',
+            'error': message || 'Connection error'
+        }[status] || '';
+
+        statusElement.textContent = statusText;
+    }
+
+    // Function to send a message via WebSocket
+    function sendWebSocketMessage(message) {
+        try {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                const messageStr = JSON.stringify(message);
+                console.log('Sending WebSocket message:', messageStr);
+                socket.send(messageStr);
+                return true;
+            }
+            
+            console.error('WebSocket is not connected. Current state:', socket ? socket.readyState : 'No socket');
+            updateConnectionStatus('error', 'Not connected. Trying to reconnect...');
+            
+            // Try to reconnect if we have a chat session ID
+            if (window.chatSessionId) {
+                const userData = JSON.parse(localStorage.getItem('chatbot_user_data') || '{}');
+                if (userData) {
+                    startSurvey({
+                        guide_id: window.surveyContext?.surveyId || '',
+                        email: userData.email,
+                        username: userData.name
+                    }).catch(console.error);
+                }
+            }
+            
+            return false;
+        } catch (error) {
+            console.error('Error sending WebSocket message:', error);
+            updateConnectionStatus('error', 'Failed to send message');
+            return false;
+        }
+    }
+
+    // Function to start the survey and initialize WebSocket
     async function startSurvey(userData) {
         if (!userData || !userData.guide_id || !userData.email || !userData.username) {
             throw new Error('Invalid user data provided');
@@ -308,10 +505,33 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             const responseData = await response.json();
-            return responseData;
-
-            const data = await response.json();
+            
+            if (!responseData.success) {
+                throw new Error(responseData.message || 'Failed to start chat session');
+            }
+            
+            const { data } = responseData;
             console.log('Survey started successfully:', data);
+            
+            // Store the chat ID for future reference
+            if (data.chat_id) {
+                window.chatSessionId = data.chat_id;
+            }
+            
+            // Initialize WebSocket connection with the provided URL
+            if (data.websocket_url) {
+                initWebSocket(data.websocket_url, handleIncomingMessage);
+            }
+            
+            // Show the initial welcome message if available
+            if (data.initial_message) {
+                // Small delay to ensure the chat UI is ready
+                setTimeout(() => {
+                    addMessage(data.initial_message, 'bot');
+                }, 500);
+            }
+            
+            return data;
             
             // Update chat with welcome message from API if available
             if (data.welcome_message) {
