@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { toast } from "@/components/ui/use-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -21,7 +23,29 @@ import UserSurveys from "./pages/UserSurveys";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  useEffect(() => {
+    const handleToast = (event: CustomEvent) => {
+      const { title, description, variant } = event.detail;
+      toast({
+        title,
+        description,
+        variant,
+        duration: 5000,
+      });
+    };
+
+    // Add event listener for custom toast events
+    // @ts-ignore - CustomEvent type needs to be handled
+    window.addEventListener('showToast', handleToast);
+
+    return () => {
+      // @ts-ignore
+      window.removeEventListener('showToast', handleToast);
+    };
+  }, []);
+
+  return (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <TooltipProvider>
@@ -77,7 +101,8 @@ const App = () => (
       </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
-  </QueryClientProvider>
-);
+    </QueryClientProvider>
+  );
+};
 
 export default App;

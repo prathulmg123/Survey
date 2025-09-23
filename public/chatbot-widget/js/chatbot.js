@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // API Configuration
+    const API_URL = 'http://vpn.seqato.com:8001/api/surveys/start';
+    
     // DOM Elements
     const chatWindow = document.getElementById('chatWindow');
     const chatMessages = document.getElementById('chatMessages');
@@ -7,6 +10,128 @@ document.addEventListener('DOMContentLoaded', function() {
     const minimizeButton = document.getElementById('minimizeChat');
     const closeButton = document.getElementById('closeChat');
     const chatbotContainer = document.querySelector('.chatbot-container');
+    
+    // Auth Elements
+    const authOverlay = document.getElementById('authOverlay');
+    const authTabs = document.querySelectorAll('.auth-tab');
+    const authForms = document.querySelectorAll('.auth-form');
+    const emailAuthForm = document.getElementById('emailAuthForm');
+    const googleSignInBtn = document.getElementById('googleSignIn');
+    const googleSignInFullBtn = document.getElementById('googleSignInFull');
+    const tabSwitchBtns = document.querySelectorAll('.auth-tab-switch');
+    const userNameInput = document.getElementById('userName');
+    const userEmailInput = document.getElementById('userEmail');
+    
+    // Always show auth modal on page load
+    authOverlay.style.display = 'flex';
+    chatbotContainer.style.display = 'none';
+    
+    // Clear any previous authentication
+    localStorage.removeItem('chatbot_authenticated');
+    localStorage.removeItem('chatbot_user_data');
+    
+    // For testing: Uncomment the following lines to enable auto-login with test credentials
+    // const testUser = {
+    //     name: 'Test User',
+    //     email: 'test@example.com',
+    //     authMethod: 'test',
+    //     authenticatedAt: new Date().toISOString()
+    // };
+    // localStorage.setItem('chatbot_user_data', JSON.stringify(testUser));
+    // localStorage.setItem('chatbot_authenticated', 'true');
+    // authOverlay.style.display = 'none';
+    // chatbotContainer.style.display = 'block';
+    
+    // Tab switching functionality
+    authTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.getAttribute('data-tab');
+            
+            // Update active tab
+            authTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // Show corresponding form
+            authForms.forEach(form => form.classList.remove('active'));
+            document.getElementById(`${tabName}AuthForm`).classList.add('active');
+        });
+    });
+    
+    // Tab switch buttons (e.g., "Use email instead")
+    tabSwitchBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.getAttribute('data-tab');
+            const tabToActivate = document.querySelector(`.auth-tab[data-tab="${tabName}"]`);
+            if (tabToActivate) tabToActivate.click();
+        });
+    });
+    
+    // Handle email form submission
+    emailAuthForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const name = userNameInput.value.trim();
+        const email = userEmailInput.value.trim();
+        
+        if (!name || !email) {
+            alert('Please fill in all fields');
+            return;
+        }
+        
+        // Simple email validation
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            alert('Please enter a valid email address');
+            return;
+        }
+        
+        // Save user data
+        const userData = {
+            name,
+            email,
+            authMethod: 'email',
+            authenticatedAt: new Date().toISOString()
+        };
+        
+        localStorage.setItem('chatbot_user_data', JSON.stringify(userData));
+        localStorage.setItem('chatbot_authenticated', 'true');
+        
+        // Hide auth modal and show chat
+        authOverlay.style.display = 'none';
+        chatbotContainer.style.display = 'block';
+        
+        // Start survey if survey ID is present
+        if (window.surveyContext?.surveyId) {
+            startSurvey();
+        }
+    });
+    
+    // Handle Google Sign In (placeholder - you'll need to implement actual Google OAuth)
+    function handleGoogleSignIn() {
+        // This is a placeholder. In a real app, you would integrate with Google OAuth
+        // For now, we'll simulate a successful Google sign-in
+        const userData = {
+            name: 'Google User',
+            email: 'user@example.com',
+            authMethod: 'google',
+            authenticatedAt: new Date().toISOString()
+        };
+        
+        localStorage.setItem('chatbot_user_data', JSON.stringify(userData));
+        localStorage.setItem('chatbot_authenticated', 'true');
+        
+        // Hide auth modal and show chat
+        authOverlay.style.display = 'none';
+        chatbotContainer.style.display = 'block';
+        
+        // Start survey if survey ID is present
+        if (window.surveyContext?.surveyId) {
+            startSurvey();
+        }
+    }
+    
+    // Add click handlers for Google sign-in buttons
+    if (googleSignInBtn) googleSignInBtn.addEventListener('click', handleGoogleSignIn);
+    if (googleSignInFullBtn) googleSignInFullBtn.addEventListener('click', handleGoogleSignIn);
 
     // Handle minimize button if it exists
     if (minimizeButton) {
@@ -134,6 +259,46 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to auto-scroll to the bottom of the chat
     function scrollToBottom() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Function to start the survey
+    async function startSurvey() {
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    guide_id: window.surveyContext?.surveyId || ''
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to start survey');
+            }
+
+            const data = await response.json();
+            console.log('Survey started successfully:', data);
+            
+            // Update chat with welcome message from API if available
+            if (data.welcome_message) {
+                addMessage(data.welcome_message, 'bot');
+                scrollToBottom();
+            }
+            
+            return data;
+        } catch (error) {
+            console.error('Error starting survey:', error);
+            // Show error message to user
+            addMessage('Sorry, I had trouble connecting to the survey. Please try again later.', 'bot');
+            scrollToBottom();
+        }
+    }
+
+    // Start the survey when the page loads if user is already authenticated
+    if (isAuthenticated && window.surveyContext?.surveyId) {
+        startSurvey();
     }
 
     // Handle clicks outside the chat (optional)

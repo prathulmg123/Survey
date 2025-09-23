@@ -182,61 +182,79 @@ useEffect(() => {
           {/* <h2 className="text-2xl font-semibold text-gray-900 mb-2">Welcome Back</h2> */}
         </div>
 
-        <Card className="bg-white border border-gray-200 shadow-lg rounded-xl overflow-hidden [&_*]:!text-gray-900">
+        <Card className="bg-white/95 backdrop-blur-sm shadow-2xl border border-gray-100 shadow-xl rounded-2xl overflow-hidden [&_*]:!text-gray-900 hover:shadow-2xl transition-shadow duration-300">
           <CardContent className="p-8">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-1">Welcome Back</h2>
+              <p className="text-gray-500">Sign in to continue to your account</p>
+            </div>
+            
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-4">
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <div className="space-y-5">
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-accent-blue transition-colors" />
+                  </div>
                   <Input
                     type="email"
                     placeholder="Your Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="pl-12 h-14 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue/50 transition-all"
+                    className="pl-12 h-14 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue/50 transition-all bg-gray-50/50 hover:bg-white"
                     noDarkMode
                   />
                 </div>
                 
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-accent-blue transition-colors" />
+                  </div>
                   <Input
                     type={showPassword ? "text" : "password"}
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="pl-12 pr-12 h-14 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue/50 transition-all"
+                    className="pl-12 pr-12 h-14 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue/50 transition-all bg-gray-50/50 hover:bg-white"
                     noDarkMode
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10 w-10 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-full"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10 w-10 text-gray-400 hover:text-accent-blue hover:bg-accent-blue/10 rounded-xl transition-colors"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
+                      <EyeOff className="h-5 w-5" />
                     ) : (
-                      <Eye className="h-4 w-4" />
+                      <Eye className="h-5 w-5" />
                     )}
                   </Button>
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <Button
                   type="submit"
-                  className="w-full h-14 text-base font-medium"
+                  className="w-full h-14 text-base font-semibold rounded-xl bg-gradient-to-r from-accent-blue to-blue-600 hover:from-accent-blue/90 hover:to-blue-600/90 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
                   disabled={isLoading}
-                  variant="encore"
                 >
-                  {isLoading ? "Signing In..." : "Login with Email"}
+                  {isLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Signing In...
+                    </>
+                  ) : (
+                    "Sign In"
+                  )}
                 </Button>
 
-                <div className="relative">
+                {/* <div className="relative">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t border-gray-300"></span>
                   </div>
@@ -308,11 +326,16 @@ useEffect(() => {
                       width="100%"
                     />
                   </GoogleOAuthProvider>
-                </div>
+                </div> */}
               </div>
 
               <div className="text-center">
-                <Button variant="link" className="text-gray-500 hover:text-accent-blue p-0 [&_*]:!text-inherit">
+                <Button 
+                  variant="link" 
+                  disabled
+                  className="text-gray-300 dark:text-gray-600 p-0 [&_*]:!text-inherit cursor-not-allowed"
+                  title="Forgot Password is currently disabled"
+                >
                   Forgot Password?
                 </Button>
               </div>

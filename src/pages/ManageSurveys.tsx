@@ -47,7 +47,7 @@ export default function ManageSurveys() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [isLoading, setIsLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
   const [editingSurveyId, setEditingSurveyId] = useState<number | null>(null);
   const [editedTitle, setEditedTitle] = useState('');
   const [updatedSurvey, setUpdatedSurvey] = useState<Survey[]>([]);
@@ -222,25 +222,27 @@ export default function ManageSurveys() {
 
   const confirmDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (surveyToDelete) {
-      try {
-        const result = await deleteSurvey(surveyToDelete._id);
-        if (result.success) {
-          // Remove the deleted survey from the list
-          setSurveys(prev => prev.filter(s => s.id !== surveyToDelete.id));
-          // Show success message
-          toast.success('Survey deleted successfully');
-        } else {
-          // Show error message from API
-          toast.error(result.message || 'Failed to delete survey');
-        }
-      } catch (error) {
-        console.error('Error deleting survey:', error);
-        toast.error('An error occurred while deleting the survey');
-      } finally {
-        setIsDeleteModalOpen(false);
-        setTimeout(() => setSurveyToDelete(null), 200);
+    if (!surveyToDelete) return;
+    
+    setIsLoading(true);
+    try {
+      const result = await deleteSurvey(surveyToDelete._id);
+      if (result.success) {
+        // Remove the deleted survey from the list
+        setSurveys(prev => prev.filter(s => s.id !== surveyToDelete.id));
+        // Show success message
+        toast.success('Survey deleted successfully');
+      } else {
+        // Show error message from API
+        toast.error(result.message || 'Failed to delete survey');
       }
+    } catch (error) {
+      console.error('Error deleting survey:', error);
+      toast.error('An error occurred while deleting the survey');
+    } finally {
+      setIsLoading(false);
+      setIsDeleteModalOpen(false);
+      setTimeout(() => setSurveyToDelete(null), 200);
     }
   };
 
@@ -436,7 +438,7 @@ export default function ManageSurveys() {
            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-blue-500" />
            <Input
              type="search"
-             placeholder="Search users..."
+             placeholder="Search Survey..."
              className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
              value={searchTerm}
              onChange={(e) => {
@@ -458,7 +460,7 @@ export default function ManageSurveys() {
           currentItems.map((survey) => (
             <div
               key={survey.id}
-              className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full"
+              className="border-blue-300 dark:border-blue-500 relative group bg-white dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl border-2 border-gray-200 dark:border-gray-600 overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col h-full hover:border-blue-300 dark:hover:border-blue-500 hover:ring-2 hover:ring-blue-200 dark:hover:ring-blue-900/40 w-full max-w-[400px]"
             >
               <div className="absolute top-4 right-4">
                 {getStatusBadge(survey.status)}
@@ -472,9 +474,24 @@ export default function ManageSurveys() {
                 </div>
                 
                 <div className="mt-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-1">
-                    {survey.title || 'Untitled Survey'}
-                  </h3>
+                  {editingSurveyId === survey.id ? (
+                    <input
+                      type="text"
+                      value={editedTitle}
+                      onChange={(e) => setEditedTitle(e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(e, survey.id)}
+                      onBlur={() => saveEdit(survey.id)}
+                      autoFocus
+                      className="w-full text-lg font-semibold text-gray-900 dark:text-white bg-transparent border-b border-blue-500 focus:outline-none focus:border-blue-700"
+                    />
+                  ) : (
+                    <h3 
+                      className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-1 cursor-text hover:bg-gray-100 dark:hover:bg-gray-800 px-1 rounded"
+                      onClick={() => startEditing(survey)}
+                    >
+                      {survey.title || 'Untitled Survey'}
+                    </h3>
+                  )}
                   <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
                     {survey.description || 'No description'}
                   </p>

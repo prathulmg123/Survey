@@ -464,12 +464,11 @@ export default function SurveyDetail() {
                         </FormLabel>
                         <FormControl>
                           <div className="relative w-full">
-                            <Input
-                              placeholder="What do you want to learn?"
-                              {...field}
-                              className="bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white truncate pr-6"
-                              title={field.value} // Shows full text on hover
-                            />
+                            <div 
+                              className="text-gray-900 dark:text-white text-sm py-2 px-3 bg-transparent w-full whitespace-normal break-words"
+                            >
+                              {field.value || 'No survey goal set'}
+                            </div>
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -535,11 +534,18 @@ export default function SurveyDetail() {
                                             <FormItem>
                                               <FormLabel>Area Name</FormLabel>
                                               <FormControl>
-                                                <Input
+                                              <div className="relative w-full">
+                                              <div 
+                                                className="text-gray-900 dark:text-white text-sm py-2 px-3 bg-transparent w-full whitespace-normal break-words"
+                                              >
+                                                {field.value || 'No area name'}
+                                              </div>
+                                            </div>
+                                                {/* <Input
                                                   placeholder="e.g., Product Features"
                                                   {...field}
                                                   className="bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                                />
+                                                /> */}
                                               </FormControl>
                                               <FormMessage />
                                             </FormItem>
@@ -552,12 +558,19 @@ export default function SurveyDetail() {
                                             <FormItem>
                                               <FormLabel>Description</FormLabel>
                                               <FormControl>
-                                                <Textarea
+                                              <div className="relative w-full">
+                                              <div 
+                                                className="text-gray-900 dark:text-white text-sm py-2 px-3 bg-transparent w-full whitespace-normal break-words"
+                                              >
+                                                {field.value || 'No description'}
+                                              </div>
+                                            </div>
+                                                {/* <Textarea
                                                   placeholder="Describe this research area"
                                                   {...field}
                                                   className="bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                   rows={3}
-                                                />
+                                                /> */}
                                               </FormControl>
                                               <FormMessage />
                                             </FormItem>
@@ -567,18 +580,27 @@ export default function SurveyDetail() {
 
                                       {/* Sub-Topics */}
                                       <div className="space-y-4">
-                                        <Accordion type="single" collapsible className="w-full space-y-2">
+                                        <Accordion type="single" collapsible className="w-full ">
                                           {area.sub_topics?.map((subTopic, subTopicIndex) => (
-                                            <AccordionItem key={subTopic.id} value={`item-${subTopic.id}`} className="border-2 border-orange-100 dark:border-orange-900/50 rounded-md overflow-hidden">
-                                              <AccordionTrigger className="bg-orange-50 dark:bg-orange-900/20 px-4 py-2 hover:no-underline">
-                                                <div className="flex items-center gap-2 flex-1 text-left">
+                                            <AccordionItem key={subTopic.id} value={`item-${subTopic.id}`} className="border-2 border-orange-200 dark:border-orange-800/70 rounded-xl overflow-hidden">
+                                              <AccordionTrigger className="px-5 py-4 hover:no-underline bg-orange-50 dark:bg-orange-900/40 mx-1 my-1 rounded-lg">
+                                                {/* <div className="flex items-center gap-2 flex-1 text-left">
                                                   <List className="h-4 w-4 text-orange-500 flex-shrink-0" />
                                                   <h5 className="text-sm font-medium truncate">
                                                     Sub Topic : {subTopic.name || 'Untitled Sub-Topic'}
                                                   </h5>
-                                                </div>
+                                                </div> */}
+                                                 <div className="flex items-center w-full space-x-4">
+                                                                              <span className="h-9 w-9 rounded-lg bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center text-orange-600 dark:text-orange-400">
+                                                                                <List className="h-4 w-4 flex-shrink-0" />
+                                                                              </span>
+                                                                              <div className="text-left flex-1 pr-4">
+                                                                                <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">Sub-Topic: {subTopic.name}</h3>
+                                                                              </div>
+                                                                            </div>
                                               </AccordionTrigger>
-                                              <AccordionContent className="p-4 space-y-4">
+                                              <AccordionContent className="mb-4 mt-1 px-2 pb-6">
+                                              <div className="p-6">
                                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <FormField
                                                   control={form.control}
@@ -587,11 +609,18 @@ export default function SurveyDetail() {
                                                     <FormItem>
                                                       <FormLabel>Sub-Topic Name</FormLabel>
                                                       <FormControl>
-                                                        <Input
+                                                      <div className="relative w-full">
+                                                        <div 
+                                                          className="text-gray-900 dark:text-white text-sm py-2 px-3 bg-transparent w-full whitespace-normal break-words"
+                                                        >
+                                                          {field.value || 'No sub topic'}
+                                                        </div>
+                                                      </div>
+                                                        {/* <Input
                                                           placeholder="e.g., Dynamic Island"
                                                           {...field}
                                                           className="bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                                        />
+                                                        /> */}
                                                       </FormControl>
                                                       <FormMessage />
                                                     </FormItem>
@@ -604,11 +633,18 @@ export default function SurveyDetail() {
                                                     <FormItem>
                                                       <FormLabel>Description (Optional)</FormLabel>
                                                       <FormControl>
-                                                        <Input
+                                                      <div className="relative w-full">
+                                                        <div 
+                                                          className="text-gray-900 dark:text-white text-sm py-2 px-3 bg-transparent w-full whitespace-normal break-words"
+                                                        >
+                                                          {field.value || 'No description'}
+                                                        </div>
+                                                      </div>
+                                                        {/* <Input
                                                           placeholder="Brief description"
                                                           {...field}
                                                           className="bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                                        />
+                                                        /> */}
                                                       </FormControl>
                                                       <FormMessage />
                                                     </FormItem>
@@ -616,7 +652,7 @@ export default function SurveyDetail() {
                                                 />
                                               </div>
 
-                                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                              <div className="grid grid-cols-1 md:grid-cols-2 mt-5 gap-6">
                                                 <FormField
                                                   control={form.control}
                                                   name={`researchAreas.${areaIndex}.sub_topics.${subTopicIndex}.follow_up_limit`}
@@ -668,7 +704,7 @@ export default function SurveyDetail() {
                                                 name={`researchAreas.${areaIndex}.sub_topics.${subTopicIndex}.completion_criteria`}
                                                 render={({ field }) => (
                                                   <FormItem>
-                                                    <FormLabel className="flex justify-between items-center">
+                                                    <FormLabel className="flex justify-between items-center mt-5">
                                                       <span>Completion Criteria</span>
                                                       <Button
                                                         type="button"
@@ -723,6 +759,7 @@ export default function SurveyDetail() {
                                                   </FormItem>
                                                 )}
                                               />
+                                              </div>
                                               </AccordionContent>
                                             </AccordionItem>
                                           ))}

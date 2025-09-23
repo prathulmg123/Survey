@@ -271,6 +271,7 @@ export default function SurveyGuide() {
                         placeholder="Enter survey name" 
                         {...field} 
                         required={false}
+                        className="bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                       />
                     </FormControl>
                     <FormMessage />

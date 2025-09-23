@@ -80,6 +80,7 @@ export default function SurveyCreateView() {
     }
 
     try {
+      setIsLoading(true);
       const result = await finalizeSurvey(survey);
       
       if (result.success) {
@@ -103,8 +104,20 @@ export default function SurveyCreateView() {
     } catch (error: any) {
       console.error('Error finalizing survey:', error);
       toast.error(error.message || 'Failed to finalize survey');
+      setIsLoading(false);
     }
   };
+
+
+    if (isLoading) {
+      return (
+        <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
+          <div className="text-center">
+            <Loader text="Finalizing survey..." show={true} size={52} />
+          </div>
+        </div>
+      );
+    }
 
   const getStatusBadge = (status: string) => {
     switch (status) {

@@ -98,21 +98,34 @@ export const authService = {
   async logout(navigate?: (path: string) => void, sessionExpired = false) {
     try {
       // Store the session expired state before clearing
-      if (sessionExpired) {
-        localStorage.setItem('sessionExpired', 'true');
-      }
+      const sessionExpiredFlag = sessionExpired ? 'true' : localStorage.getItem('sessionExpired');
       
-      // Get the current token before clearing
-      const token = this.getAuthToken();
-      
-      // Clear all auth-related items from localStorage
-      const sessionExpiredFlag = localStorage.getItem('sessionExpired');
+      // Clear both local and session storage
       localStorage.clear();
+      sessionStorage.clear();
+      
+      // Show session expired toast if needed
+      if (sessionExpired) {
+        // Use a small timeout to ensure the toast shows after the page navigation
+        setTimeout(() => {
+          const toastEvent = new CustomEvent('showToast', {
+            detail: {
+              title: 'Session Expired',
+              description: 'Your session has expired. Please log in again.',
+              variant: 'destructive'
+            }
+          });
+          window.dispatchEvent(toastEvent);
+        }, 500);
+      }
       
       // Restore sessionExpired flag if it was set
-      if (sessionExpired) {
+      if (sessionExpiredFlag === 'true') {
         localStorage.setItem('sessionExpired', 'true');
       }
+      
+      // Get the current token before clearing for API call
+      const token = this.getAuthToken();
       
       // Clear axios authorization header
       delete apiClient.defaults.headers.common['Authorization'];

@@ -31,13 +31,7 @@ export default function Users() {
   const [sortField, setSortField] = useState<SortableField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   // Load view mode from localStorage or default to 'table'
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>(() => {
-    if (typeof window !== 'undefined') {
-      const savedViewMode = localStorage.getItem('usersViewMode') as 'table' | 'grid' | null;
-      return savedViewMode || 'table';
-    }
-    return 'table';
-  });
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
 
   // Save view mode to localStorage when it changes
   useEffect(() => {
@@ -257,19 +251,22 @@ export default function Users() {
                  ) : (currentItems.map((user) => (
            <div
              key={user.id}
-             className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full hover:-translate-y-1 hover:scale-[1.03] w-full max-w-[400px]"
+             className="border-blue-300 dark:border-blue-500 relative group bg-white dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl border-2 border-gray-200 dark:border-gray-600 overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col h-full hover:border-blue-300 dark:hover:border-blue-500 hover:ring-2 hover:ring-blue-200 dark:hover:ring-blue-900/40 w-full max-w-[400px]"
            >
+             {/* Subtle gradient overlay on hover */}
+             <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-blue-50/30 dark:to-blue-900/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+             
              {/* Status */}
              <div
                className={`absolute top-4 right-4 w-3 h-3 rounded-full ${
                  user.is_active ? "bg-green-400" : "bg-gray-400"
-               } ring-2 ring-white dark:ring-gray-900`}
+               } ring-2 ring-white dark:ring-gray-900 z-10`}
              ></div>
  
-             <div className="p-8 flex-1">
+             <div className="p-6 flex-1 relative z-10">
                {/* Profile */}
-               <div className="flex items-center space-x-4">
-                 <div className="h-16 w-16 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xl font-semibold shadow-lg">
+               <div className="flex items-center space-x-4 pb-4 mb-4 border-b border-gray-100 dark:border-gray-700/50">
+                 <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-xl font-semibold shadow-inner border-2 border-white/20">
                    {user.full_name.charAt(0).toUpperCase()}
                  </div>
                  <div className="flex-1 min-w-0">
@@ -283,36 +280,39 @@ export default function Users() {
                </div>
  
                {/* Email + Role */}
-               <div className="mt-4 space-y-3">
+               <div className="space-y-4">
                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                   <Mail className="h-4 w-4 text-gray-400 mr-2" />
+                   <Mail className="h-4 w-4 text-blue-400 mr-2 flex-shrink-0" />
                    <a
                      href={`mailto:${user.email}`}
-                     className="hover:underline truncate"
+                     className="hover:underline truncate hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                    >
                      {user.email}
                    </a>
                  </div>
  
-                 <span
-                   className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium shadow-sm ${
-                     user.role === "Admin"
-                       ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
-                       : user.role === "User"
-                       ? "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300"
-                       : "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300"
-                   }`}
-                 >
-                   {user.role}
-                 </span>
+                 <div className="flex justify-between items-center">
+                   <span
+                     className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium shadow-sm ${
+                       user.role === "Admin"
+                         ? "bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300"
+                         : user.role === "User"
+                         ? "bg-sky-100 text-sky-700 dark:bg-sky-900/60 dark:text-sky-300"
+                         : "bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300"
+                     }`}
+                   >
+                     {user.role}
+                   </span>
+                 </div>
  
                  {/* Last Active */}
-                 <div className="pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                 <div className="pt-3 mt-3 border-t border-gray-100 dark:border-gray-700/50 flex justify-between text-xs text-gray-500 dark:text-gray-400">
                    <span>Last active</span>
-                   <span>
+                   <span className="font-medium">
                      {new Date(user.last_login).toLocaleDateString("en-US", {
                        month: "short",
                        day: "numeric",
+                       year: 'numeric'
                      })}
                    </span>
                  </div>

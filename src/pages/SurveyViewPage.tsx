@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowLeft, Info, List, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Copy, ExternalLink, Info, List, MessageSquare, Plus, Trash2 } from "lucide-react";
 import { useLoader } from "@/hooks/useLoader";
 import { Loader } from "@/components/ui/Loader";
 import { getSurveyById } from "@/api/surveyService";
@@ -19,6 +19,7 @@ export default function SurveyViewPage() {
   const [survey, setSurvey] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
     const fetchSurvey = async () => {
@@ -146,11 +147,14 @@ export default function SurveyViewPage() {
             </ol>
           </nav>
         </div>
+
       </div>
 
       <div className="bg-white dark:bg-gray-800 shadow-sm rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700/50">
+        {/* Chatbot URL Section */}
+     
         {/* Header Section */}
-        <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-700/50">
+        <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-700/50 flex justify-between items-center">
           <div className="flex flex-col space-y-4">
             <div className="flex flex-col space-y-1">
               <div className="flex items-center gap-4">
@@ -195,18 +199,64 @@ export default function SurveyViewPage() {
             </div>
             </div>
           </div>
+          <div className="px-6 pb-6">
+            <div className="max-w-md mx-auto">
+              <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 p-2">
+                <a 
+                  href={`/chatbot-widget/index.html?surveyId=${id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 text-sm text-blue-600 dark:text-blue-400 hover:underline truncate"
+                  title="Open Chat in New Tab"
+                >
+                  {`${window.location.origin}/chatbot-widget/index.html?surveyId=${id}`}
+                </a>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      try {
+                        await navigator.clipboard.writeText(`${window.location.origin}/chatbot-widget/index.html?surveyId=${id}`);
+                        setIsCopied(true);
+                        setTimeout(() => setIsCopied(false), 2000);
+                      } catch (err) {
+                        console.error('Failed to copy URL:', err);
+                      }
+                    }}
+                    className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    title="Copy URL"
+                  >
+                    {isCopied ? (
+                      <span className="text-xs text-green-500">Copied!</span>
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </button>
+                  <a 
+                    href={`/chatbot-widget/index.html?surveyId=${id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    title="Open in New Tab"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Details Section */}
         <div className="bg-gray-50/50 dark:bg-gray-800/50 px-8 py-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="border-b border-gray-100 dark:border-gray-700/50">
+          <div >
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Guide</h3>
             <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
             {survey?.source_document_name || 'Product Feedback'}
             </div>
           </div>
-          <div className="border-b border-gray-100 dark:border-gray-700/50">
+          <div >
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Goal</h3>
             <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
             {survey?.overall_research_goal || 'Understand user satisfaction with new features'}
@@ -214,7 +264,7 @@ export default function SurveyViewPage() {
           </div>
             
             
-            <div className="border-b border-gray-100 dark:border-gray-700/50">
+            <div >
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Initiator Question</h3>
             <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
             {survey?.initiator_question || 'How satisfied are you with our product?'}
