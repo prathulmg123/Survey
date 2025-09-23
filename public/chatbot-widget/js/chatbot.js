@@ -4,20 +4,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatMessages = document.getElementById('chatMessages');
     const userInput = document.getElementById('userInput');
     const sendButton = document.getElementById('sendButton');
-    const toggleButton = document.getElementById('toggleChat');
+    const minimizeButton = document.getElementById('minimizeChat');
+    const closeButton = document.getElementById('closeChat');
     const chatbotContainer = document.querySelector('.chatbot-container');
 
-    // Toggle chat window
-    toggleButton.addEventListener('click', function(e) {
-        e.stopPropagation();
-        chatbotContainer.classList.toggle('collapsed');
-        if (!chatbotContainer.classList.contains('collapsed')) {
-            // Auto-scroll to bottom when opening
-            setTimeout(() => {
-                scrollToBottom();
-            }, 100);
-        }
-    });
+    // Handle minimize button if it exists
+    if (minimizeButton) {
+        minimizeButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            // Toggle minimized state
+            chatbotContainer.classList.toggle('minimized');
+        });
+    }
+
+    // Handle close button if it exists
+    if (closeButton) {
+        closeButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            // Hide the chat container
+            chatbotContainer.style.display = 'none';
+        });
+    }
 
     // Send message when clicking the send button
     sendButton.addEventListener('click', sendMessage);
@@ -38,6 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add user message to chat
         addMessage(message, 'user');
         userInput.value = '';
+        userInput.focus();
         scrollToBottom();
 
         // Simulate bot response after a short delay
@@ -54,12 +62,39 @@ document.addEventListener('DOMContentLoaded', function() {
         messageDiv.classList.add('message');
         messageDiv.classList.add(sender + '-message');
         
+        // Create avatar
+        const avatarDiv = document.createElement('div');
+        avatarDiv.classList.add('message-avatar');
+        avatarDiv.textContent = sender === 'bot' ? 'AI' : 'You';
+        
+        // Create message content container
         const contentDiv = document.createElement('div');
         contentDiv.classList.add('message-content');
-        contentDiv.textContent = text;
         
+        // Create message text
+        const textDiv = document.createElement('div');
+        textDiv.classList.add('message-text');
+        textDiv.textContent = text;
+        
+        // Create timestamp
+        const timeDiv = document.createElement('div');
+        timeDiv.classList.add('message-time');
+        timeDiv.textContent = getCurrentTime();
+        
+        // Assemble the message
+        contentDiv.appendChild(textDiv);
+        contentDiv.appendChild(timeDiv);
+        messageDiv.appendChild(avatarDiv);
         messageDiv.appendChild(contentDiv);
+        
+        // Add to chat
         chatMessages.appendChild(messageDiv);
+    }
+    
+    // Helper function to get current time in HH:MM format
+    function getCurrentTime() {
+        const now = new Date();
+        return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
     // Function to generate bot responses
@@ -101,15 +136,8 @@ document.addEventListener('DOMContentLoaded', function() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Close chat when clicking outside
+    // Handle clicks outside the chat (optional)
     document.addEventListener('click', function(e) {
-        if (!chatbotContainer.contains(e.target) && !chatbotContainer.classList.contains('collapsed')) {
-            chatbotContainer.classList.add('collapsed');
-        }
-    });
-
-    // Prevent clicks inside the chat from closing it
-    chatWindow.addEventListener('click', function(e) {
-        e.stopPropagation();
+        // Add any outside click handling here if needed
     });
 });

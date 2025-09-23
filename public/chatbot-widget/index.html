@@ -3,29 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot Widget</title>
+    <title>AI Assistant</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="chatbot-container">
         <div class="chatbot-header">
-            <h3>AI Assistant</h3>
-            <button id="toggleChat" class="toggle-button">
-                <i class="fas fa-comment-dots"></i>
-            </button>
+            <div class="header-content">
+                <div class="header-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="header-info">
+                    <h3>AI Assistant</h3>
+                    <div class="status">Online</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" id="minimizeChat" title="Minimize">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="header-btn" id="closeChat" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
         </div>
+        
         <div class="chat-window" id="chatWindow">
             <div class="chat-messages" id="chatMessages">
                 <div class="message bot-message">
+                    <div class="message-avatar">AI</div>
                     <div class="message-content">
-                        Hello! How can I help you today?
+                        <div class="message-text">Hello! How can I help you today?</div>
+                        <div class="message-time">Just now</div>
                     </div>
                 </div>
             </div>
-            <div class="chat-input">
-                <input type="text" id="userInput" placeholder="Type your message..." />
-                <button id="sendButton">
+            
+            <div class="chat-input-container">
+                <div class="input-wrapper">
+                    <div class="input-actions">
+                        <button class="input-btn" title="Add attachment">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                    </div>
+                    <input type="text" id="userInput" placeholder="Type a message..." />
+                    <button class="input-btn emoji-btn" title="Choose emoji">
+                        <i class="far fa-smile"></i>
+                    </button>
+                </div>
+                <button id="sendButton" class="send-button" title="Send message">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
