@@ -133,27 +133,123 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Handle Google Sign In (placeholder - you'll need to implement actual Google OAuth)
+    // Handle Google Sign In with Google Identity Services
     function handleGoogleSignIn() {
-        // This is a placeholder. In a real app, you would integrate with Google OAuth
-        // For now, we'll simulate a successful Google sign-in
-        const userData = {
-            name: 'Google User',
-            email: 'user@example.com',
-            authMethod: 'google',
-            authenticatedAt: new Date().toISOString()
-        };
+        // Load the Google API client library
+        const script = document.createElement('script');
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.async = true;
+        script.defer = true;
+        script.onload = initializeGoogleSignIn;
+        document.head.appendChild(script);
+    }
+    
+    // Initialize Google Sign-In
+    function initializeGoogleSignIn() {
+        if (!window.google) {
+            console.error('Google Sign-In failed to load');
+            return;
+        }
         
-        localStorage.setItem('chatbot_user_data', JSON.stringify(userData));
-        localStorage.setItem('chatbot_authenticated', 'true');
+        // Configure Google client
+        try {
+            const clientId = '29816798151-jm2ioshu4q9ei3cb4qnn8rdm90tc8cb2.apps.googleusercontent.com';
+            
+            // Validate client ID format
+            if (!clientId || !clientId.endsWith('.apps.googleusercontent.com')) {
+                throw new Error('Invalid Google Client ID format');
+            }
+            
+            google.accounts.id.initialize({
+                client_id: clientId,
+                callback: handleGoogleResponse,
+                auto_select: false,
+                ux_mode: 'popup',
+                context: 'signin'
+            });
+            
+            console.log('Google Sign-In initialized with client ID:', clientId);
+        } catch (error) {
+            console.error('Error initializing Google Sign-In:', error);
+            alert('Failed to initialize Google Sign-In. Please check the configuration.');
+            return;
+        }
         
-        // Hide auth modal and show chat
-        authOverlay.style.display = 'none';
-        chatbotContainer.style.display = 'block';
+        // Show the Google Sign-In button
+        google.accounts.id.renderButton(
+            document.getElementById('googleSignIn'),
+            {
+                type: 'standard',
+                theme: 'outline',
+                size: 'large',
+                text: 'continue_with',
+                shape: 'rectangular',
+                logo_alignment: 'left',
+                width: '100%',
+                height: '40'
+            }
+        );
         
-        // Start survey if survey ID is present
-        if (window.surveyContext?.surveyId) {
-            startSurvey();
+        // Also show the One Tap prompt
+        google.accounts.id.prompt((notification) => {
+            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                // Continue with the normal sign-in flow
+            }
+        });
+    }
+    
+    // Handle Google Sign-In response
+    function handleGoogleResponse(response) {
+        try {
+            // Decode the JWT token
+            const responsePayload = parseJwt(response.credential);
+            
+            console.log('Google Sign-In successful:', responsePayload);
+            
+            // Extract user data
+            const userData = {
+                name: responsePayload.name || responsePayload.given_name,
+                email: responsePayload.email,
+                picture: responsePayload.picture,
+                authMethod: 'google',
+                authenticatedAt: new Date().toISOString(),
+                googleId: responsePayload.sub
+            };
+            
+            // Save user data
+            localStorage.setItem('chatbot_user_data', JSON.stringify(userData));
+            localStorage.setItem('chatbot_authenticated', 'true');
+            
+            // Hide auth modal and show chat
+            authOverlay.style.display = 'none';
+            chatbotContainer.style.display = 'block';
+            
+            // Start survey if survey ID is present
+            if (window.surveyContext?.surveyId) {
+                startSurvey({
+                    guide_id: window.surveyContext.surveyId,
+                    email: userData.email,
+                    username: userData.name
+                });
+            }
+        } catch (error) {
+            console.error('Google Sign-In error:', error);
+            alert('Failed to sign in with Google. Please try again.');
+        }
+    }
+    
+    // Helper function to parse JWT token
+    function parseJwt(token) {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        } catch (e) {
+            console.error('Error parsing JWT:', e);
+            return {};
         }
     }
     
