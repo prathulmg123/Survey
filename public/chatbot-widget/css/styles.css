@@ -248,8 +248,8 @@ a:hover {
 }
 
 .header-avatar {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.1rem;
+    height: 2.1rem;
     border-radius: var(--radius-full);
     background: rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(5px);
@@ -279,17 +279,55 @@ a:hover {
     opacity: 0.9;
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.5rem;
     margin-top: 0.125rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
 .status::before {
     content: '';
     display: block;
-    width: 0.5rem;
-    height: 0.5rem;
-    background: var(--success);
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
+    background: var(--success);
+    transition: all 0.3s ease;
+}
+
+/* Online state */
+.status.online {
+    color: #10b981;
+}
+
+.status.online::before {
+    background-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+}
+
+/* Offline state */
+.status.offline {
+    color: var(--text-secondary);
+}
+
+.status.offline::before {
+    background-color: var(--text-secondary);
+}
+
+/* Connecting state */
+.status.connecting {
+    color: #f59e0b;
+}
+
+.status.connecting::before {
+    background-color: #f59e0b;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
 }
 
 .header-actions {
@@ -402,62 +440,199 @@ a:hover {
     min-width: min-content;
 }
 
+/* Modern Avatar Styling */
 .message-avatar {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    background: var(--bg-tertiary);
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: white;
     margin-right: 0.75rem;
     flex-shrink: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* AI Avatar Specific */
+.bot-message .message-avatar {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
+}
+
+/* User Avatar Specific */
+.user-message .message-avatar {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    margin-left: 0.75rem;
+    margin-right: 0;
+}
+
+/* Avatar Hover Effects */
+.message-avatar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Avatar Icons */
+.message-avatar i {
+    position: relative;
+    z-index: 2;
+    transition: transform 0.3s ease;
+}
+
+/* Avatar Animation */
+@keyframes avatarPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Add a subtle shine effect to avatars */
+.message-avatar::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        to bottom right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(30deg);
+    transition: all 0.6s ease;
+    opacity: 0;
+}
+
+.message-avatar:hover::after {
+    left: 100%;
+    opacity: 0.6;
 }
 
 .message-content {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    max-width: calc(100% - 3rem);
+    /* max-width: 80% */
 }
 
 .message-text {
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius-lg);
-    font-size: 0.9375rem;
-    line-height: 1.5;
-    word-wrap: break-word;
-    overflow: hidden;
+    margin: 0;
+    line-height: 1.6;
     max-width: 100%;
-    white-space: pre-wrap;
+    overflow: hidden;
 }
 
-.message-time {
-    font-size: 0.6875rem;
-    color: var(--text-muted);
-    opacity: 0.8;
+.message-text a {
+    word-break: break-all;
+}
+
+.message-text pre,
+.message-text code {
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.message-text pre {
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    margin: 0.5rem 0;
+}
+
+.message-status {
+    font-size: 0.7rem;
+    margin-top: 0.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-weight: 500;
+}
+
+.message-status::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-secondary);
+    transition: all 0.3s ease;
+}
+
+.message-status.online {
+    color: #10b981;
+}
+
+.message-status.online::before {
+    background-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+}
+
+.message-status.offline {
+    color: var(--text-secondary);
+}
+
+.message-status.offline::before {
+    background-color: var(--text-secondary);
+}
+
+.message-status.connecting {
+    color: #f59e0b;
+    animation: pulse 1.5s infinite;
+}
+
+.message-status.connecting::before {
+    background-color: #f59e0b;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+/* Message Container */
+.message {
+    max-width: 90%;
+    margin-bottom: 1.25rem;
+    display: flex;
+    position: relative;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    animation: messageAppear 0.3s ease-out forwards;
+    opacity: 0;
+    transform: translateY(10px);
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+@keyframes messageAppear {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* User Message */
 .user-message {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: white;
-    align-self: flex-end;
-    border-top-right-radius: 4px;
     margin-left: auto;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-    border: none;
-    position: relative;
-    overflow: hidden;
+    flex-direction: row-reverse;
 }
 
+/* User avatar specific styles are now in the main avatar section */
 .user-message .message-avatar {
     margin: 0 0 0 0.75rem;
-    background: var(--primary);
-    color: white;
 }
 
 .user-message .message-content {
@@ -465,42 +640,117 @@ a:hover {
 }
 
 .user-message .message-text {
-    background: var(--primary);
-    color: white;
-    border-bottom-right-radius: var(--radius-sm);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border-radius: 18px 18px 4px 18px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow-wrap: anywhere;
+    overflow-x: hidden;
+    font-weight: 500;
+    max-width: 100%;
+    word-break: break-word;
+    hyphens: auto;
+    line-height: 1.6;
+    padding: 0.875rem 1.125rem;
+    white-space: pre-wrap;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    /* Force breaking of long strings */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    -ms-word-break: break-all;
+    word-break: break-word;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
 }
 
 .user-message .message-time {
+    color: var(--text-muted);
+    font-size: 0.6875rem;
+    margin-top: 0.25rem;
     text-align: right;
+    opacity: 0.8;
 }
 
 /* Bot Message */
 .bot-message {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    align-self: flex-start;
-    border-top-left-radius: 4px;
     margin-right: auto;
-    color: var(--text-secondary);
-    position: relative;
-    overflow: hidden;
+    flex-direction: row;
 }
 
-.bot-message::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 3px;
-    height: 100%;
-    background: linear-gradient(to bottom, var(--primary) 0%, var(--primary-dark) 100%);
+/* Bot avatar specific styles are now in the main avatar section */
+.bot-message .message-avatar {
+    /* Additional bot-specific styles can go here */
+}
+
+.bot-message .message-content {
+    align-items: flex-start;
 }
 
 .bot-message .message-text {
-    background: var(--bg-primary);
+    background: var(--bg-secondary);
     color: var(--text-primary);
-    border-bottom-left-radius: var(--radius-sm);
-    box-shadow: var(--shadow-sm);
+    border-radius: 18px 18px 18px 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-color);
+    position: relative;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    overflow-x: hidden;
+    word-break: break-word;
+    hyphens: auto;
+    line-height: 1.6;
+    padding: 0.875rem 1.125rem;
+    white-space: pre-wrap;
+    /* Force breaking of long strings */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    -ms-word-break: break-all;
+    word-break: break-word;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+}
+
+.bot-message .message-time {
+    color: var(--text-muted);
+    font-size: 0.6875rem;
+    margin-top: 0.25rem;
+    opacity: 0.8;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    display: flex;
+    padding: 0.75rem 1rem;
+    background: var(--bg-secondary);
+    border-radius: 18px 18px 18px 4px;
+    align-items: center;
+    gap: 0.25rem;
+    width: fit-content;
+    border: 1px solid var(--border-color);
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: inline-block;
+    animation: typingAnimation 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typingAnimation {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.6; }
+    40% { transform: scale(1); opacity: 1; }
 }
 
 /* Chat Input */
@@ -514,8 +764,8 @@ a:hover {
     background: var(--bg-secondary);
     border-top: 1px solid var(--border-color);
     display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 0.75rem;
     width: 100%;
     box-sizing: border-box;
     z-index: 30;
@@ -539,17 +789,19 @@ a:hover {
 }
 
 .input-wrapper {
-    flex: 1;
     position: relative;
     background: var(--bg-tertiary);
-    border-radius: var(--radius-lg);
+    border-radius: 24px;
     border: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     padding: 0.5rem 1rem;
     transition: var(--transition);
     min-height: 3rem;
+    max-width: 60%;
+    width: 100%;
     box-shadow: var(--shadow-sm);
+   
 }
 
 .input-wrapper:focus-within {
@@ -597,16 +849,16 @@ a:hover {
     border: none;
     color: var(--text-primary);
     font-size: 0.9375rem;
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem 0.75rem 0.5rem 0.5rem;
     margin: 0;
     outline: none;
     border-radius: var(--radius-sm);
     resize: none;
     max-height: 8rem;
     min-height: 1.5rem;
+    /* min-width: 200px; */
     font-family: inherit;
     line-height: 1.5;
-    width: 100%;
     transition: var(--transition);
     scrollbar-width: thin;
     scrollbar-color: var(--text-muted) transparent;
@@ -627,8 +879,8 @@ a:hover {
 }
 
 .send-button {
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: 50%;
     background: var(--primary);
     color: white;
@@ -640,6 +892,9 @@ a:hover {
     flex-shrink: 0;
     border: none;
     box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3);
+    position: relative;
+    z-index: 1; /* Ensure it's above the input wrapper */
+    margin-left: 0.7rem;
 }
 
 .send-button:hover {

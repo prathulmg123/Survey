@@ -350,33 +350,60 @@ document.addEventListener('DOMContentLoaded', function() {
         messageDiv.classList.add('message');
         messageDiv.classList.add(sender + '-message');
         
-        // Create avatar
+        // Create avatar with icon
         const avatarDiv = document.createElement('div');
-        avatarDiv.classList.add('message-avatar');
-        avatarDiv.textContent = sender === 'bot' ? 'AI' : 'You';
+        avatarDiv.className = 'message-avatar';
+        
+        // Create icon element
+        const icon = document.createElement('i');
+        if (sender === 'bot') {
+            // Different bot icons for variety
+            const botIcons = ['fa-robot', 'fa-headset', 'fa-comment-dots'];
+            const randomIcon = botIcons[Math.floor(Math.random() * botIcons.length)];
+            icon.className = `fas ${randomIcon}`;
+        } else {
+            icon.className = 'fas fa-user';
+        }
+        avatarDiv.appendChild(icon);
         
         // Create message content container
         const contentDiv = document.createElement('div');
-        contentDiv.classList.add('message-content');
+        contentDiv.className = 'message-content';
         
         // Create message text
         const textDiv = document.createElement('div');
-        textDiv.classList.add('message-text');
-        textDiv.textContent = text;
+        textDiv.className = 'message-text';
+        
+        // Check if the text contains HTML or is plain text
+        if (/<[a-z][\s\S]*>/i.test(text)) {
+            textDiv.innerHTML = text;
+        } else {
+            textDiv.textContent = text;
+        }
         
         // Create timestamp
         const timeDiv = document.createElement('div');
-        timeDiv.classList.add('message-time');
+        timeDiv.className = 'message-time';
         timeDiv.textContent = getCurrentTime();
         
         // Assemble the message
         contentDiv.appendChild(textDiv);
         contentDiv.appendChild(timeDiv);
+        
+        // Always add avatar first, then content for both user and bot
+        // The CSS will handle the positioning based on the message type
         messageDiv.appendChild(avatarDiv);
         messageDiv.appendChild(contentDiv);
         
-        // Add to chat
+        // Add to chat and scroll to bottom
         chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+        
+        // Add animation class
+        setTimeout(() => {
+            messageDiv.style.opacity = '1';
+            messageDiv.style.transform = 'translateY(0)';
+        }, 10);
     }
     
     // Helper function to get current time in HH:MM format
@@ -528,8 +555,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update connection status in the UI
     function updateConnectionStatus(status, message = '') {
         const statusElement = document.getElementById('connectionStatus');
-        if (!statusElement) return;
+        const statusIndicator = document.querySelector('.status');
+        
+        if (!statusElement || !statusIndicator) return;
 
+        // Update connection status bar
         statusElement.className = `connection-status ${status}`;
         
         const statusText = {
@@ -540,6 +570,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }[status] || '';
 
         statusElement.textContent = statusText;
+        
+        // Update the online/offline indicator in the header
+        if (status === 'connected') {
+            statusIndicator.textContent = 'Online';
+            statusIndicator.className = 'status online';
+        } else {
+            statusIndicator.textContent = 'Offline';
+            statusIndicator.className = 'status offline';
+            
+            // For connecting state, show a pulsing animation
+            if (status === 'connecting') {
+                statusIndicator.textContent = 'Connecting...';
+                statusIndicator.className = 'status connecting';
+            }
+        }
     }
 
     // Function to send a message via WebSocket
