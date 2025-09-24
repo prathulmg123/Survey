@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Check authentication status
+    const isAuthenticated = localStorage.getItem('chatbot_authenticated') === 'true';
+    
     // API Configuration
     const API_URL = 'http://vpn.seqato.com:8001/api/surveys/start';
     const WS_URL = 'ws://vpn.seqato.com:8001/ws/chat/'; // WebSocket URL
@@ -298,13 +301,48 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Received message:', data);
         
         if (data.type === 'message' && data.content) {
+            // Hide thinking indicator when we receive a message
+            hideThinkingIndicator();
             addMessage(data.content, 'bot');
+            scrollToBottom();
         } else if (data.type === 'typing') {
             // Handle typing indicator if needed
             console.log('Bot is typing...');
         } else if (data.type === 'error') {
             console.error('Server error:', data.message);
             addMessage('Sorry, an error occurred. Please try again.', 'bot');
+        }
+    }
+
+    // Function to show thinking indicator
+    function showThinkingIndicator() {
+        // Remove any existing thinking indicator
+        const existingIndicator = document.getElementById('thinking-indicator');
+        if (existingIndicator) return;
+        
+        // Create and show thinking indicator
+        const thinkingDiv = document.createElement('div');
+        thinkingDiv.className = 'message bot-message';
+        thinkingDiv.id = 'thinking-indicator';
+        thinkingDiv.innerHTML = `
+            <div class="message-avatar">
+                <i class="fas fa-comment-dots"></i>
+            </div>
+            <div class="message-content">
+                <div class="message-text thinking-bubble">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(thinkingDiv);
+        scrollToBottom();
+    }
+    
+    // Function to hide thinking indicator
+    function hideThinkingIndicator() {
+        const thinkingEl = document.getElementById('thinking-indicator');
+        if (thinkingEl) {
+            thinkingEl.remove();
         }
     }
 
@@ -317,13 +355,8 @@ document.addEventListener('DOMContentLoaded', function() {
         addMessage(message, 'user');
         userInput.value = '';
         
-        // Show typing indicator
-        const typingIndicator = document.createElement('div');
-        typingIndicator.className = 'typing-indicator';
-        typingIndicator.id = 'typing';
-        typingIndicator.innerHTML = '<span></span><span></span><span></span>';
-        chatMessages.appendChild(typingIndicator);
-        scrollToBottom();
+        // Show thinking indicator
+        showThinkingIndicator();
 
         // Send message via WebSocket
         const messageSent = sendWebSocketMessage({
@@ -335,11 +368,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!messageSent) {
             // Fallback to local response if WebSocket is not available
             setTimeout(() => {
+                hideThinkingIndicator();
                 const botResponse = getBotResponse(message);
                 addMessage(botResponse, 'bot');
-                // Remove typing indicator
-                const typingEl = document.getElementById('typing');
-                if (typingEl) typingEl.remove();
             }, 1000);
         }
     }
@@ -358,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const icon = document.createElement('i');
         if (sender === 'bot') {
             // Different bot icons for variety
-            const botIcons = ['fa-robot', 'fa-headset', 'fa-comment-dots'];
+            const botIcons = ['fa-comment-dots'];
             const randomIcon = botIcons[Math.floor(Math.random() * botIcons.length)];
             icon.className = `fas ${randomIcon}`;
         } else {
@@ -467,22 +498,6 @@ document.addEventListener('DOMContentLoaded', function() {
             socket.onopen = () => {
                 console.log('WebSocket connected');
                 updateConnectionStatus('connected');
-                
-                // Clear any existing ping interval
-                if (window.pingInterval) {
-                    clearInterval(window.pingInterval);
-                }
-                
-                // Send a ping to keep the connection alive
-                window.pingInterval = setInterval(() => {
-                    if (socket && socket.readyState === WebSocket.OPEN) {
-                        try {
-                            socket.send(JSON.stringify({ type: 'ping' }));
-                        } catch (e) {
-                            console.error('Error sending ping:', e);
-                        }
-                    }
-                }, 30000); // Send ping every 30 seconds
             };
 
             socket.onmessage = (event) => {
@@ -510,6 +525,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 
+                // Show error message to user
+                const errorMessage = 'We are facing some issues. Please try after some time.';
+                if (document.querySelector('.chat-messages')) {
+                    addMessage(errorMessage, 'bot');
+                }
+                
                 // Attempt to reconnect
                 if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
                     reconnectAttempts++;
@@ -525,6 +546,12 @@ document.addEventListener('DOMContentLoaded', function() {
             socket.onerror = (error) => {
                 console.error('WebSocket error:', error);
                 updateConnectionStatus('error', 'Connection error');
+                
+                // Show error message to user
+                const errorMessage = 'We are facing some issues. Please try after some time.';
+                if (document.querySelector('.chat-messages')) {
+                    addMessage(errorMessage, 'bot');
+                }
                 
                 // Try to reconnect on error
                 if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
@@ -600,6 +627,12 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('WebSocket is not connected. Current state:', socket ? socket.readyState : 'No socket');
             updateConnectionStatus('error', 'Not connected. Trying to reconnect...');
             
+            // Show error message to user
+            const errorMessage = 'We are facing some issues. Please try after some time.';
+            if (document.querySelector('.chat-messages')) {
+                addMessage(errorMessage, 'bot');
+            }
+            
             // Try to reconnect if we have a chat session ID
             if (window.chatSessionId) {
                 const userData = JSON.parse(localStorage.getItem('chatbot_user_data') || '{}');
@@ -608,7 +641,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         guide_id: window.surveyContext?.surveyId || '',
                         email: userData.email,
                         username: userData.name
-                    }).catch(console.error);
+                    }).catch(error => {
+                        console.error('Failed to reconnect:', error);
+                        if (document.querySelector('.chat-messages')) {
+                            addMessage('Unable to reconnect. Please refresh the page and try again.', 'bot');
+                        }
+                    });
                 }
             }
             
@@ -664,21 +702,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 initWebSocket(data.websocket_url, handleIncomingMessage);
             }
             
-            // Show the initial welcome message if available
-            if (data.initial_message) {
-                // Small delay to ensure the chat UI is ready
-                setTimeout(() => {
-                    addMessage(data.initial_message, 'bot');
-                }, 500);
-            }
-            
-            return data;
-            
-            // Update chat with welcome message from API if available
-            if (data.welcome_message) {
-                addMessage(data.welcome_message, 'bot');
-                scrollToBottom();
-            }
+            // We'll show the welcome message when it comes through the WebSocket
             
             return data;
         } catch (error) {

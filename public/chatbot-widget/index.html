@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Assistant</title>
+    <title>Survey Assistant</title>
+    <link rel="icon" type="image/png" href="https://img.icons8.com/fluency/48/000000/chatbot.png">
     <script>
       // Get survey ID from URL
       const urlParams = new URLSearchParams(window.location.search);
@@ -58,11 +59,11 @@
     </div>
 
     <div class="chatbot-container" style="display: none;">
-        <div id="connectionStatus" class="connection-status">Connecting...</div>
+        <!-- <div id="connectionStatus" class="connection-status">Connecting...</div> -->
         <div class="chatbot-header">
             <div class="header-content">
                 <div class="header-avatar">
-                    <i class="fas fa-robot"></i>
+                    <i class="fas fa-headset"></i>
                 </div>
                 <div class="header-info">
                     <h3>AI Assistant</h3>
@@ -102,7 +103,7 @@
       if (window.surveyContext?.surveyId) {
         const chatTitle = document.querySelector('.header-info h3');
         if (chatTitle) {
-          chatTitle.textContent = `Survey #${window.surveyContext.surveyId} Assistant`;
+          chatTitle.textContent = `Survey Assistant`;
         }
       }
     </script>

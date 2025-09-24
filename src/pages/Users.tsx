@@ -172,9 +172,14 @@ export default function Users() {
 
   // Pagination logic
   const totalItems = filteredUsers.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+  
+  // Use 8 items per page for grid view, current itemsPerPage for table view
+  const gridItemsPerPage = 8;
+  const effectiveItemsPerPage = viewMode === 'grid' ? gridItemsPerPage : itemsPerPage;
+  
+  const totalPages = Math.ceil(totalItems / effectiveItemsPerPage);
+  const startIndex = (currentPage - 1) * effectiveItemsPerPage;
+  const endIndex = Math.min(startIndex + effectiveItemsPerPage, totalItems);
   const currentItems = sortedUsers.slice(startIndex, endIndex);
 
   const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -237,10 +242,7 @@ export default function Users() {
          </div>
        </div>
 
-       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8" style={{
-         gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))',
-         justifyItems: 'center'
-       }}>
+       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
 
          {currentItems.length === 0 ? (
@@ -332,29 +334,7 @@ export default function Users() {
            </div>
  
            <div className="flex items-center space-x-3">
-             {/* Rows per page */}
-             <div className="flex items-center space-x-2">
-               <span className="text-sm text-gray-600 dark:text-gray-300">
-                 Rows per page:
-               </span>
-               <Select
-                 value={itemsPerPage.toString()}
-                 onValueChange={(value) => {
-                   setItemsPerPage(Number(value));
-                   setCurrentPage(1);
-                 }}
-               >
-                 <SelectTrigger className="w-20 h-8 rounded-full border-gray-300 dark:border-gray-600">
-                   <SelectValue placeholder={itemsPerPage.toString()} />
-                 </SelectTrigger>
-                 <SelectContent>
-                   <SelectItem value="5">5</SelectItem>
-                   <SelectItem value="10">10</SelectItem>
-                   <SelectItem value="25">25</SelectItem>
-                   <SelectItem value="50">50</SelectItem>
-                 </SelectContent>
-               </Select>
-             </div>
+          
  
              {/* Page controls */}
              <div className="flex items-center space-x-1">
@@ -576,25 +556,27 @@ export default function Users() {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600 dark:text-gray-300">Rows per page:</span>
-                        <div className="w-24">
-                          <Select
-                            value={itemsPerPage.toString()}
-                            onValueChange={(value) => setItemsPerPage(Number(value))}
-                          >
-                            <SelectTrigger className="w-full h-8 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0">
-                              <SelectValue placeholder={itemsPerPage.toString()} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="5">5</SelectItem>
-                              <SelectItem value="10">10</SelectItem>
-                              <SelectItem value="25">25</SelectItem>
-                              <SelectItem value="50">50</SelectItem>
-                            </SelectContent>
-                          </Select>
+                      {viewMode === 'table' && (
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm text-gray-600 dark:text-gray-300">Rows per page:</span>
+                          <div className="w-24">
+                            <Select
+                              value={itemsPerPage.toString()}
+                              onValueChange={(value) => setItemsPerPage(Number(value))}
+                            >
+                              <SelectTrigger className="w-full h-8 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0">
+                                <SelectValue placeholder={itemsPerPage.toString()} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="5">5</SelectItem>
+                                <SelectItem value="10">10</SelectItem>
+                                <SelectItem value="25">25</SelectItem>
+                                <SelectItem value="50">50</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       <div className="flex items-center space-x-1">
                         <button

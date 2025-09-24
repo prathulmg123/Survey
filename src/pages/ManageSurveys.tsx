@@ -194,9 +194,14 @@ export default function ManageSurveys() {
 
   // Pagination logic
   const totalItems = sortedSurveys.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+  
+  // Use 8 items per page for grid view, current itemsPerPage for table view
+  const gridItemsPerPage = 8;
+  const effectiveItemsPerPage = viewMode === 'grid' ? gridItemsPerPage : itemsPerPage;
+  
+  const totalPages = Math.ceil(totalItems / effectiveItemsPerPage);
+  const startIndex = (currentPage - 1) * effectiveItemsPerPage;
+  const endIndex = Math.min(startIndex + effectiveItemsPerPage, totalItems);
   const currentItems = sortedSurveys.slice(startIndex, endIndex);
 
   const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -563,29 +568,8 @@ export default function ManageSurveys() {
            </div>
  
            <div className="flex items-center space-x-3">
-             {/* Rows per page */}
-             <div className="flex items-center space-x-2">
-               <span className="text-sm text-gray-600 dark:text-gray-300">
-                 Rows per page:
-               </span>
-               <Select
-                 value={itemsPerPage.toString()}
-                 onValueChange={(value) => {
-                   setItemsPerPage(Number(value));
-                   setCurrentPage(1);
-                 }}
-               >
-                 <SelectTrigger className="w-20 h-8 rounded-full border-gray-300 dark:border-gray-600">
-                   <SelectValue placeholder={itemsPerPage.toString()} />
-                 </SelectTrigger>
-                 <SelectContent>
-                   <SelectItem value="5">5</SelectItem>
-                   <SelectItem value="10">10</SelectItem>
-                   <SelectItem value="25">25</SelectItem>
-                   <SelectItem value="50">50</SelectItem>
-                 </SelectContent>
-               </Select>
-             </div>
+             {/* Rows per page - Only show in table view */}
+            
  
              {/* Page controls */}
              <div className="flex items-center space-x-1">
