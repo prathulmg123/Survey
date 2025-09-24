@@ -26,12 +26,16 @@ export default function Users() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [tableCurrentPage, setTableCurrentPage] = useState(1);
+  const [gridCurrentPage, setGridCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [sortField, setSortField] = useState<SortableField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
-  // Load view mode from localStorage or default to 'table'
+  // Load view mode from localStorage or default to 'grid'
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
+
+  // Get the appropriate current page based on view mode
+  const currentPage = viewMode === 'table' ? tableCurrentPage : gridCurrentPage;
 
   // Save view mode to localStorage when it changes
   useEffect(() => {
@@ -39,6 +43,7 @@ export default function Users() {
       localStorage.setItem('usersViewMode', viewMode);
     }
   }, [viewMode]);
+
   const { showLoader, hideLoader } = useLoader();
 
   // Fetch users from API
@@ -149,7 +154,12 @@ export default function Users() {
       setSortField(field);
       setSortDirection('asc');
     }
-    setCurrentPage(1); // Reset to first page when changing sort
+    // Reset to first page when changing sort
+    if (viewMode === 'table') {
+      setTableCurrentPage(1);
+    } else {
+      setGridCurrentPage(1);
+    }
   };
 
   // Get sort icon for a column
@@ -182,16 +192,34 @@ export default function Users() {
   const endIndex = Math.min(startIndex + effectiveItemsPerPage, totalItems);
   const currentItems = sortedUsers.slice(startIndex, endIndex);
 
-  const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setItemsPerPage(Number(e.target.value));
-    setCurrentPage(1); // Reset to first page when changing items per page
-  };
-
+  // Update the goToPage function to update the correct state
   const goToPage = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    if (viewMode === 'table') {
+      setTableCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    } else {
+      setGridCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    }
   };
 
+  // Update the items per page change handler
+  const handleItemsPerPageChange = (value: string) => {
+    const newItemsPerPage = Number(value);
+    setItemsPerPage(newItemsPerPage);
+    // Reset to first page when changing items per page
+    if (viewMode === 'table') {
+      setTableCurrentPage(1);
+    } else {
+      setGridCurrentPage(1);
+    }
+  };
 
+  // Handle search input change
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    // Reset both paginations on search
+    setTableCurrentPage(1);
+    setGridCurrentPage(1);
+  };
 
   return (
     <div className="space-y-6">
@@ -202,26 +230,26 @@ export default function Users() {
             Here's an overview of your survey platform users and their activities.
           </p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant={viewMode === 'table' ? 'outline' : 'ghost'}
-            size="sm"
-            onClick={() => setViewMode('table')}
-            className={`flex items-center gap-2 ${viewMode === 'table' ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800' : ''}`}
-          >
-            <List className="h-4 w-4" />
-            <span>Table</span>
-          </Button>
-          <Button
-            variant={viewMode === 'grid' ? 'outline' : 'ghost'}
-            size="sm"
-            onClick={() => setViewMode('grid')}
-            className={`flex items-center gap-2 ${viewMode === 'grid' ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800' : ''}`}
-          >
-            <Grid className="h-4 w-4" />
-            <span>Grid</span>
-          </Button>
-        </div>
+        <div className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+            <Button
+              variant={viewMode === 'table' ? 'outline' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('table')}
+              className={`flex items-center gap-2 ${viewMode === 'table' ? 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600' : ''}`}
+            >
+              <List className="h-4 w-4" />
+              <span>Table</span>
+            </Button>
+            <Button
+              variant={viewMode === 'grid' ? 'outline' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('grid')}
+              className={`flex items-center gap-2 ${viewMode === 'grid' ? 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600' : ''}`}
+            >
+              <Grid className="h-4 w-4" />
+              <span>Grid</span>
+            </Button>
+          </div>
       </div>
       {viewMode == 'grid' && (
        <div className="w-full">
@@ -234,10 +262,7 @@ export default function Users() {
              placeholder="Search users..."
              className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
              value={searchTerm}
-             onChange={(e) => {
-               setSearchTerm(e.target.value);
-               setCurrentPage(1);
-             }}
+             onChange={handleSearch}
            />
          </div>
        </div>
@@ -413,10 +438,7 @@ export default function Users() {
                   placeholder="Search users..."
                   className="w-full pl-10 pr-4 py-2 border border-blue-200 rounded-md focus:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-0 transition-colors duration-200"
                   value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1); // Reset to first page when searching
-                  }}
+                  onChange={handleSearch}
                 />
               </div>
             </div>
@@ -562,7 +584,7 @@ export default function Users() {
                           <div className="w-24">
                             <Select
                               value={itemsPerPage.toString()}
-                              onValueChange={(value) => setItemsPerPage(Number(value))}
+                              onValueChange={handleItemsPerPageChange}
                             >
                               <SelectTrigger className="w-full h-8 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0">
                                 <SelectValue placeholder={itemsPerPage.toString()} />

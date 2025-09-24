@@ -239,19 +239,19 @@ export default function SurveyCreateView() {
         {/* Details Section */}
         <div className="bg-gray-50/50 dark:bg-gray-800/50 px-8 py-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="border-b border-gray-100 dark:border-gray-700/50">
+            <div >
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Guide</h3>
               <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
                 {survey?.source_document_name || 'Product Feedback'}
               </div>
             </div>
-            <div className="border-b border-gray-100 dark:border-gray-700/50">
+            <div >
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Goal</h3>
               <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
                 {survey?.overall_research_goal || 'Understand user satisfaction with new features'}
               </div>
             </div>
-            <div className="border-b border-gray-100 dark:border-gray-700/50">
+            <div >
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Initiator Question</h3>
               <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
                 {survey?.initiator_question || 'How satisfied are you with our product?'}

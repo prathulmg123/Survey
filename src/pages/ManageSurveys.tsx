@@ -44,10 +44,28 @@ export default function ManageSurveys() {
 
   const [sortField, setSortField] = useState<keyof Survey>('title');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [tableCurrentPage, setTableCurrentPage] = useState(1);
+  const [gridCurrentPage, setGridCurrentPage] = useState(1);
+  const [tableItemsPerPage, setTableItemsPerPage] = useState(5);
+  const [gridItemsPerPage, setGridItemsPerPage] = useState(8);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
+  
+  // Get the appropriate items per page based on view mode
+  const itemsPerPage = viewMode === 'table' ? tableItemsPerPage : gridItemsPerPage;
+  
+  // Toggle view mode
+  const toggleViewMode = (mode: 'table' | 'grid') => {
+    // Reset to first page when switching views
+    if (mode === 'table') {
+      setTableCurrentPage(1);
+    } else {
+      setGridCurrentPage(1);
+    }
+    setViewMode(mode);
+  };
+  // Get the appropriate current page based on view mode
+  const currentPage = viewMode === 'table' ? tableCurrentPage : gridCurrentPage;
   const [editingSurveyId, setEditingSurveyId] = useState<number | null>(null);
   const [editedTitle, setEditedTitle] = useState('');
   const [updatedSurvey, setUpdatedSurvey] = useState<Survey[]>([]);
@@ -169,7 +187,12 @@ export default function ManageSurveys() {
       setSortField(field);
       setSortDirection('asc');
     }
-    setCurrentPage(1); // Reset to first page when changing sort
+    // Reset to first page when changing sort
+    if (viewMode === 'table') {
+      setTableCurrentPage(1);
+    } else {
+      setGridCurrentPage(1);
+    }
   };
 
   // Get sort icon for a column
@@ -195,22 +218,42 @@ export default function ManageSurveys() {
   // Pagination logic
   const totalItems = sortedSurveys.length;
   
-  // Use 8 items per page for grid view, current itemsPerPage for table view
-  const gridItemsPerPage = 8;
-  const effectiveItemsPerPage = viewMode === 'grid' ? gridItemsPerPage : itemsPerPage;
+  // Use the appropriate items per page based on view mode
+  const effectiveItemsPerPage = viewMode === 'grid' ? gridItemsPerPage : tableItemsPerPage;
   
   const totalPages = Math.ceil(totalItems / effectiveItemsPerPage);
   const startIndex = (currentPage - 1) * effectiveItemsPerPage;
   const endIndex = Math.min(startIndex + effectiveItemsPerPage, totalItems);
   const currentItems = sortedSurveys.slice(startIndex, endIndex);
 
-  const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setItemsPerPage(Number(e.target.value));
-    setCurrentPage(1);
+  // Update the goToPage function to update the correct state
+  const goToPage = (page: number) => {
+    if (viewMode === 'table') {
+      setTableCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    } else {
+      setGridCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    }
   };
 
-  const goToPage = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  // Update the items per page change handler
+  const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement> | { target: { value: string } }) => {
+    const newItemsPerPage = Number(e.target.value);
+    // Update the appropriate items per page state based on view mode
+    if (viewMode === 'table') {
+      setTableItemsPerPage(newItemsPerPage);
+      setTableCurrentPage(1);
+    } else {
+      setGridItemsPerPage(newItemsPerPage);
+      setGridCurrentPage(1);
+    }
+  };
+
+  // Handle search input change
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    // Reset both paginations on search
+    setTableCurrentPage(1);
+    setGridCurrentPage(1);
   };
 
   const handleDeleteClick = (survey: Survey) => {
@@ -446,10 +489,7 @@ export default function ManageSurveys() {
              placeholder="Search Survey..."
              className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
              value={searchTerm}
-             onChange={(e) => {
-               setSearchTerm(e.target.value);
-               setCurrentPage(1);
-             }}
+             onChange={handleSearch}
            />
          </div>
        </div>
@@ -647,10 +687,7 @@ export default function ManageSurveys() {
                 placeholder="Search Survey..."
                 className="w-full pl-10 pr-4 py-2 border border-blue-200 rounded-md focus:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-0 transition-colors duration-200"
                 value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1); // Reset to first page when searching
-                }}
+                onChange={handleSearch}
               />
             </div>
           </div>
@@ -821,7 +858,7 @@ export default function ManageSurveys() {
                       <div className="w-24 [&_button]:border-0 [&_button]:ring-1 [&_button]:ring-gray-300 [&_button]:ring-offset-0">
                       <Select
                         value={itemsPerPage.toString()}
-                        onValueChange={(value) => handleItemsPerPageChange({ target: { value }as any }as any)}
+                        onValueChange={(value) => handleItemsPerPageChange({ target: { value } } as React.ChangeEvent<HTMLSelectElement>)}
                       >
                         <SelectTrigger className="w-full h-8 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0">
                           <SelectValue placeholder={itemsPerPage.toString()} />
