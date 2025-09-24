@@ -450,7 +450,7 @@ export default function ManageSurveys() {
           </p>
         </div>
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+          <div className="flex items-center space-x-2 bg-gray-300 dark:bg-gray-800 p-1 rounded-lg">
             <Button
               variant={viewMode === 'table' ? 'outline' : 'ghost'}
               size="sm"
@@ -563,6 +563,23 @@ export default function ManageSurveys() {
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>View Survey</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // TODO: Add navigation to survey users page when implemented
+                            console.log('Manage survey users:', survey.id);
+                          }}
+                        >
+                          <Users className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Attended Users</TooltipContent>
                     </Tooltip>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -726,7 +743,7 @@ export default function ManageSurveys() {
                         {getSortIcon('createdAt')}
                       </div>
                     </TableHead>
-                    <TableHead className="text-white/95 font-medium py-3 px-4 text-right">Actions</TableHead>
+                    <TableHead className="text-white/95 font-medium py-3 px-12 text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="bg-white dark:bg-gray-800/30">
@@ -805,6 +822,24 @@ export default function ManageSurveys() {
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>View Survey</TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-transparent dark:text-blue-400 dark:hover:text-blue-300"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    // TODO: Add navigation to survey users page when implemented
+                                    console.log('Manage survey users:', survey.id);
+                                  }}
+                                >
+                                  <Users className="h-4 w-4" />
+                                  <span className="sr-only">Users</span>
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Attended Users</TooltipContent>
                             </Tooltip>
                             <Tooltip>
                               <TooltipTrigger asChild>

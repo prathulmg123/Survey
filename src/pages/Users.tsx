@@ -230,7 +230,7 @@ export default function Users() {
             Here's an overview of your survey platform users and their activities.
           </p>
         </div>
-        <div className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+        <div className="flex items-center space-x-2 bg-gray-300 dark:bg-gray-800 p-1 rounded-lg">
             <Button
               variant={viewMode === 'table' ? 'outline' : 'ghost'}
               size="sm"

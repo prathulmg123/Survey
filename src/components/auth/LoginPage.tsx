@@ -182,7 +182,7 @@ useEffect(() => {
           {/* <h2 className="text-2xl font-semibold text-gray-900 mb-2">Welcome Back</h2> */}
         </div>
 
-        <Card className="bg-white/95 backdrop-blur-sm shadow-2xl border border-gray-100 shadow-xl rounded-2xl overflow-hidden [&_*]:!text-gray-900 hover:shadow-2xl transition-shadow duration-300">
+        <Card className="bg-white/95 backdrop-blur-sm shadow-2xl border border-gray-100 shadow-xl rounded-2xl overflow-hidden  hover:shadow-2xl transition-shadow duration-300">
           <CardContent className="p-8">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-1">Welcome Back</h2>
