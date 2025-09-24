@@ -203,20 +203,20 @@ export default function SurveyViewPage() {
             <div className="max-w-md mx-auto">
               <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 p-2">
                 <a 
-                  href={`/chatbot-widget/index.html?surveyId=${id}`}
+                  href={`http://vpn.seqato.com:4001/?surveyId=${id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 text-sm text-blue-600 dark:text-blue-400 hover:underline truncate"
                   title="Open Chat in New Tab"
                 >
-                  {`${window.location.origin}/chatbot-widget/index.html?surveyId=${id}`}
+                  {`http://vpn.seqato.com:4001/?surveyId=${id}`}
                 </a>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={async (e) => {
                       e.preventDefault();
                       try {
-                        await navigator.clipboard.writeText(`${window.location.origin}/chatbot-widget/index.html?surveyId=${id}`);
+                        await navigator.clipboard.writeText(`http://vpn.seqato.com:4001/?surveyId=${id}`);
                         setIsCopied(true);
                         setTimeout(() => setIsCopied(false), 2000);
                       } catch (err) {
@@ -233,7 +233,7 @@ export default function SurveyViewPage() {
                     )}
                   </button>
                   <a 
-                    href={`/chatbot-widget/index.html?surveyId=${id}`}
+                    href={`http://vpn.seqato.com:4001/?surveyId=${id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -276,9 +276,10 @@ export default function SurveyViewPage() {
 
          {/* Topic Area Section */}
       <div className="mt-8 p-6">
+        <Accordion type="single" collapsible className="w-full space-y-4">
         {survey?.topicArea?.map((area: any, index: number) => (
-          <Accordion key={`area-${index}`} type="single" collapsible className="w-full space-y-4 mb-6" defaultValue={`area-${index}`}>
-            <AccordionItem value={`area-${index}`} className="border-2 border-indigo-200 dark:border-indigo-800/70 rounded-xl overflow-hidden">
+          <div key={`area-${index}`} className="mb-6">
+            <AccordionItem value={area.id || `area-${index}`} className="border-2 border-indigo-200 dark:border-indigo-800/70 rounded-xl overflow-hidden">
               <AccordionTrigger className="px-6 py-4 hover:no-underline bg-indigo-100 dark:bg-indigo-900/40">
                 <div className="flex items-center space-x-4">
                   <span className="h-10 w-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
@@ -415,8 +416,9 @@ export default function SurveyViewPage() {
                 </div>
               </AccordionContent>
             </AccordionItem>
-          </Accordion>
+          </div>
         ))}
+        </Accordion>
       </div>
     </div>
   </div>

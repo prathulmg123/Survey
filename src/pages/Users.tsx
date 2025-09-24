@@ -267,7 +267,7 @@ export default function Users() {
          </div>
        </div>
 
-       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 py-8">
 
 
          {currentItems.length === 0 ? (
@@ -276,76 +276,97 @@ export default function Users() {
                      <p className="text-gray-500 dark:text-gray-400 text-lg">No Users found</p>
                    </div>
                  ) : (currentItems.map((user) => (
-           <div
-             key={user.id}
-             className="border-blue-300 dark:border-blue-500 relative group bg-white dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl border-2 border-gray-200 dark:border-gray-600 overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col h-full hover:border-blue-300 dark:hover:border-blue-500 hover:ring-2 hover:ring-blue-200 dark:hover:ring-blue-900/40 w-full max-w-[400px]"
-           >
-             {/* Subtle gradient overlay on hover */}
-             <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-blue-50/30 dark:to-blue-900/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-             
-             {/* Status */}
-             <div
-               className={`absolute top-4 right-4 w-3 h-3 rounded-full ${
-                 user.is_active ? "bg-green-400" : "bg-gray-400"
-               } ring-2 ring-white dark:ring-gray-900 z-10`}
-             ></div>
- 
-             <div className="p-6 flex-1 relative z-10">
-               {/* Profile */}
-               <div className="flex items-center space-x-4 pb-4 mb-4 border-b border-gray-100 dark:border-gray-700/50">
-                 <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-xl font-semibold shadow-inner border-2 border-white/20">
-                   {user.full_name.charAt(0).toUpperCase()}
-                 </div>
-                 <div className="flex-1 min-w-0">
-                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                     {user.full_name}
-                   </h3>
-                   <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                     @{user.username}
-                   </p>
-                 </div>
-               </div>
- 
-               {/* Email + Role */}
-               <div className="space-y-4">
-                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                   <Mail className="h-4 w-4 text-blue-400 mr-2 flex-shrink-0" />
-                   <a
-                     href={`mailto:${user.email}`}
-                     className="hover:underline truncate hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                   >
-                     {user.email}
-                   </a>
-                 </div>
- 
-                 <div className="flex justify-between items-center">
-                   <span
-                     className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium shadow-sm ${
-                       user.role === "Admin"
-                         ? "bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300"
-                         : user.role === "User"
-                         ? "bg-sky-100 text-sky-700 dark:bg-sky-900/60 dark:text-sky-300"
-                         : "bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300"
-                     }`}
-                   >
-                     {user.role}
-                   </span>
-                 </div>
- 
-                 {/* Last Active */}
-                 <div className="pt-3 mt-3 border-t border-gray-100 dark:border-gray-700/50 flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                   <span>Last active</span>
-                   <span className="font-medium">
-                     {new Date(user.last_login).toLocaleDateString("en-US", {
-                       month: "short",
-                       day: "numeric",
-                       year: 'numeric'
-                     })}
-                   </span>
-                 </div>
-               </div>
-             </div>
-           </div>
+                  <div
+                  key={user.id}
+                  className="relative group bg-white dark:bg-gray-900/95 rounded-2xl border border-gray-100 dark:border-gray-700/80 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 dark:hover:border-blue-500/70 hover:ring-1 hover:ring-blue-100 dark:hover:ring-blue-900/30 flex flex-col h-full w-full max-w-[400px] mx-auto"
+                >
+                  {/* Gradient header that matches card corners */}
+                  <div className="h-1.5 bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 dark:from-blue-500/90 dark:via-indigo-500/90 dark:to-purple-500/90 rounded-t-2xl"></div>
+                
+                  {/* Status indicator */}
+                  <div className="absolute top-4 right-4 z-10">
+                    <div className="flex items-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-md px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm">
+                      <div className="relative flex items-center justify-center h-2.5 w-2.5 mr-2">
+                        <span
+                          className={`absolute inline-flex h-full w-full rounded-full ${
+                            user.is_active ? "bg-green-400" : "bg-gray-400"
+                          } opacity-75 animate-ping`}
+                        ></span>
+                        <span
+                          className={`relative inline-flex rounded-full h-2 w-2 ${
+                            user.is_active ? "bg-green-500" : "bg-gray-500"
+                          }`}
+                        ></span>
+                      </div>
+                      <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                        {user.is_active ? "Active" : "Inactive"}
+                      </span>
+                    </div>
+                  </div>
+                
+                  <div className="p-6 flex-1 flex flex-col">
+                    {/* Profile section */}
+                    <div className="flex flex-col items-center text-center mb-5 -mt-14">
+                      <div className="h-20 w-20 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 dark:from-blue-500/90 dark:to-indigo-500/90 flex items-center justify-center text-2xl font-bold text-white/95 shadow-md border-4 border-white/90 dark:border-gray-800/90 group-hover:scale-105 transition-all duration-300">
+                        {user.full_name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="mt-4">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          {user.full_name}
+                        </h3>
+                        <p className="text-sm text-blue-500 font-medium mt-1">@{user.username}</p>
+                      </div>
+                    </div>
+                
+                    {/* User details */}
+                    <div className="space-y-4 flex-1 flex flex-col">
+                      {/* Email */}
+                      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center text-sm">
+                          <Mail className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0" />
+                          <a
+                            href={`mailto:${user.email}`}
+                            className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate"
+                            title={user.email}
+                          >
+                            {user.email}
+                          </a>
+                        </div>
+                      </div>
+                
+                      {/* Role badge */}
+                      <div className="flex justify-center">
+                        <span
+                          className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide shadow-sm ${
+                            user.role === "admin"
+                              ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                              : user.role === "user"
+                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+                              : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                          }`}
+                        >
+                          {user.role}
+                        </span>
+                      </div>
+                
+                      {/* Last Active */}
+                      <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-gray-500 dark:text-gray-400 font-medium">Last active</span>
+                          <div className="text-gray-700 dark:text-gray-300 font-medium">
+                            {new Date(user.last_login).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                
          )))}
        </div>
  
@@ -520,11 +541,11 @@ export default function Users() {
                             </a>
                           </TableCell>
                           <TableCell className="px-4">
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${user.role === 'Admin'
-                                ? 'bg-blue-500/20 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
-                                : user.role === 'User'
-                                  ? 'bg-sky-500/20 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300'
-                                  : 'bg-purple-500/20 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300'
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${user.role === "admin"
+                              ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                              : user.role === "user"
+                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+                              : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
                               }`}>
                               {user.role}
                             </span>

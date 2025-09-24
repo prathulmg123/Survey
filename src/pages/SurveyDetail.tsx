@@ -500,9 +500,10 @@ export default function SurveyDetail() {
               </div>
 
               {/* Topic Area Accordion */}
+              <Accordion type="single" collapsible className="w-full space-y-4">
               {form.watch('researchAreas')?.map((area, areaIndex) => (
-              <Accordion type="single" collapsible  className="w-full space-y-4">
-                <AccordionItem value="topic-area" className="border-2 border-indigo-200 dark:border-indigo-800/70 rounded-xl overflow-hidden">
+                <div key={`area-${areaIndex}`} className="w-full">
+                  <AccordionItem value={`area-${areaIndex}`} className="border-2 border-indigo-200 dark:border-indigo-800/70 rounded-xl overflow-hidden">
                   <AccordionTrigger className="px-6 py-4 hover:no-underline bg-indigo-100 dark:bg-indigo-900/40">
                       <div className="flex items-center gap-3">
                       <span className="h-10 w-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
@@ -775,9 +776,10 @@ export default function SurveyDetail() {
                       </div>
                     </div>
                   </AccordionContent>
-                </AccordionItem>
+                  </AccordionItem>
+                </div>
+              ))}
               </Accordion>
-            ))}
             {form.formState.errors.researchAreas && (
               <p className="text-sm font-medium text-destructive">
                 {form.formState.errors.researchAreas.message}
