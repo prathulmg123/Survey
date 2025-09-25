@@ -254,7 +254,7 @@ useEffect(() => {
                   )}
                 </Button>
 
-                {/* <div className="relative">
+                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t border-gray-300"></span>
                   </div>
@@ -326,14 +326,14 @@ useEffect(() => {
                       width="100%"
                     />
                   </GoogleOAuthProvider>
-                </div> */}
+                </div> 
               </div>
 
               <div className="text-center">
                 <Button 
                   variant="link" 
                   disabled
-                  className="text-gray-300 dark:text-gray-600 p-0 [&_*]:!text-inherit cursor-not-allowed"
+                  className="text-dark-500 dark:text-dark-600 p-0 [&_*]:!text-inherit cursor-not-allowed"
                   title="Forgot Password is currently disabled"
                 >
                   Forgot Password?

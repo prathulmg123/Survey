@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { getSurveyAttendees, SurveyAttendee } from '@/api/surveyService';
 import { toast } from 'sonner';
+import { Loader } from '@/components/ui/Loader';
 
 export default function SurveyAttendees() {
   const { surveyId } = useParams<{ surveyId: string }>();
@@ -95,10 +96,10 @@ export default function SurveyAttendees() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
+     <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
+             <div className="text-center">
+               <Loader text="Loading Attendees..." show={true} size={52} />
+             </div>
       </div>
     );
   }
