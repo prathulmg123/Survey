@@ -341,14 +341,20 @@ export default function SurveyDetail() {
 
   if (error || !survey) {
     return (
-      <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <p className="text-red-500">{error || 'Survey not found'}</p>
-          <Button onClick={() => navigate('/manage')} variant="outline">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Surveys
-          </Button>
-        </div>
+      <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-6">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          {error ? 'Error Loading Survey' : 'Survey Not Found'}
+        </h3>
+        <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-md text-center">
+          {error || 'The requested survey could not be found. It may have been moved or deleted.'}
+        </p>
+        <Button 
+          onClick={() => navigate('/manage')} 
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Surveys
+        </Button>
       </div>
     );
   }

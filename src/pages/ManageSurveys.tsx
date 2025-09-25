@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Pencil, Trash2, Eye, FileText, Users, X, Plus, ChevronLeft, ChevronRight, Search, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown, Grid, List } from "lucide-react";
+import { Pencil, Trash2, Eye, FileText, Users, X, User,Plus, ChevronLeft, ChevronRight, Search, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown, Grid, List, MessageSquare, Users2, BarChart2 } from "lucide-react";
 import { Loader } from "@/components/ui/Loader";
 import { useLoader } from "@/hooks/useLoader";
 import {
@@ -66,7 +66,7 @@ export default function ManageSurveys() {
   };
   // Get the appropriate current page based on view mode
   const currentPage = viewMode === 'table' ? tableCurrentPage : gridCurrentPage;
-  const [editingSurveyId, setEditingSurveyId] = useState<number | null>(null);
+  const [editingSurveyId, setEditingSurveyId] = useState<any | null>(null);
   const [editedTitle, setEditedTitle] = useState('');
   const [updatedSurvey, setUpdatedSurvey] = useState<Survey[]>([]);
   const navigate = useNavigate();
@@ -78,9 +78,25 @@ export default function ManageSurveys() {
       const response = await getSurveys()as any;
       if (response.success) {
         setUpdatedSurvey(response.data.guides)
-        const mappedSurveys = response.data.guides.map((survey, index) => 
-          mapApiSurveyToUiSurvey(survey, index)
-        ) as any;
+        // const mappedSurveys = response.data.guides.map((survey, index) => 
+        //   mapApiSurveyToUiSurvey(survey, index)
+        // ) as any;
+        const mappedSurveys = response.data.guides.map((guide: any) => ({
+          _id: guide._id,
+          title: guide.name,
+          description: guide.overall_research_goal,
+          questions: guide.research_areas.reduce((acc: number, area: any) => 
+            acc + (area.sub_topics?.length || 0), 0
+          ),
+          responses: guide.user_count || 0,
+          status: 'active', // Default status since it's not in the API
+          createdAt: guide.created_at,
+          updatedAt: guide.updated_at || guide.created_at,
+          topicArea: guide.research_areas,
+          source_document_name: guide.source_document_name,
+          initiator_question: guide.initiator_question,
+          overall_research_goal: guide.overall_research_goal
+        }));
         console.log(mappedSurveys,"mapped")
         setSurveys(mappedSurveys);
       } else {
@@ -126,29 +142,20 @@ export default function ManageSurveys() {
 
   if (error) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
-          <strong className="font-bold">Error: </strong>
-          <span className="block sm:inline">{error}</span>
-          <button 
-            onClick={fetchSurveys}
-            className="absolute top-0 bottom-0 right-0 px-4 py-3"
-          >
-            <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-              <title>Close</title>
-              <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
-            </svg>
-          </button>
-          <div className="mt-2">
-            <button
-              onClick={fetchSurveys}
-              className="text-sm bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-      </div>
+      <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-6">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                Something went wrong
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-md text-center">
+                Facing some issues. Please try again after some time.
+              </p>
+              <Button
+               onClick={fetchSurveys}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+              >
+                Retry
+              </Button>
+            </div>
     );
   }
 
@@ -303,14 +310,14 @@ export default function ManageSurveys() {
   };
 
   const startEditing = (survey: Survey) => {
-    setEditingSurveyId(survey.id);
+    setEditingSurveyId(survey._id);
     setEditedTitle(survey.title);
   };
 
-  const saveEdit = async (surveyId: number) => {
+  const saveEdit = async (surveyId: any) => {
     try {
       // Find the survey in the surveys array to get the _id
-      const surveyToUpdate = surveys.find(survey => survey.id === surveyId);
+      const surveyToUpdate = surveys.find(survey => survey._id === surveyId);
       
       if (!surveyToUpdate) {
         console.error('Survey not found:', surveyId);
@@ -319,7 +326,7 @@ export default function ManageSurveys() {
 
       // Find the full survey data in updatedSurvey
       const fullSurvey = updatedSurvey.find(survey => 
-        survey._id === surveyToUpdate._id || survey.id === surveyId
+        survey._id === surveyToUpdate._id || survey._id === surveyId
       );
 
       if (!fullSurvey) {
@@ -346,7 +353,7 @@ export default function ManageSurveys() {
 
       // Update the local state if API call is successful
       const updatedSurveys = surveys.map(survey => 
-        survey.id === surveyId ? { ...survey, title: editedTitle } : survey
+        survey._id === surveyId ? { ...survey, title: editedTitle } : survey
       );
       
       const updatedSurveyData = updatedSurvey.map(survey => {
@@ -370,7 +377,7 @@ export default function ManageSurveys() {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent, surveyId: number) => {
+  const handleKeyDown = (e: React.KeyboardEvent, surveyId: any) => {
     if (e.key === 'Enter') {
       saveEdit(surveyId);
     } else if (e.key === 'Escape') {
@@ -504,11 +511,21 @@ export default function ManageSurveys() {
         ) : (
           currentItems.map((survey) => (
             <div
-              key={survey.id}
+              key={survey._id}
               className="border-blue-300 dark:border-blue-500 relative group bg-white dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl border-2 border-gray-200 dark:border-gray-600 overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col h-full hover:border-blue-300 dark:hover:border-blue-500 hover:ring-2 hover:ring-blue-200 dark:hover:ring-blue-900/40 w-full max-w-[400px]"
             >
               <div className="absolute top-4 right-4">
-                {getStatusBadge(survey.status)}
+                <div className="relative group/response">
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-900/50 border border-blue-100 dark:border-blue-800/60 shadow-sm shadow-blue-100/30 dark:shadow-blue-900/10 transition-all duration-200">
+                    <User className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                    <span className="text-xs font-medium text-blue-700 dark:text-blue-200">
+                      {survey.responses} {survey.responses === 1 ? 'User' : 'User'}
+                    </span>
+                  </div>
+                  <div className="absolute -bottom-7 right-0 bg-gray-900 text-white text-[11px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap opacity-0 group-hover/response:opacity-100 transition-opacity duration-200 pointer-events-none">
+                    {survey.responses} {survey.responses === 1 ? 'response' : 'responses'}
+                  </div>
+                </div>
               </div>
               
               <div className="p-6 flex-1 flex flex-col">
@@ -519,13 +536,13 @@ export default function ManageSurveys() {
                 </div>
                 
                 <div className="mt-4">
-                  {editingSurveyId === survey.id ? (
+                  {editingSurveyId === survey._id ? (
                     <input
                       type="text"
                       value={editedTitle}
                       onChange={(e) => setEditedTitle(e.target.value)}
-                      onKeyDown={(e) => handleKeyDown(e, survey.id)}
-                      onBlur={() => saveEdit(survey.id)}
+                      onKeyDown={(e) => handleKeyDown(e, survey._id)}
+                      onBlur={() => saveEdit(survey._id)}
                       autoFocus
                       className="w-full text-lg font-semibold text-gray-900 dark:text-white bg-transparent border-b border-blue-500 focus:outline-none focus:border-blue-700"
                     />
@@ -569,11 +586,10 @@ export default function ManageSurveys() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                          className="h-8 w-8 text-blue-600 hover:text-blue-700 dark:text-white dark:hover:text-blue-100"
                           onClick={(e) => {
                             e.stopPropagation();
-                            // TODO: Add navigation to survey users page when implemented
-                            console.log('Manage survey users:', survey.id);
+                            navigate(`/surveys/attendees/${survey._id}`);
                           }}
                         >
                           <Users className="h-4 w-4" />
@@ -726,11 +742,11 @@ export default function ManageSurveys() {
                     </TableHead>
                     <TableHead 
                       className="text-white/95 font-medium py-3 px-4 text-left cursor-pointer hover:bg-blue-700/80 dark:hover:bg-blue-800/90 transition-colors"
-                      onClick={() => handleSort('status')}
+                      onClick={() => handleSort('responses')}
                     >
                       <div className="flex items-center">
-                        Status
-                        {getSortIcon('status')}
+                        Users
+                        {getSortIcon('responses')}
                       </div>
                     </TableHead>
                    
@@ -758,20 +774,20 @@ export default function ManageSurveys() {
                     </TableRow>
                   ) : (
                     currentItems.map((survey) => (
-                      <TableRow key={survey.id} className="hover:bg-gray-50">
+                      <TableRow key={survey._id} className="hover:bg-gray-50">
                         <TableCell className="py-4 px-4">
                           <div className="flex items-center gap-3">
                             <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
                               <FileText className="h-5 w-5 text-blue-600" />
                             </div>
                             <div>
-                              {editingSurveyId === survey.id ? (
+                              {editingSurveyId === survey._id ? (
                                 <Input
                                   type="text"
                                   value={editedTitle}
                                   onChange={(e) => setEditedTitle(e.target.value)}
-                                  onKeyDown={(e) => handleKeyDown(e, survey.id)}
-                                  onBlur={() => saveEdit(survey.id)}
+                                  onKeyDown={(e) => handleKeyDown(e, survey._id)}
+                                  onBlur={() => saveEdit(survey._id)}
                                   autoFocus
                                   className="h-8 px-2 py-1 text-sm border-blue-300 focus-visible:ring-1 focus-visible:ring-blue-500"
                                 />
@@ -797,8 +813,10 @@ export default function ManageSurveys() {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="px-4">
-                            {getStatusBadge(survey.status)}
+                        <TableCell className="px-8 ml-3">
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">
+                              {survey.responses || 0} 
+                            </div>
                         </TableCell>
                         <TableCell className="px-4 text-gray-700 dark:text-gray-300">
                           {new Date(survey.createdAt).toLocaleDateString('en-US', {
@@ -831,8 +849,7 @@ export default function ManageSurveys() {
                                   className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-transparent dark:text-blue-400 dark:hover:text-blue-300"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    // TODO: Add navigation to survey users page when implemented
-                                    console.log('Manage survey users:', survey.id);
+                                    navigate(`/surveys/attendees/${survey._id}`);
                                   }}
                                 >
                                   <Users className="h-4 w-4" />

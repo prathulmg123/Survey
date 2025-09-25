@@ -159,6 +159,37 @@ export const finalizeSurvey = async (params: FinalizeSurveyParams): Promise<{ su
   }
 };
 
+export interface AISummary {
+  summary_text: string | null;
+  generated_at: string | null;
+  status: 'generated' | 'not_generated' | 'in_progress';
+}
+
+export interface SurveyAttendee {
+  user_id: string;
+  email: string;
+  username: string;
+  attendance_type: 'websocket_chat' | 'traditional';
+  session_id: string;
+  created_at: string;
+  status: 'active' | 'inactive' | 'completed';
+  conversation_turns: number;
+  last_activity: string;
+  ai_summary: AISummary;
+}
+
+export interface SurveyAttendeesResponse {
+  success: boolean;
+  message: string;
+  data: {
+    survey_id: string;
+    total_unique_users: number;
+    chat_users: number;
+    traditional_users: number;
+    attendance_details: SurveyAttendee[];
+  };
+}
+
 export interface UpdateSurveyParams {
   surveyId: string;
   name: string;
@@ -167,6 +198,16 @@ export interface UpdateSurveyParams {
   initiator_question: string;
   research_areas: ResearchArea[];
 }
+
+export const getSurveyAttendees = async (surveyId: string): Promise<SurveyAttendeesResponse> => {
+  try {
+    const response = await apiClient.get<SurveyAttendeesResponse>(`/api/guides/${surveyId}/attendance`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching survey attendees:', error);
+    throw error;
+  }
+};
 
 export const updateSurvey = async (params: UpdateSurveyParams): Promise<{ success: boolean; message?: string; data?: any }> => {
   try {

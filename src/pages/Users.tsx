@@ -5,7 +5,7 @@ import { useLoader } from "@/hooks/useLoader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Search, FileText,UserPlus, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown, AlertCircle, Grid, List, Mail } from "lucide-react";
+import { Search, FileText, UserPlus, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown, AlertCircle, Grid, List, Mail } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getUsers, User } from "@/api/userService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -91,21 +91,20 @@ export default function Users() {
 
   if (error) {
     return (
-      <div className="container mx-auto p-6">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            {error}
-            <Button
-              variant="outline"
-              className="mt-2"
-              onClick={fetchUsers}
-            >
-              Retry
-            </Button>
-          </AlertDescription>
-        </Alert>
+
+      <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-6">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          Something went wrong
+        </h3>
+        <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-md text-center">
+          Facing some issues. Please try again after some time.
+        </p>
+        <Button
+          onClick={fetchUsers}
+          className=" px-5 py-2 rounded-lg flex items-center gap-2"
+        >
+          Retry
+        </Button>
       </div>
     );
   }
@@ -182,11 +181,11 @@ export default function Users() {
 
   // Pagination logic
   const totalItems = filteredUsers.length;
-  
+
   // Use 8 items per page for grid view, current itemsPerPage for table view
   const gridItemsPerPage = 8;
   const effectiveItemsPerPage = viewMode === 'grid' ? gridItemsPerPage : itemsPerPage;
-  
+
   const totalPages = Math.ceil(totalItems / effectiveItemsPerPage);
   const startIndex = (currentPage - 1) * effectiveItemsPerPage;
   const endIndex = Math.min(startIndex + effectiveItemsPerPage, totalItems);
@@ -231,240 +230,236 @@ export default function Users() {
           </p>
         </div>
         <div className="flex items-center space-x-2 bg-gray-300 dark:bg-gray-800 p-1 rounded-lg">
-            <Button
-              variant={viewMode === 'table' ? 'outline' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('table')}
-              className={`flex items-center gap-2 ${viewMode === 'table' ? 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600' : ''}`}
-            >
-              <List className="h-4 w-4" />
-              <span>Table</span>
-            </Button>
-            <Button
-              variant={viewMode === 'grid' ? 'outline' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('grid')}
-              className={`flex items-center gap-2 ${viewMode === 'grid' ? 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600' : ''}`}
-            >
-              <Grid className="h-4 w-4" />
-              <span>Grid</span>
-            </Button>
-          </div>
+          <Button
+            variant={viewMode === 'table' ? 'outline' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('table')}
+            className={`flex items-center gap-2 ${viewMode === 'table' ? 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600' : ''}`}
+          >
+            <List className="h-4 w-4" />
+            <span>Table</span>
+          </Button>
+          <Button
+            variant={viewMode === 'grid' ? 'outline' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('grid')}
+            className={`flex items-center gap-2 ${viewMode === 'grid' ? 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600' : ''}`}
+          >
+            <Grid className="h-4 w-4" />
+            <span>Grid</span>
+          </Button>
+        </div>
       </div>
       {viewMode == 'grid' && (
-       <div className="w-full">
-       {/* Search */}
-       <div className="mb-6 flex justify-end">
-         <div className="relative w-full max-w-sm">
-           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-blue-500" />
-           <Input
-             type="search"
-             placeholder="Search users..."
-             className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
-             value={searchTerm}
-             onChange={handleSearch}
-           />
-         </div>
-       </div>
+        <div className="w-full">
+          {/* Search */}
+          <div className="mb-6 flex justify-end">
+            <div className="relative w-full max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-blue-500" />
+              <Input
+                type="search"
+                placeholder="Search users..."
+                className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+            </div>
+          </div>
 
-       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 py-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 py-8">
 
 
-         {currentItems.length === 0 ? (
-                   <div className="col-span-full flex flex-col items-center justify-center py-12 mt-12">
-                     <FileText className="h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
-                     <p className="text-gray-500 dark:text-gray-400 text-lg">No Users found</p>
-                   </div>
-                 ) : (currentItems.map((user) => (
-                  <div
-                  key={user.id}
-                  className="relative group bg-white dark:bg-gray-900/95 rounded-2xl border border-gray-100 dark:border-gray-700/80 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 dark:hover:border-blue-500/70 hover:ring-1 hover:ring-blue-100 dark:hover:ring-blue-900/30 flex flex-col h-full w-full max-w-[400px] mx-auto"
-                >
-                  {/* Gradient header that matches card corners */}
-                  <div className="h-1.5 bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 dark:from-blue-500/90 dark:via-indigo-500/90 dark:to-purple-500/90 rounded-t-2xl"></div>
-                
-                  {/* Status indicator */}
-                  <div className="absolute top-4 right-4 z-10">
-                    <div className="flex items-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-md px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm">
-                      <div className="relative flex items-center justify-center h-2.5 w-2.5 mr-2">
-                        <span
-                          className={`absolute inline-flex h-full w-full rounded-full ${
-                            user.is_active ? "bg-green-400" : "bg-gray-400"
+            {currentItems.length === 0 ? (
+              <div className="col-span-full flex flex-col items-center justify-center py-12 mt-12">
+                <FileText className="h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
+                <p className="text-gray-500 dark:text-gray-400 text-lg">No Users found</p>
+              </div>
+            ) : (currentItems.map((user) => (
+              <div
+                key={user.id}
+                className="relative group bg-white dark:bg-gray-900/95 rounded-2xl border border-gray-100 dark:border-gray-700/80 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 dark:hover:border-blue-500/70 hover:ring-1 hover:ring-blue-100 dark:hover:ring-blue-900/30 flex flex-col h-full w-full max-w-[400px] mx-auto"
+              >
+                {/* Gradient header that matches card corners */}
+                <div className="h-1.5 bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 dark:from-blue-500/90 dark:via-indigo-500/90 dark:to-purple-500/90 rounded-t-2xl"></div>
+
+                {/* Status indicator */}
+                <div className="absolute top-4 right-4 z-10">
+                  <div className="flex items-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-md px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <div className="relative flex items-center justify-center h-2.5 w-2.5 mr-2">
+                      <span
+                        className={`absolute inline-flex h-full w-full rounded-full ${user.is_active ? "bg-green-400" : "bg-gray-400"
                           } opacity-75 animate-ping`}
-                        ></span>
-                        <span
-                          className={`relative inline-flex rounded-full h-2 w-2 ${
-                            user.is_active ? "bg-green-500" : "bg-gray-500"
+                      ></span>
+                      <span
+                        className={`relative inline-flex rounded-full h-2 w-2 ${user.is_active ? "bg-green-500" : "bg-gray-500"
                           }`}
-                        ></span>
-                      </div>
-                      <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                        {user.is_active ? "Active" : "Inactive"}
-                      </span>
+                      ></span>
+                    </div>
+                    <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                      {user.is_active ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-6 flex-1 flex flex-col">
+                  {/* Profile section */}
+                  <div className="flex flex-col items-center text-center mb-5 -mt-14">
+                    <div className="h-20 w-20 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 dark:from-blue-500/90 dark:to-indigo-500/90 flex items-center justify-center text-2xl font-bold text-white/95 shadow-md border-4 border-white/90 dark:border-gray-800/90 group-hover:scale-105 transition-all duration-300">
+                      {user.full_name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="mt-4">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {user.full_name}
+                      </h3>
+                      <p className="text-sm text-blue-500 font-medium mt-1">@{user.username}</p>
                     </div>
                   </div>
-                
-                  <div className="p-6 flex-1 flex flex-col">
-                    {/* Profile section */}
-                    <div className="flex flex-col items-center text-center mb-5 -mt-14">
-                      <div className="h-20 w-20 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 dark:from-blue-500/90 dark:to-indigo-500/90 flex items-center justify-center text-2xl font-bold text-white/95 shadow-md border-4 border-white/90 dark:border-gray-800/90 group-hover:scale-105 transition-all duration-300">
-                        {user.full_name.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="mt-4">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                          {user.full_name}
-                        </h3>
-                        <p className="text-sm text-blue-500 font-medium mt-1">@{user.username}</p>
+
+                  {/* User details */}
+                  <div className="space-y-4 flex-1 flex flex-col">
+                    {/* Email */}
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center text-sm">
+                        <Mail className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0" />
+                        <a
+                          href={`mailto:${user.email}`}
+                          className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate"
+                          title={user.email}
+                        >
+                          {user.email}
+                        </a>
                       </div>
                     </div>
-                
-                    {/* User details */}
-                    <div className="space-y-4 flex-1 flex flex-col">
-                      {/* Email */}
-                      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center text-sm">
-                          <Mail className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0" />
-                          <a
-                            href={`mailto:${user.email}`}
-                            className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate"
-                            title={user.email}
-                          >
-                            {user.email}
-                          </a>
-                        </div>
-                      </div>
-                
-                      {/* Role badge */}
-                      <div className="flex justify-center">
-                        <span
-                          className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide shadow-sm ${
-                            user.role === "admin"
-                              ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
-                              : user.role === "user"
+
+                    {/* Role badge */}
+                    <div className="flex justify-center">
+                      <span
+                        className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide shadow-sm ${user.role === "admin"
+                            ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                            : user.role === "user"
                               ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
                               : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
                           }`}
-                        >
-                          {user.role}
-                        </span>
-                      </div>
-                
-                      {/* Last Active */}
-                      <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <div className="flex justify-between items-center text-xs">
-                          <span className="text-gray-500 dark:text-gray-400 font-medium">Last active</span>
-                          <div className="text-gray-700 dark:text-gray-300 font-medium">
-                            {new Date(user.last_login).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })}
-                          </div>
+                      >
+                        {user.role}
+                      </span>
+                    </div>
+
+                    {/* Last Active */}
+                    <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-gray-500 dark:text-gray-400 font-medium">Last active</span>
+                        <div className="text-gray-700 dark:text-gray-300 font-medium">
+                          {new Date(user.last_login).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                
-                
-         )))}
-       </div>
- 
-       {/* Pagination */}
-       {totalItems > 0 && (
-         <div className="mt-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm px-6 py-4 flex flex-col sm:flex-row items-center justify-between">
-           <div className="text-sm text-gray-600 dark:text-gray-300 mb-4 sm:mb-0">
-             Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
-             <span className="font-medium">{Math.min(endIndex, totalItems)}</span>{" "}
-             of <span className="font-medium">{totalItems}</span> results
-           </div>
- 
-           <div className="flex items-center space-x-3">
-          
- 
-             {/* Page controls */}
-             <div className="flex items-center space-x-1">
-               <button
-                 onClick={() => goToPage(1)}
-                 disabled={currentPage === 1}
-                 className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-               >
-                 <ChevronsLeft className="h-4 w-4" />
-               </button>
-               <button
-                 onClick={() => goToPage(currentPage - 1)}
-                 disabled={currentPage === 1}
-                 className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-               >
-                 <ChevronLeft className="h-4 w-4" />
-               </button>
- 
-               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                 let pageNum;
-                 if (totalPages <= 5) {
-                   pageNum = i + 1;
-                 } else if (currentPage <= 3) {
-                   pageNum = i + 1;
-                 } else if (currentPage >= totalPages - 2) {
-                   pageNum = totalPages - 4 + i;
-                 } else {
-                   pageNum = currentPage - 2 + i;
-                 }
- 
-                 return (
-                   <button
-                     key={pageNum}
-                     onClick={() => goToPage(pageNum)}
-                     className={`w-9 h-9 flex items-center justify-center rounded-full text-sm font-medium transition-colors ${
-                       currentPage === pageNum
-                         ? "bg-blue-600 text-white shadow-md"
-                         : "border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                     }`}
-                   >
-                     {pageNum}
-                   </button>
-                 );
-               })}
- 
-               <button
-                 onClick={() => goToPage(currentPage + 1)}
-                 disabled={currentPage === totalPages}
-                 className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-               >
-                 <ChevronRight className="h-4 w-4" />
-               </button>
-               <button
-                 onClick={() => goToPage(totalPages)}
-                 disabled={currentPage === totalPages}
-                 className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-               >
-                 <ChevronsRight className="h-4 w-4" />
-               </button>
-             </div>
-           </div>
-         </div>
-       )}
-     </div>
+              </div>
 
-      )}
-       {viewMode === 'table' && (
-      <Card>
-        <CardContent >
-          {viewMode === 'table' && (
-            <div className="mb-4 flex justify-end mt-4">
-              <div className="relative w-50 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue-500 z-10" />
-                <Input
-                  type="search"
-                  placeholder="Search users..."
-                  className="w-full pl-10 pr-4 py-2 border border-blue-200 rounded-md focus:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-0 transition-colors duration-200"
-                  value={searchTerm}
-                  onChange={handleSearch}
-                />
+
+            )))}
+          </div>
+
+          {/* Pagination */}
+          {totalItems > 0 && (
+            <div className="mt-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm px-6 py-4 flex flex-col sm:flex-row items-center justify-between">
+              <div className="text-sm text-gray-600 dark:text-gray-300 mb-4 sm:mb-0">
+                Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
+                <span className="font-medium">{Math.min(endIndex, totalItems)}</span>{" "}
+                of <span className="font-medium">{totalItems}</span> results
+              </div>
+
+              <div className="flex items-center space-x-3">
+
+
+                {/* Page controls */}
+                <div className="flex items-center space-x-1">
+                  <button
+                    onClick={() => goToPage(1)}
+                    disabled={currentPage === 1}
+                    className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                  >
+                    <ChevronsLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => goToPage(pageNum)}
+                        className={`w-9 h-9 flex items-center justify-center rounded-full text-sm font-medium transition-colors ${currentPage === pageNum
+                            ? "bg-blue-600 text-white shadow-md"
+                            : "border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => goToPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                  >
+                    <ChevronsRight className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </div>
           )}
-         
+        </div>
+
+      )}
+      {viewMode === 'table' && (
+        <Card>
+          <CardContent >
+            {viewMode === 'table' && (
+              <div className="mb-4 flex justify-end mt-4">
+                <div className="relative w-50 max-w-md">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue-500 z-10" />
+                  <Input
+                    type="search"
+                    placeholder="Search users..."
+                    className="w-full pl-10 pr-4 py-2 border border-blue-200 rounded-md focus:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-0 transition-colors duration-200"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="relative rounded-lg border-2 border-blue-100 dark:border-gray-700 overflow-hidden mb-6 group shadow-md transition-shadow duration-200">
               <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-blue-50/50 to-transparent dark:from-gray-800/50 dark:to-transparent opacity-70 rounded-b-lg pointer-events-none"></div>
               <div className="relative bg-white dark:bg-gray-800/50 rounded-lg overflow-hidden">
@@ -544,16 +539,16 @@ export default function Users() {
                             <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${user.role === "admin"
                               ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
                               : user.role === "user"
-                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
-                              : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+                                : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
                               }`}>
                               {user.role}
                             </span>
                           </TableCell>
                           <TableCell className="px-4">
                             <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${user.is_active
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                               }`}>
                               {user.is_active ? 'Active' : 'Inactive'}
                             </span>
@@ -581,7 +576,7 @@ export default function Users() {
                       <TableRow>
                         <TableCell colSpan={5} className="h-24 text-center py-8">
                           <div className="flex flex-col items-center justify-center">
-                          <FileText className="h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
+                            <FileText className="h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
                             <p className="text-gray-500">No users found</p>
                           </div>
                         </TableCell>
@@ -654,8 +649,8 @@ export default function Users() {
                               key={pageNum}
                               onClick={() => goToPage(pageNum)}
                               className={`w-8 h-8 rounded-md text-sm ${currentPage === pageNum
-                                  ? 'bg-blue-700/90 hover:bg-blue-700/90 text-white dark:bg-blue-600 dark:hover:bg-blue-700'
-                                  : 'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                ? 'bg-blue-700/90 hover:bg-blue-700/90 text-white dark:bg-blue-600 dark:hover:bg-blue-700'
+                                : 'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'
                                 }`}
                             >
                               {pageNum}
@@ -683,12 +678,12 @@ export default function Users() {
                 )}
               </div>
             </div>
-        
 
-          
-        </CardContent>
-      </Card>
-    )}
+
+
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

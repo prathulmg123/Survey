@@ -20,6 +20,7 @@ import SurveyCreateView from "./pages/SurveyCreateView";
 import Users from "./pages/Users";
 import ProgressPage from "./pages/ProgressPage";
 import UserSurveys from "./pages/UserSurveys";
+import SurveyAttendees from "./pages/SurveyAttendees";
 
 const queryClient = new QueryClient();
 
@@ -80,6 +81,7 @@ const App = () => {
             <Route path="/survey" element={<UserSurveys />} />
             <Route path="/surveys/:id" element={<SurveyDetail />} />
             <Route path="/surveys/view/:id" element={<SurveyViewPage />} />
+            <Route path="/surveys/attendees/:surveyId" element={<SurveyAttendees />} />
             <Route path="/surveys/create-view" element={<SurveyCreateView />} />
             <Route path="/users" element={<Users />} />
             <Route path="/active" element={<ProgressPage />} />

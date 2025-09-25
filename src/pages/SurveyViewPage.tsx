@@ -24,10 +24,10 @@ export default function SurveyViewPage() {
   useEffect(() => {
     const fetchSurvey = async () => {
       if (!id) return;
-      
+
       try {
         const response = await getSurveyById(id);
-        
+
         if (response.success) {
           // Map the API response to the expected format
           const surveyData = {
@@ -39,9 +39,9 @@ export default function SurveyViewPage() {
             responses: response.data.responses || 0,
             createdAt: response.data.created_at || response.data.createdAt,
             updatedAt: response.data.updated_at || response.data.updatedAt,
-            topicArea : response?.data?.research_areas
+            topicArea: response?.data?.research_areas
           };
-          
+
           setSurvey(surveyData);
         } else {
           setError(response.message || 'Failed to fetch survey');
@@ -82,9 +82,9 @@ export default function SurveyViewPage() {
             </div>
           </div>
         </div>
-        <Button 
-          onClick={() => navigate(-1)} 
-          variant="outline" 
+        <Button
+          onClick={() => navigate(-1)}
+          variant="outline"
           className="mt-4"
         >
           Go Back
@@ -95,11 +95,19 @@ export default function SurveyViewPage() {
 
   if (!survey) {
     return (
-      <div className="text-center p-8">
-        <h2 className="text-xl font-semibold mb-2">Survey not found</h2>
-        <p className="text-gray-600 mb-4">The requested survey could not be found.</p>
-        <Button asChild>
-          <Link to="/manage">Back to Surveys</Link>
+      <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-6">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          Survey not found
+        </h3>
+        <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-md text-center">
+          The requested survey could not be found
+        </p>
+        <Button
+          onClick={() => navigate('/manage')}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Surveys
         </Button>
       </div>
     );
@@ -152,57 +160,57 @@ export default function SurveyViewPage() {
 
       <div className="bg-white dark:bg-gray-800 shadow-sm rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700/50">
         {/* Chatbot URL Section */}
-     
+
         {/* Header Section */}
         <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-700/50 flex justify-between items-center">
           <div className="flex flex-col space-y-4">
             <div className="flex flex-col space-y-1">
               <div className="flex items-center gap-4">
-              <h1 className="text-xl font-medium text-gray-800 dark:text-gray-200 leading-tight">
-                {survey.title}
-              </h1>
-              {/* {getStatusBadge(survey.status)} */}
-            </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm mt-4">
-              <span className="inline-flex items-center text-gray-500 dark:text-gray-400">
-                <Calendar className="h-4 mb-1 w-4 mr-1.5 text-gray-400 dark:text-gray-500" />
-                Created {survey.createdAt ? new Date(survey.createdAt).toLocaleDateString('en-US', { 
-                  year: 'numeric', 
-                  month: 'short', 
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                }) : 'N/A'}
-              </span>
-              {survey.questions > 0 && (
-                <>
-                  <span className="text-gray-300 dark:text-gray-600">•</span>
-                  <span className="text-gray-500 dark:text-gray-400">
-                    <span className="font-medium text-gray-700 dark:text-gray-300">
-                      {survey.questions}
-                    </span>{' '}
-                    question{survey.questions !== 1 ? 's' : ''}
-                  </span>
-                </>
-              )}
-              {survey.responses > 0 && (
-                <>
-                  <span className="text-gray-300 dark:text-gray-600">•</span>
-                  <span className="text-gray-500 dark:text-gray-400">
-                    <span className="font-medium text-gray-700 dark:text-gray-300">
-                      {survey.responses}
-                    </span>{' '}
-                    response{survey.responses !== 1 ? 's' : ''}
-                  </span>
-                </>
-              )}
-            </div>
+                <h1 className="text-xl font-medium text-gray-800 dark:text-gray-200 leading-tight">
+                  {survey.title}
+                </h1>
+                {/* {getStatusBadge(survey.status)} */}
+              </div>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm mt-4">
+                <span className="inline-flex items-center text-gray-500 dark:text-gray-400">
+                  <Calendar className="h-4 mb-1 w-4 mr-1.5 text-gray-400 dark:text-gray-500" />
+                  Created {survey.createdAt ? new Date(survey.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  }) : 'N/A'}
+                </span>
+                {survey.questions > 0 && (
+                  <>
+                    <span className="text-gray-300 dark:text-gray-600">•</span>
+                    <span className="text-gray-500 dark:text-gray-400">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                        {survey.questions}
+                      </span>{' '}
+                      question{survey.questions !== 1 ? 's' : ''}
+                    </span>
+                  </>
+                )}
+                {survey.responses > 0 && (
+                  <>
+                    <span className="text-gray-300 dark:text-gray-600">•</span>
+                    <span className="text-gray-500 dark:text-gray-400">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                        {survey.responses}
+                      </span>{' '}
+                      response{survey.responses !== 1 ? 's' : ''}
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <div className="px-6 pb-6">
             <div className="max-w-md mx-auto">
               <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 p-2">
-                <a 
+                <a
                   href={`http://vpn.seqato.com:4001/?surveyId=${id}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -232,7 +240,7 @@ export default function SurveyViewPage() {
                       <Copy className="h-4 w-4" />
                     )}
                   </button>
-                  <a 
+                  <a
                     href={`http://vpn.seqato.com:4001/?surveyId=${id}`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -250,177 +258,177 @@ export default function SurveyViewPage() {
         {/* Details Section */}
         <div className="bg-gray-50/50 dark:bg-gray-800/50 px-8 py-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div >
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Guide</h3>
-            <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
-            {survey?.source_document_name || 'Product Feedback'}
-            </div>
-          </div>
-          <div >
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Goal</h3>
-            <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
-            {survey?.overall_research_goal || 'Understand user satisfaction with new features'}
-            </div>
-          </div>
-            
-            
             <div >
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Initiator Question</h3>
-            <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
-            {survey?.initiator_question || 'How satisfied are you with our product?'}
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Guide</h3>
+              <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
+                {survey?.source_document_name || 'Product Feedback'}
+              </div>
             </div>
-          </div>
-           
+            <div >
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Goal</h3>
+              <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
+                {survey?.overall_research_goal || 'Understand user satisfaction with new features'}
+              </div>
+            </div>
+
+
+            <div >
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Initiator Question</h3>
+              <div className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">
+                {survey?.initiator_question || 'How satisfied are you with our product?'}
+              </div>
+            </div>
+
           </div>
         </div>
 
-         {/* Topic Area Section */}
-      <div className="mt-8 p-6">
-        <Accordion type="single" collapsible className="w-full space-y-4">
-        {survey?.topicArea?.map((area: any, index: number) => (
-          <div key={`area-${index}`} className="mb-6">
-            <AccordionItem value={area.id || `area-${index}`} className="border-2 border-indigo-200 dark:border-indigo-800/70 rounded-xl overflow-hidden">
-              <AccordionTrigger className="px-6 py-4 hover:no-underline bg-indigo-100 dark:bg-indigo-900/40">
-                <div className="flex items-center space-x-4">
-                  <span className="h-10 w-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                    <Info className="h-5 w-5" />
-                  </span>
-                  <div className="text-left">
-                    <h3 className="text-base font-semibold">Topic  Area : {area.name}</h3>
-                  </div>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-6 pb-6 pt-0">
-                <div className="space-y-6 mt-6">
-                  <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700/50">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <div className="space-y-4">
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Area Name</h4>
-                            <p className="text-sm text-gray-900 dark:text-gray-100">{area.name}</p>
-                          </div>
-                          {area.follow_up_limit && (
-                            <div>
-                              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Follow-up Limit</h4>
-                              <p className="text-sm text-gray-900 dark:text-gray-100">{area.follow_up_limit} questions</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="space-y-4">
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</h4>
-                            <p className="text-sm text-gray-900 dark:text-gray-100">
-                              {area.description || 'No description provided for this area.'}
-                            </p>
-                          </div>
-                          {area.consecutive_probes_limit && (
-                            <div>
-                              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Consecutive Probes</h4>
-                              <p className="text-sm text-gray-900 dark:text-gray-100">{area.consecutive_probes_limit} probes</p>
-                            </div>
-                          )}
-                        </div>
+        {/* Topic Area Section */}
+        <div className="mt-8 p-6">
+          <Accordion type="single" collapsible className="w-full space-y-4">
+            {survey?.topicArea?.map((area: any, index: number) => (
+              <div key={`area-${index}`} className="mb-6">
+                <AccordionItem value={area.id || `area-${index}`} className="border-2 border-indigo-200 dark:border-indigo-800/70 rounded-xl overflow-hidden">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline bg-indigo-100 dark:bg-indigo-900/40">
+                    <div className="flex items-center space-x-4">
+                      <span className="h-10 w-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                        <Info className="h-5 w-5" />
+                      </span>
+                      <div className="text-left">
+                        <h3 className="text-base font-semibold">Topic  Area : {area.name}</h3>
                       </div>
                     </div>
-                    
-                    {area.completion_criteria?.length > 0 && (
-                      <div className="mt-4">
-                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Completion Criteria</h4>
-                        <ul className="list-disc pl-5 space-y-1">
-                          {area.completion_criteria.map((criteria: string, i: number) => (
-                            <li key={`area-criteria-${i}`} className="text-sm text-gray-900 dark:text-gray-100">
-                              {criteria}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Sub-Topics */}
-                  {area.sub_topics?.map((subTopic: any, subIndex: number) => (
-                    <div key={`subtopic-${subIndex}`} className="mt-6">
-                      <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value={`subtopic-${subIndex}`} className="border-2 border-orange-200 dark:border-orange-800/70 rounded-xl overflow-hidden">
-                          <AccordionTrigger className="px-5 py-4 hover:no-underline bg-orange-50 dark:bg-orange-900/40 mx-1 my-1 rounded-lg">
-                            <div className="flex items-center w-full space-x-4">
-                              <span className="h-9 w-9 rounded-lg bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center text-orange-600 dark:text-orange-400">
-                                <List className="h-4 w-4 flex-shrink-0" />
-                              </span>
-                              <div className="text-left flex-1 pr-4">
-                                <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">Sub-Topic: {subTopic.name}</h3>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6 pt-0">
+                    <div className="space-y-6 mt-6">
+                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700/50">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <div className="space-y-4">
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Area Name</h4>
+                                <p className="text-sm text-gray-900 dark:text-gray-100">{area.name}</p>
                               </div>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent className="mb-4 mt-1 px-2 pb-6">
-                            <div className="p-6">
-                              <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
-                                <div className="md:col-span-3">
-                                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Name</p>
-                                  <p className="text-sm text-gray-900 dark:text-gray-100">{subTopic.name}</p>
-                                </div>
-                                {subTopic.description && (
-                                  <div className="md:col-span-3">
-                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Description</p>
-                                    <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">{subTopic.description}</p>
-                                  </div>
-                                )}
-                                <div className="md:col-span-6">
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Follow-up Limit</p>
-                                      <p className="text-sm text-gray-900 dark:text-gray-100">{subTopic.follow_up_limit || '0'} questions</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Probes Limit</p>
-                                      <p className="text-sm text-gray-900 dark:text-gray-100">{subTopic.consecutive_probes_limit || '0'} probes</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Completion Criteria Section */}
-                              {subTopic.completion_criteria?.length > 0 && (
-                                <div className="mt-6">
-                                  <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                                    <div className="flex items-start">
-                                      <div className="flex-shrink-0 h-5 w-5 text-gray-500 dark:text-gray-400">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h.01a1 1 0 100-2H10V9a1 1 0 00-1-1z" clipRule="evenodd" />
-                                        </svg>
-                                      </div>
-                                      <div className="ml-3 flex-1">
-                                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Completion Criteria</h4>
-                                        <ul className="space-y-2">
-                                          {subTopic.completion_criteria.map((criteria: string, i: number) => (
-                                            <li key={`criteria-${i}`} className="text-sm text-gray-700 dark:text-gray-300 flex items-start">
-                                              <span className="flex-shrink-0 h-1.5 w-1.5 mt-2 rounded-full bg-gray-500 dark:bg-gray-400 mr-2"></span>
-                                              <span className="leading-relaxed">{criteria}</span>
-                                            </li>
-                                          ))}
-                                        </ul>
-                                      </div>
-                                    </div>
-                                  </div>
+                              {area.follow_up_limit && (
+                                <div>
+                                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Follow-up Limit</h4>
+                                  <p className="text-sm text-gray-900 dark:text-gray-100">{area.follow_up_limit} questions</p>
                                 </div>
                               )}
                             </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
+                          </div>
+                          <div>
+                            <div className="space-y-4">
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</h4>
+                                <p className="text-sm text-gray-900 dark:text-gray-100">
+                                  {area.description || 'No description provided for this area.'}
+                                </p>
+                              </div>
+                              {area.consecutive_probes_limit && (
+                                <div>
+                                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Consecutive Probes</h4>
+                                  <p className="text-sm text-gray-900 dark:text-gray-100">{area.consecutive_probes_limit} probes</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {area.completion_criteria?.length > 0 && (
+                          <div className="mt-4">
+                            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Completion Criteria</h4>
+                            <ul className="list-disc pl-5 space-y-1">
+                              {area.completion_criteria.map((criteria: string, i: number) => (
+                                <li key={`area-criteria-${i}`} className="text-sm text-gray-900 dark:text-gray-100">
+                                  {criteria}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Sub-Topics */}
+                      {area.sub_topics?.map((subTopic: any, subIndex: number) => (
+                        <div key={`subtopic-${subIndex}`} className="mt-6">
+                          <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value={`subtopic-${subIndex}`} className="border-2 border-orange-200 dark:border-orange-800/70 rounded-xl overflow-hidden">
+                              <AccordionTrigger className="px-5 py-4 hover:no-underline bg-orange-50 dark:bg-orange-900/40 mx-1 my-1 rounded-lg">
+                                <div className="flex items-center w-full space-x-4">
+                                  <span className="h-9 w-9 rounded-lg bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center text-orange-600 dark:text-orange-400">
+                                    <List className="h-4 w-4 flex-shrink-0" />
+                                  </span>
+                                  <div className="text-left flex-1 pr-4">
+                                    <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">Sub-Topic: {subTopic.name}</h3>
+                                  </div>
+                                </div>
+                              </AccordionTrigger>
+                              <AccordionContent className="mb-4 mt-1 px-2 pb-6">
+                                <div className="p-6">
+                                  <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+                                    <div className="md:col-span-3">
+                                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Name</p>
+                                      <p className="text-sm text-gray-900 dark:text-gray-100">{subTopic.name}</p>
+                                    </div>
+                                    {subTopic.description && (
+                                      <div className="md:col-span-3">
+                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Description</p>
+                                        <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">{subTopic.description}</p>
+                                      </div>
+                                    )}
+                                    <div className="md:col-span-6">
+                                      <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Follow-up Limit</p>
+                                          <p className="text-sm text-gray-900 dark:text-gray-100">{subTopic.follow_up_limit || '0'} questions</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Probes Limit</p>
+                                          <p className="text-sm text-gray-900 dark:text-gray-100">{subTopic.consecutive_probes_limit || '0'} probes</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Completion Criteria Section */}
+                                  {subTopic.completion_criteria?.length > 0 && (
+                                    <div className="mt-6">
+                                      <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                        <div className="flex items-start">
+                                          <div className="flex-shrink-0 h-5 w-5 text-gray-500 dark:text-gray-400">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h.01a1 1 0 100-2H10V9a1 1 0 00-1-1z" clipRule="evenodd" />
+                                            </svg>
+                                          </div>
+                                          <div className="ml-3 flex-1">
+                                            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Completion Criteria</h4>
+                                            <ul className="space-y-2">
+                                              {subTopic.completion_criteria.map((criteria: string, i: number) => (
+                                                <li key={`criteria-${i}`} className="text-sm text-gray-700 dark:text-gray-300 flex items-start">
+                                                  <span className="flex-shrink-0 h-1.5 w-1.5 mt-2 rounded-full bg-gray-500 dark:bg-gray-400 mr-2"></span>
+                                                  <span className="leading-relaxed">{criteria}</span>
+                                                </li>
+                                              ))}
+                                            </ul>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </AccordionContent>
+                            </AccordionItem>
+                          </Accordion>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </div>
-        ))}
-        </Accordion>
+                  </AccordionContent>
+                </AccordionItem>
+              </div>
+            ))}
+          </Accordion>
+        </div>
       </div>
     </div>
-  </div>
   );
 }
