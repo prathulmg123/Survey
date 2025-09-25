@@ -166,7 +166,7 @@ export default function SurveyAttendees() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ">
           {filteredUsers.map((user) => (
             <div 
               key={user.user_id} 
@@ -210,7 +210,7 @@ export default function SurveyAttendees() {
                         </div>
                         <div>
                           <p className="text-xs text-gray-500 dark:text-gray-400">Session Start</p>
-                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mt-1">
                             {formatDate(user.created_at).split(',')[0]}
                           </p>
                         </div>
@@ -222,7 +222,7 @@ export default function SurveyAttendees() {
                         </div>
                         <div>
                           <p className="text-xs text-gray-500 dark:text-gray-400">Last Activity</p>
-                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mt-1">
                             {formatDate(user.last_activity)}
                           </p>
                         </div>
