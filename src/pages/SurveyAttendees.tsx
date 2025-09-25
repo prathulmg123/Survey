@@ -165,78 +165,99 @@ export default function SurveyAttendees() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
           {filteredUsers.map((user) => (
-            <Card key={user.user_id} className="group hover:shadow-lg transition-shadow duration-200">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-1">
-                    {user.username}
-                  </CardTitle>
-                  {getStatusBadge(user.status)}
+            <div 
+              key={user.user_id} 
+              className="group relative bg-white dark:bg-gray-900/95 rounded-2xl border border-gray-100 dark:border-gray-700/80 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 dark:hover:border-blue-500/70 hover:ring-1 hover:ring-blue-100 dark:hover:ring-blue-900/30"
+            >
+              {/* Glow Effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-transparent to-purple-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              
+              <div className="relative z-10 h-full p-5">
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="relative">
+                    <div className="absolute -inset-1 from-blue-300 via-indigo-300 to-purple-300 dark:from-blue-100/90 dark:via-indigo-100/90 dark:to-purple-100/90 rounded-full blur opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="relative h-12 w-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 dark:from-blue-500/90 dark:to-indigo-500/90 flex items-center justify-center text-white font-bold text-lg shadow-lg border-2 border-white/90 dark:border-gray-800/90">
+                      {user.username.charAt(0).toUpperCase()}
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate">
+                      {user.username}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate flex items-center">
+                      <Mail className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+                      <span className="truncate">{user.email}</span>
+                    </p>
+                  </div>
                 </div>
-                <CardDescription className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                  <Mail className="h-4 w-4 mr-1.5" />
-                  <span className="truncate">{user.email}</span>
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-3">
-                  {/* <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Attendance Type</span>
-                    <span className="font-medium text-gray-900 dark:text-white capitalize">
-                      {user.attendance_type.replace('_', ' ')}
-                    </span>
-                  </div> */}
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Conversation Turns</span>
-                    <span className="font-medium text-gray-900 dark:text-white">
-                      {user.conversation_turns}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Session Started</span>
-                    <div className="flex items-center">
-                      <Calendar className="h-3.5 w-3.5 mr-1 text-gray-400" />
-                      <span className="text-gray-700 dark:text-gray-300">
-                        {formatDate(user.created_at).split(',')[0]}
+                
+                <div className="space-y-4">
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Conversation</span>
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 dark:from-blue-900/30 dark:to-indigo-900/30 dark:text-blue-300">
+                        {user.conversation_turns} turns
                       </span>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Last Activity</span>
-                    <div className="flex items-center">
-                      <Clock className="h-3.5 w-3.5 mr-1 text-blue-400" />
-                      <span className="text-blue-600 dark:text-blue-400">
-                        {formatDate(user.last_activity)}
-                      </span>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center p-3 bg-white dark:bg-gray-800/80 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 mr-3">
+                          <Calendar className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Session Start</p>
+                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                            {formatDate(user.created_at).split(',')[0]}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center p-3 bg-white dark:bg-gray-800/80 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <div className="p-2 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-300 mr-3">
+                          <Clock className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Last Activity</p>
+                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                            {formatDate(user.last_activity)}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
+                  
                   {user.ai_summary?.status === 'generated' && (
-                    <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-md">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">AI Summary</p>
-                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                      <div className="flex items-center mb-2">
+                        <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 mr-2">
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                          </svg>
+                        </div>
+                        <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">AI Summary</p>
+                      </div>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 pl-2 border-l-2 border-blue-200 dark:border-blue-800 ml-1.5">
                         {user.ai_summary.summary_text}
                       </p>
                     </div>
                   )}
                 </div>
-                <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full group-hover:bg-blue-50 dark:group-hover:bg-gray-700/50 transition-colors"
-                    onClick={() => {
-                      // TODO: Navigate to user's conversation detail page
-                      console.log('View user conversation:', user.user_id);
-                    }}
+                
+                <div className="mt-5">
+                  <button 
+                    onClick={() => console.log('View user conversation:', user.user_id)}
+                    className="w-full flex items-center justify-center px-2 py-1.5 bg-gradient-to-r from-blue-400 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-sm text-white font-medium rounded-md shadow-sm hover:shadow transform transition-all duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-1 focus:ring-blue-300 focus:ring-opacity-50"
                   >
                     View Summary
-                  </Button>
+                  </button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+              </div>
           ))}
+            </div>
         </div>
 
         {filteredUsers.length === 0 && (
@@ -249,6 +270,6 @@ export default function SurveyAttendees() {
           </div>
         )}
       </div>
-    </div>
+    // </div>
   );
 }
